@@ -107,6 +107,8 @@ public:
 
 	// Fix broken boat numbers
 	void FixBoatNums();
+	// Fix broken/missing gates
+	void FixGateNums();
 
     //
     // Get a unit by its number.

@@ -439,6 +439,7 @@ int Game::OpenGame()
 	}
 
 	FixBoatNums();
+	FixGateNums();
 	SetupUnitNums();
 
 	f.Close();
@@ -1609,6 +1610,34 @@ void Game::SetupUnitSeq()
 		}
 	}
 	unitseq = max+1;
+}
+
+void Game::FixGateNums()
+{
+	for(int i=1; i <= regions.numberofgates; i++) {
+		ARegion *tar = regions.FindGate(i);
+		int done = 0;
+		while(!done) {
+			// We have a missing gate, add it
+
+			// Get the z coord, exclude the nexus (and the abyss as well)
+			int z = getrandom(regions.numLevels);
+			ARegionArray *arr = regions.GetRegionArray(z);
+			if(arr->levelType == ARegionArray::LEVEL_NEXUS) continue;
+
+			// Get a random hex within that level
+			int x = getrandom(arr->x);
+			int y = getrandom(arr->y);
+			tar = arr->GetRegion(x, y);
+			if(!tar) continue;
+
+			// Make sure the hex can have a gate and doesn't already
+			if((TerrainDefs[tar->type].similar_type==R_OCEAN) || tar->gate)
+				continue;
+			tar->gate = i;
+			done = 1;
+		}
+	}
 }
 
 void Game::FixBoatNums()
