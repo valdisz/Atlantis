@@ -75,7 +75,6 @@ enum {
 	U_GUARD,
 	U_WMON,
 	U_GUARDMAGE,
-	U_APPRENTICE,
 	NUNITTYPES
 };
 
@@ -259,7 +258,6 @@ class Unit : public AListElem
 		AList findorders;
 		AList giveorders;
 		AList withdraworders;
-		AList bankorders;
 		AList buyorders;
 		AList sellorders;
 		AList forgetorders;

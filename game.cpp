@@ -693,6 +693,7 @@ Unit *Game::ParseGMUnit(AString *tag, Faction *pFac)
 	return NULL;
 }
 
+//TODO: Jeez! This needs to be broken up somewhat!
 int Game::ReadPlayersLine(AString *pToken, AString *pLine, Faction *pFac,
 		int newPlayer)
 {
@@ -907,13 +908,8 @@ int Game::ReadPlayersLine(AString *pToken, AString *pLine, Faction *pFac,
 									 */
 									int mage = (SkillDefs[sk].flags &
 											SkillType::MAGIC);
-									int app = (SkillDefs[sk].flags &
-											SkillType::APPRENTICE);
 									if(mage) {
 										u->type = U_MAGE;
-									}
-									if(app && u->type == U_NORMAL) {
-										u->type = U_APPRENTICE;
 									}
 								}
 							}
@@ -1156,15 +1152,7 @@ void Game::WriteReport()
 
 	MakeFactionReportLists();
 	CountAllSpecialists();
-	/*
-	CountAllMages();
-	if(Globals->APPRENTICES_EXIST)
-		CountAllApprentices();
-	if (Globals->TRANSPORT & GameDefs::ALLOW_TRANSPORT)
-		CountAllQuarterMasters();
-	if (Globals->TACTICS_NEEDS_WAR)
-		CountAllTacticians();
-	*/
+	
 	forlist(&factions) {
 		Faction *fac = (Faction *) elem;
 		AString str = "report.";
@@ -1345,7 +1333,6 @@ void Game::CountAllSpecialists()
 		((Faction *) elem)->nummages = 0;
 		((Faction *) elem)->numqms = 0;
 		((Faction *) elem)->numtacts = 0;
-		((Faction *) elem)->numapprentices = 0;
 	}
 
 	{
@@ -1360,80 +1347,11 @@ void Game::CountAllSpecialists()
 						u->faction->numqms++;
 					if (u->GetSkill(S_TACTICS) == 5)
 						u->faction->numtacts++;
-					if (u->type == U_APPRENTICE)
-						u->faction->numapprentices++;
 				}
 			}
 		}
 	}
 }
-
-
-/*
-void Game::CountAllMages()
-{
-	forlist(&factions) {
-		((Faction *) elem)->nummages = 0;
-	}
-
-	{
-		forlist(&regions) {
-			ARegion *r = (ARegion *) elem;
-			forlist(&r->objects) {
-				Object *o = (Object *) elem;
-				forlist(&o->units) {
-					Unit *u = (Unit *) elem;
-					if (u->type == U_MAGE) u->faction->nummages++;
-				}
-			}
-		}
-	}
-}
-
-void Game::CountAllQuarterMasters()
-{
-	forlist(&factions) {
-		((Faction *) elem)->numqms = 0;
-	}
-
-	{
-		forlist(&regions) {
-			ARegion *r = (ARegion *) elem;
-			forlist(&r->objects) {
-				Object *o = (Object *) elem;
-				forlist(&o->units) {
-					Unit *u = (Unit *) elem;
-					if (u->GetSkill(S_QUARTERMASTER))
-						u->faction->numqms++;
-				}
-			}
-		}
-	}
-}
-
-// This, along with counting apprentices, mages and quartermasters, 
-// should all be in the one function (CountSpecialists?)
-void Game::CountAllTacticians()
-{
-	forlist(&factions) {
-		((Faction *) elem)->numtacts = 0;
-	}
-
-	{
-		forlist(&regions) {
-			ARegion *r = (ARegion *) elem;
-			forlist(&r->objects) {
-				Object *o = (Object *) elem;
-				forlist(&o->units) {
-					Unit *u = (Unit *) elem;
-					if (u->GetSkill(S_TACTICS) == 5)
-						u->faction->numtacts++;
-				}
-			}
-		}
-	}
-}
-*/
 
 // LLS
 void Game::UnitFactionMap()
@@ -1477,29 +1395,6 @@ void Game::RemoveInactiveFactions()
 	}
 }
 
-/*
-void Game::CountAllApprentices()
-{
-	if(!Globals->APPRENTICES_EXIST) return;
-
-	forlist(&factions) {
-		((Faction *)elem)->numapprentices = 0;
-	}
-	{
-		forlist(&regions) {
-			ARegion *r = (ARegion *)elem;
-			forlist(&r->objects) {
-				Object *o = (Object *)elem;
-				forlist(&o->units) {
-					Unit *u = (Unit *)elem;
-					if(u->type == U_APPRENTICE)
-						u->faction->numapprentices++;
-				}
-			}
-		}
-	}
-}
-*/
 
 int Game::CountMages(Faction *pFac)
 {
@@ -1549,22 +1444,6 @@ int Game::CountTacticians(Faction *pFac)
 	return i;
 }
 
-int Game::CountApprentices(Faction *pFac)
-{
-	int i = 0;
-	forlist(&regions) {
-		ARegion *r = (ARegion *)elem;
-		forlist(&r->objects) {
-			Object *o = (Object *)elem;
-			forlist(&o->units) {
-				Unit *u = (Unit *)elem;
-				if(u->faction == pFac && u->type == U_APPRENTICE) i++;
-			}
-		}
-	}
-	return i;
-}
-
 int Game::AllowedMages(Faction *pFac)
 {
 	int points = pFac->type[F_MAGIC];
@@ -1595,17 +1474,6 @@ int Game::AllowedTacticians(Faction *pFac)
 		points = allowedTacticiansSize - 1;
 
 	return allowedTacticians[points];
-}
-
-int Game::AllowedApprentices(Faction *pFac)
-{
-	int points = pFac->type[F_MAGIC];
-
-	if (points < 0) points = 0;
-	if (points > allowedApprenticesSize - 1)
-		points = allowedApprenticesSize - 1;
-
-	return allowedApprentices[points];
 }
 
 int Game::AllowedTaxes(Faction *pFac)
@@ -2082,18 +1950,6 @@ void Game::AdjustCityMon(ARegion *r, Unit *u)
 		if(weapon!= -1) {
 			u->items.SetNum(weapon,men);
 		}
-	}
-}
-
-void Game::BankInterest()
-{
-	int interest;
-
-	forlist(&factions) {
-		Faction * fac = (Faction *) elem;
-		interest = (fac->bankaccount/100)*fac->type[F_TRADE];
-		fac->bankaccount += interest;
-		fac->interest = interest;
 	}
 }
 

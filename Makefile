@@ -16,7 +16,7 @@ CFLAGS = -g -I. -I.. -Wall
 RULESET_OBJECTS = extra.o map.o monsters.o rules.o world.o 
 
 ENGINE_OBJECTS = alist.o aregion.o army.o astring.o battle.o economy.o edit.o faction.o \
-  fileio.o game.o gamedata.o gamedefs.o gameio.o genrules.o items.o main.o \
+  fileio.o game.o gamedata.o gamedefs.o gameio.o items.o main.o \
   market.o modify.o monthorders.o npc.o object.o orders.o parseorders.o \
   production.o runorders.o shields.o skills.o skillshows.o specials.o \
   spells.o template.o unit.o
@@ -72,29 +72,6 @@ clean:
 	if [ -d $(GAME)/obj ]; then rmdir $(GAME)/obj; fi
 	rm -f $(GAME)/html/$(GAME).html
 	rm -f $(GAME)/$(GAME)
-
-all-rules: arcadia-rules basic-rules standard-rules fracas-rules \
-  kingdoms-rules
-
-arcadia-rules:
-	$(MAKE) GAME=arcadia rules
-
-basic-rules:
-	$(MAKE) GAME=basic rules
-
-standard-rules:
-	$(MAKE) GAME=standard rules
-
-fracas-rules:
-	$(MAKE) GAME=fracas rules
-	
-kingdoms-rules:
-	$(MAKE) GAME=kingdoms rules
-
-rules: $(GAME)/$(GAME)
-	(cd $(GAME); \
-	 ./$(GAME) genrules $(GAME)_intro.html $(GAME).css html/$(GAME).html \
-	)
 
 FORCE:
 

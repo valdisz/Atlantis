@@ -401,18 +401,6 @@ void Game::ModifyObjectFlags(int ob, int flags)
 	ObjectDefs[ob].flags = flags;
 }
 
-void Game::ModifyObjectDecay(int ob, int maxMaint, int maxMonthDecay, int mFact)
-{
-	if(ob < 0 || ob > (NOBJECTS-1)) return;
-	if(maxMonthDecay > maxMaint) return;
-	if(maxMaint < 0) return;
-	if(maxMonthDecay < 0) return;
-	if(mFact < 0) return;
-	ObjectDefs[ob].maxMaintenance = maxMaint;
-	ObjectDefs[ob].maxMonthlyDecay = maxMonthDecay;
-	ObjectDefs[ob].maintFactor = mFact;
-}
-
 void Game::ModifyObjectProduction(int ob, int it)
 {
 	if(ob < 0 || ob > (NOBJECTS-1)) return;

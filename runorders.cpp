@@ -71,13 +71,6 @@ void Game::RunOrders()
 	DeleteEmptyUnits();
 	SinkUncrewedShips();
 	DrownUnits();
-	if (Globals->ALLOW_BANK & GameDefs::BANK_ENABLED) {
-		Awrite("Running BANK orders...");
-		if (Globals->ALLOW_BANK & GameDefs::BANK_TRADEINTEREST)
-			BankInterest();
-		DoBankDepositOrders();
-		DoBankWithdrawOrders();
-	}
 	if(Globals->ALLOW_WITHDRAW) {
 		Awrite("Running WITHDRAW Orders...");
 		DoWithdrawOrders();
@@ -144,62 +137,34 @@ void Game::RunCastOrders()
   }
 }
 
-/* Moved to game.cpp, where it belongs...
-int Game::CountMages(Faction *pFac)
-{
-	int i = 0;
-	forlist(&regions) {
-		ARegion *r = (ARegion *) elem;
-		forlist(&r->objects) {
-			Object *o = (Object *) elem;
-			forlist(&o->units) {
-				Unit *u = (Unit *) elem;
-				if (u->faction == pFac && u->type == U_MAGE) i++;
-			}
-		}
-	}
-	return(i);
-}
-*/
-
 int Game::TaxCheck(ARegion *pReg, Faction *pFac)
 {
 	if(Globals->FACTION_LIMIT_TYPE == GameDefs::FACLIM_FACTION_TYPES) {
 		if(AllowedTaxes(pFac) == -1) {
-			//
 			// No limit.
-			//
 			return(1);
 		}
 
 		forlist(&(pFac->war_regions)) {
 			ARegion *x = ((ARegionPtr *) elem)->ptr;
 			if(x == pReg) {
-				//
 				// This faction already performed a tax action in this
 				// region.
-				//
 				return 1;
 			}
 		}
 		if(pFac->war_regions.Num() >= AllowedTaxes(pFac)) {
-			//
 			// Can't tax here.
-			//
 			return 0;
 		} else {
-			//
 			// Add this region to the faction's tax list.
-			//
 			ARegionPtr *y = new ARegionPtr;
 			y->ptr = pReg;
 			pFac->war_regions.Add(y);
 			return 1;
 		}
 	} else {
-		//
 		// No limit on taxing regions in this game.
-		//
 		return(1);
 	}
 }
@@ -208,40 +173,30 @@ int Game::TradeCheck(ARegion *pReg, Faction *pFac)
 {
 	if(Globals->FACTION_LIMIT_TYPE == GameDefs::FACLIM_FACTION_TYPES) {
 		if(AllowedTrades(pFac) == -1) {
-			//
 			// No limit on trading on this faction.
-			//
 			return(1);
 		}
 
 		forlist(&(pFac->trade_regions)) {
 			ARegion *x = ((ARegionPtr *) elem)->ptr;
 			if (x == pReg) {
-				//
 				// This faction has already performed a trade action in this
 				// region.
-				//
 				return 1;
 			}
 		}
 		if (pFac->trade_regions.Num() >= AllowedTrades(pFac)) {
-			//
 			// This faction is over its trade limit.
-			//
 			return 0;
 		} else {
-			//
 			// Add this region to the faction's trade list, and return 1.
-			//
 			ARegionPtr *y = new ARegionPtr;
 			y->ptr = pReg;
 			pFac->trade_regions.Add(y);
 			return 1;
 		}
 	} else {
-		//
 		// No limit on trade in this game.
-		//
 		return(1);
 	}
 }
@@ -270,6 +225,7 @@ void Game::RunStealOrders()
 
 AList *Game::CanSeeSteal(ARegion *r, Unit *u)
 {
+	// Return a list of units who can see the Unit *u
 	AList *retval = new AList;
 	forlist(&factions) {
 		Faction *f = (Faction *) elem;
@@ -363,6 +319,9 @@ void Game::Do1Assassinate(ARegion *r, Object *o, Unit *u)
 
 void Game::Do1Steal(ARegion *r, Object *o, Unit *u)
 {
+	//TODO: A lot of this is a straight duplication of the
+	//      assassination code - see what we can factor out
+
 	StealOrder *so = (StealOrder *) u->stealorders;
 	Unit *tar = r->GetUnitId(so->target, u->faction->num);
 
@@ -371,7 +330,7 @@ void Game::Do1Steal(ARegion *r, Object *o, Unit *u)
 		return;
 	}
 
-	// New RULE!! You can only steal from someone you can see.
+	// New Rule: You can only steal from someone you can see.
 	if(!u->CanSee(r, tar)) {
 		u->Error("STEAL: Invalid unit given.");
 		return;
@@ -388,7 +347,7 @@ void Game::Do1Steal(ARegion *r, Object *o, Unit *u)
 		u->Error("STEAL: Must be executed by a 1-man unit.");
 		return;
 	}
-
+	
 	AList *seers = CanSeeSteal(r, u);
 	int succ = 1;
 	forlist(seers) {
@@ -419,10 +378,8 @@ void Game::Do1Steal(ARegion *r, Object *o, Unit *u)
 		return;
 	}
 
-	//
 	// New rule; if a target has an amulet of true seeing they can't be
 	// stolen from by someone with a ring of invisibility
-	//
 	if(tar->AmtsPreventCrime(u)) {
 		tar->Event("Theft prevented by amulet of true seeing.");
 		u->Event(AString("Attempts to steal from ") + *(tar->name) + ", but "
@@ -445,14 +402,14 @@ void Game::Do1Steal(ARegion *r, Object *o, Unit *u)
 	u->items.SetNum(so->item, u->items.GetNum(so->item) + amt);
 	tar->items.SetNum(so->item, tar->items.GetNum(so->item) - amt);
 
-	{
+	{ // TODO: What is this { associated with?
 		AString temp = *(u->name) + " steals " +
 			ItemString(so->item, amt) + " from " + *(tar->name) + ".";
 		forlist(seers) {
 			Faction *f = ((FactionPtr *) elem)->ptr;
 			f->Event(temp);
 		}
-	}
+	} // TODO: ditto...
 
 	tar->Event(AString("Has ") + ItemString(so->item, amt) + " stolen.");
 	u->PracticeAttribute("stealth");
@@ -685,6 +642,7 @@ void Game::RunTaxOrders()
 	}
 }
 
+// TODO: Haven't heard of this one - what does it do?
 int Game::FortTaxBonus(Object *o, Unit *u)
 {
 	int protect = ObjectDefs[o->type].protect;
@@ -762,7 +720,8 @@ void Game::RunTaxRegion(ARegion *reg)
 			if (u->taxing == TAX_TAX) {
 				int t = u->Taxers(0);
 				t += FortTaxBonus(o, u);
-				double fAmt = ((double) t) *
+					// TODO: Is this one of those funky overflow things?
+					double fAmt = ((double) t) *
 					((double) reg->wealth) / ((double) desired);
 				int amt = (int) fAmt;
 				reg->wealth -= amt;
@@ -892,6 +851,8 @@ void Game::RunPromoteOrders()
 		forlist(&r->objects) {
 			o = (Object *)elem;
 			if (o->type != O_DUMMY) {
+				// TODO: ie they're in a building, not a region.
+				//       Could this be extended to a region?
 				u = o->GetOwner();
 				if(u && u->promote) {
 					Do1PromoteOrder(o, u);
@@ -1264,8 +1225,7 @@ int Game::CountWMonTars(ARegion *r, Unit *mon) {
 		Object *o = (Object *) elem;
 		forlist(&o->units) {
 			Unit *u = (Unit *) elem;
-			if (u->type == U_NORMAL || u->type == U_MAGE ||
-					u->type == U_APPRENTICE) {
+			if (u->type == U_NORMAL || u->type == U_MAGE) {
 				if (mon->CanSee(r, u) && mon->CanCatch(r, u)) {
 					retval += u->GetMen();
 				}
@@ -1280,8 +1240,7 @@ Unit *Game::GetWMonTar(ARegion *r, int tarnum, Unit *mon) {
 		Object *o = (Object *) elem;
 		forlist(&o->units) {
 			Unit *u = (Unit *) elem;
-			if (u->type == U_NORMAL || u->type == U_MAGE ||
-					u->type == U_APPRENTICE) {
+			if (u->type == U_NORMAL || u->type == U_MAGE ) {
 				if (mon->CanSee(r, u) && mon->CanCatch(r, u)) {
 					int num = u->GetMen();
 					if (num && tarnum < num) return u;
@@ -1367,6 +1326,13 @@ void Game::AttemptAttack(ARegion *r, Unit *u, Unit *t, int silent, int adv)
 	RunBattle(r, u, t, 0, adv);
 	return;
 }
+
+// TODO: All of these loops for buying and selling could
+// possibly be merged into one loop:
+// ...loop stuff... region, markets, objects, units
+// run all sell orders
+// run all buy orders
+// ... end loop ...
 
 void Game::RunSellOrders()
 {
@@ -1496,12 +1462,7 @@ int Game::GetBuyAmount(ARegion *r, Market *m)
 							u->Error("BUY: Mages can't recruit more men.");
 							o->num = 0;
 						}
-						if(u->type == U_APPRENTICE) {
-							u->Error("BUY: Apprentices can't recruit more "
-									"men.");
-							o->num = 0;
-						}
-						// XXX: there has to be a better way
+						// TODO: there has to be a better way
 						if (u->GetSkill(S_QUARTERMASTER)) {
 							u->Error("BUY: Quartermasters can't recruit more "
 									"men.");
@@ -1600,6 +1561,9 @@ void Game::DoBuy(ARegion *r, Market *m)
 
 	m->amount = oldamount;
 }
+
+// TODO: These maintenance functions (7 of them! Hunger *and* Maintenance!)
+// all seem rather long-winded. Is there a better way to do them?
 
 void Game::CheckUnitMaintenanceItem(int item, int value, int consume)
 {
@@ -2090,173 +2054,6 @@ int Game::DoWithdrawOrder(ARegion *r, Unit *u, WithdrawOrder *o)
 }
 
 
-void Game::DoBankDepositOrders()
-{
-	forlist((&regions)) {
-		ARegion *r = (ARegion *)elem;
-		forlist((&r->objects)) {
-			Object *obj = (Object *)elem;
-			forlist((&obj->units)) {
-				Unit *u = (Unit *) elem;
-				forlist((&u->bankorders)) {
-					BankOrder *o = (BankOrder *)elem;
-					if (o->what == 2) // deposit
-						DoBankOrder(r, u, o);
-				}
-			}
-		}
-	}
-}
-
-void Game::DoBankWithdrawOrders()
-{
-	forlist((&regions)) {
-		ARegion *r = (ARegion *)elem;
-		forlist((&r->objects)) {
-			Object *obj = (Object *)elem;
-			forlist((&obj->units)) {
-				Unit *u = (Unit *) elem;
-				forlist((&u->bankorders)) {
-					BankOrder *o = (BankOrder *)elem;
-					DoBankOrder(r, u, o);
-				}
-				u->bankorders.DeleteAll();
-			}
-		}
-	}
-}
-
-void Game::DoBankOrder(ARegion *r, Unit *u, BankOrder *o)
-{
-	int what = o->what;
-	int amt = o->amount;
-	int max;// = o->max;
-	int lvl;// = o->level;
-	int inbank;// = o->inbank;
-	int fee;
-
-	if(r->type == R_NEXUS) {
-		u->Error("BANK: does not work in the Nexus.");
-		u->bankorders.Remove(o);
-		return;
-	}
-	if (!(SkillDefs[S_BANKING].flags & SkillType::DISABLED)) { // banking skill ?
-		lvl = u->GetSkill(S_BANKING);
-	} else { // skill disabled - pretend level 5
-		lvl = 5;
-	}
-	if (!(ObjectDefs[O_OBANK].flags & ObjectType::DISABLED)) { // banks enabled ?
-		if (u->object->type != O_OBANK) // Are they in Bank ?
-			inbank = 0; // No they are not
-		else { // Yes they are in bank
-			if (u->object->incomplete > 0) // Is it completed ?
-				inbank = 0; // Not completed
-			else
-				inbank = 1; // Completed
-		}
-		if (inbank)
-			max = Globals->BANK_MAXSKILLPERLEVEL * lvl * inbank;
-		else
-			max = Globals->BANK_MAXUNSKILLED;
-	} else { // banks disabled - pretend they are in a bank
-		inbank = 1;
-		max = Globals->BANK_MAXSKILLPERLEVEL * lvl;
-	}
-
-	if (!r->CanTax(u) && (Globals->ALLOW_BANK & GameDefs::BANK_NOTONGUARD)) {
-		if (ObjectDefs[O_OBANK].flags & ObjectType::DISABLED) {
-			// if banks are disabled, inbank will be 1, so ignore it
-			//FIXME
-			u->Error("BANK1: A unit is on guard - banking is not allowed.");
-			u->bankorders.Remove(o);
-			return;
-		} else { // pay attention to inbank
-			if (!inbank) { // if a unit is in a bank, then allow nevertheless
-				u->Error("BANK2: A unit is on guard - banking is not allowed."); //FIXME
-				u->bankorders.Remove(o);
-				return;
-			}
-		}
-	}
-
-	if(!u->object->region->town && (Globals->ALLOW_BANK & GameDefs::BANK_INSETTLEMENT)) {
-		if (ObjectDefs[O_OBANK].flags & ObjectType::DISABLED) { // if banks are disabled, inbank will be 1, so ignore it
-			u->Error("BANK: Unit is not in a village, town or city.");
-			u->bankorders.Remove(o);
-			return;
-		} else { // pay attention to inbank
-			if (!inbank) { // if a unit is in a bank, then allow nevertheless
-				u->Error("BANK: Unit is not in a village, town or city.");
-				u->bankorders.Remove(o);
-				return;
-			}
-		}
-	}
-
-	if ((amt > u->faction->bankaccount) && (what == 1)) {
-		u->Error(AString("BANK: Too little silver in the bank to withdraw."));
-		u->bankorders.Remove(o);
-		return;
-	}
-	if (what == 1) { // withdraw
-		if (amt > max) {
-			AString temp = "BANK: Withdrawal limited to ";
-			temp += max;
-			temp += " silver.";
-			u->Error(temp);
-			amt = max;
-		}
-	} else { // deposit
-		if (u->items.GetNum(I_SILVER) == 0) {
-			u->Error(AString("BANK: No silver available."));
-			u->bankorders.Remove(o);
-			return;
-		} else {
-			if (amt > max) {
-				AString temp = "BANK: Deposit limited to ";
-				temp += max;
-				temp += " silver.";
-				u->Error(temp);
-				amt = max;
-			}
-			if (u->items.GetNum(I_SILVER) < amt)
-				amt = u->items.GetNum(I_SILVER);
-		}
-	}
-	if (Globals->ALLOW_BANK & GameDefs::BANK_FEES)
-		fee = (amt * Globals->BANK_FEE)/100;
-	else
-		fee = 0;
-	AString temp;
-	if (what == 2)
-		temp += "Deposits ";
-	else
-		temp += "Withdraws ";
-	temp += amt - fee;
-	if (what == 2)
-		temp += " in";
-	else
-		temp += " from";
-	temp += " the bank";
-	if (Globals->ALLOW_BANK & GameDefs::BANK_FEES) {
-		temp += " (fees ";
-		temp += fee;
-		temp += ")";
-	}
-	temp += ".";
-	u->Event(temp);
-	if (what == 2) {// deposit
-		u->faction->bankaccount += amt - fee;
-		u->items.SetNum(I_SILVER, u->items.GetNum(I_SILVER) - amt);
-	} else { // withdrawal
-		u->faction->bankaccount -= amt;
-		u->items.SetNum(I_SILVER, u->items.GetNum(I_SILVER) + amt - fee);
-	}
-
-	u->bankorders.Remove(o);
-	return;
-}
-
 void Game::DoGiveOrders()
 {
 	forlist((&regions)) {
@@ -2355,7 +2152,7 @@ void Game::DoExchangeOrder(ARegion *r, Unit *u, ExchangeOrder *o)
 		return;
 	}
 
-	// New RULE -- Must be able to see unit to give something to them!
+	// New rule: Must be able to see unit to give something to them!
 	if(!u->CanSee(r, t)) {
 		u->Error(AString("EXCHANGE: Nonexistant target (") +
 				o->target->Print() + ").");
@@ -2536,7 +2333,7 @@ int Game::DoGiveOrder(ARegion *r, Unit *u, GiveOrder *o)
 		return 0;
 	}
 
-	// New RULE -- Must be able to see unit to give something to them!
+	// New rule: Must be able to see unit to give something to them!
 	if(!u->CanSee(r, t) &&
 			(t->faction->GetAttitude(u->faction->num) < A_FRIENDLY)) {
 		u->Error(AString("GIVE: Nonexistant target (") + o->target->Print() +
@@ -2556,15 +2353,6 @@ int Game::DoGiveOrder(ARegion *r, Unit *u, GiveOrder *o)
 			if(Globals->FACTION_LIMIT_TYPE != GameDefs::FACLIM_UNLIMITED) {
 				if (CountMages(t->faction) >= AllowedMages(t->faction)) {
 					u->Error("GIVE: Faction has too many mages.");
-					return 0;
-				}
-			}
-		}
-		if(u->type == U_APPRENTICE) {
-			if(Globals->FACTION_LIMIT_TYPE != GameDefs::FACLIM_UNLIMITED) {
-				if(CountApprentices(t->faction) >=
-						AllowedApprentices(t->faction)){
-					u->Error("GIVE: Faction has too many apprentices.");
 					return 0;
 				}
 			}
@@ -2623,7 +2411,7 @@ int Game::DoGiveOrder(ARegion *r, Unit *u, GiveOrder *o)
 			}
 		}
 
-		// Okay, not for each item that the unit has, tell the new faction
+		// Okay, now for each item that the unit has, tell the new faction
 		// about it in case they don't know about it yet.
 		{
 			forlist(&u->items) {
@@ -2637,8 +2425,7 @@ int Game::DoGiveOrder(ARegion *r, Unit *u, GiveOrder *o)
 
 	/* If the item to be given is a man, combine skills */
 	if (ItemDefs[o->item].type & IT_MAN) {
-		if (u->type == U_MAGE || u->type == U_APPRENTICE ||
-				t->type == U_MAGE || t->type == U_APPRENTICE) {
+		if (u->type == U_MAGE || t->type == U_MAGE) { 
 			u->Error("GIVE: Magicians can't transfer men.");
 			return 0;
 		}
@@ -2659,11 +2446,6 @@ int Game::DoGiveOrder(ARegion *r, Unit *u, GiveOrder *o)
 				u->Error("GIVE: Can't mix leaders and normal men.");
 				return 0;
 			}
-		}
-		// Small hack for Ceran
-		if(o->item == I_MERC && t->GetMen()) {
-			u->Error("GIVE: Can't mix mercenaries with other men.");
-			return 0;
 		}
 
 		if (u->faction != t->faction) {
@@ -2763,6 +2545,7 @@ void Game::DeleteEmptyInRegion(ARegion *region)
 	}
 }
 
+// TODO: Seems quite convoluted, and repeats in a couple of places
 void Game::CheckTransportOrders()
 {
 	if (!(Globals->TRANSPORT & GameDefs::ALLOW_TRANSPORT))
@@ -2907,6 +2690,7 @@ void Game::CheckTransportOrders()
 	}
 }
 
+// TODO: Can we merge check and run?
 void Game::RunTransportOrders()
 {
 	if (!(Globals->TRANSPORT & GameDefs::ALLOW_TRANSPORT))

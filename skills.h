@@ -75,7 +75,7 @@ class SkillType
 			COMBAT = 0x2,
 			CAST = 0x4,
 			FOUNDATION = 0x8,
-			APPRENTICE = 0x10,
+			DISABLED2 = 0x10,
 			DISABLED = 0x20,
 			SLOWSTUDY = 0x40,
 			BATTLEREP = 0x80,

@@ -40,8 +40,8 @@ void OrdersCheck::Error(const AString &strError)
 {
 	if(pCheckFile) {
 		pCheckFile->PutStr("");
-		pCheckFile->PutStr("");
 		pCheckFile->PutStr(AString("*** Error: ") + strError + " ***");
+		pCheckFile->PutStr("");
 	}
 }
 
@@ -459,9 +459,6 @@ void Game::ProcessOrder(int orderNum, Unit *unit, AString *o,
 		case O_AVOID:
 			ProcessAvoidOrder(unit, o, pCheck);
 			break;
-		case O_BANK:
-			ProcessBankOrder(unit, o, pCheck);
-			break;
 		case O_IDLE:
 			ProcessIdleOrder(unit, o, pCheck);
 			break;
@@ -750,10 +747,7 @@ void Game::ProcessReshowOrder(Unit *u, AString *o, OrdersCheck *pCheck)
 		int sk = ParseSkill(token);
 		delete token;
 
-		if(sk == -1 ||
-				(SkillDefs[sk].flags & SkillType::DISABLED) ||
-				((SkillDefs[sk].flags & SkillType::APPRENTICE) &&
-				 !Globals->APPRENTICES_EXIST)) {
+		if(sk == -1 || (SkillDefs[sk].flags & SkillType::DISABLED)) {
 			ParseError(pCheck, u, 0, "SHOW: No such skill.");
 			return;
 		}
@@ -952,9 +946,9 @@ void Game::ProcessPrepareOrder(Unit *u, AString *o, OrdersCheck *pCheck)
 
 	if(!pCheck) {
 		if ((bt->flags & BattleItemType::MAGEONLY) &&
-			!((u->type == U_MAGE) || (u->type == U_APPRENTICE) ||
+			!((u->type == U_MAGE) || 
 				(u->type == U_GUARDMAGE))) {
-			u->Error("PREPARE: Only a mage or apprentice may use this item.");
+			u->Error("PREPARE: Only a mage may use this item.");
 			return;
 		}
 		if(!u->items.GetNum(it)) {
@@ -1125,22 +1119,11 @@ void Game::ProcessFactionOrder(Unit *u, AString *o, OrdersCheck *pCheck)
 
 	if(!pCheck) {
 		int m = CountMages(u->faction);
-		int a = CountApprentices(u->faction);
 
 		for(i = 0; i < NFACTYPES; i++) u->faction->type[i] = factype[i];
 
 		if(m > AllowedMages(u->faction)) {
 			u->Error(AString("FACTION: Too many mages to change to that "
-							 "faction type."));
-
-			for(i = 0; i < NFACTYPES; i++)
-				u->faction->type[i] = oldfactype[i];
-
-			return;
-		}
-
-		if (a > AllowedApprentices(u->faction)) {
-			u->Error(AString("FACTION: Too many apprentices to change to that "
 							 "faction type."));
 
 			for(i = 0; i < NFACTYPES; i++)
@@ -1342,58 +1325,6 @@ void Game::ProcessConsumeOrder(Unit *u, AString *o, OrdersCheck *pCheck)
 			u->SetFlag(FLAG_CONSUMING_FACTION, 0);
 		}
 	}
-}
-
-void Game::ProcessBankOrder(Unit *u, AString *o, OrdersCheck *pCheck)
-{
-	int amt;
-	int what;
-//	int inbank;
-//	int lvl;
-//	int max = Globals->BANK_MAXSKILLPERLEVEL *5; // value if banks & skills disabled
-
-	if (!(Globals->ALLOW_BANK & GameDefs::BANK_ENABLED)) {
-		ParseError(pCheck, u, 0, "There are no banks in this game.");
-		return;
-	}
-	AString *token = o->gettoken();
-	if (token) {
-		if (*token == "deposit")
-			what = 2;
-		if (*token == "withdraw")
-			what = 1;
-		delete token;
-		if (what == 2) {
-			token = o->gettoken();
-			if (!token) {
-				ParseError(pCheck, u, 0, "BANK: No amount to deposit given.");
-				return;
-			}
-			amt = token->value();
-			delete token;
-		} else if (what == 1) {	// withdrawal
-			token = o->gettoken();
-			if (!token) {
-				ParseError(pCheck, u, 0, "BANK: No amount to withdraw given.");
-				return;
-			}
-			amt = token->value();
-			delete token;
-		} else {
-			ParseError(pCheck, u, 0, "BANK: No WITHDRAW or DEPOSIT given.");
-			return;
-		}
-	} else {
-		ParseError(pCheck, u, 0, "BANK: No action given.");
-		return;
-	}
-	if(!pCheck) {
-		BankOrder *order = new BankOrder;
-		order->what = what;
-		order->amount = amt;
-		u->bankorders.Add(order);
-	}
-	return;
 }
 
 void Game::ProcessRevealOrder(Unit *u, AString *o, OrdersCheck *pCheck)
@@ -1815,12 +1746,6 @@ void Game::ProcessStudyOrder(Unit *u, AString *o, OrdersCheck *pCheck)
 	}
 
 	if(SkillDefs[sk].flags & SkillType::DISABLED) {
-		ParseError(pCheck, u, 0, "STUDY: Invalid skill.");
-		return;
-	}
-
-	if((SkillDefs[sk].flags & SkillType::APPRENTICE) &&
-			!Globals->APPRENTICES_EXIST) {
 		ParseError(pCheck, u, 0, "STUDY: Invalid skill.");
 		return;
 	}
@@ -2283,6 +2208,7 @@ void Game::ProcessDescribeOrder(Unit *unit, AString *o, OrdersCheck *pCheck)
 	ParseError(pCheck, unit, 0, "DESCRIBE: Can't describe that.");
 }
 
+// TODO: Name region?
 void Game::ProcessNameOrder(Unit *unit, AString *o, OrdersCheck *pCheck)
 {
 	AString *token = o->gettoken();

@@ -111,9 +111,6 @@ Faction *Game::CheckVictory()
 
 void Game::ModifyTablesPerRuleset(void)
 {
-	if(Globals->APPRENTICES_EXIST)
-		EnableSkill(S_MANIPULATE);
-
 	if(!Globals->GATES_EXIST)
 		DisableSkill(S_GATE_LORE);
 

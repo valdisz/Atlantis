@@ -42,10 +42,9 @@ class ObjectType {
 		enum {
 			DISABLED	= 0x001,
 			NOMONSTERGROWTH	= 0x002,
-			NEVERDECAY	= 0x004,
-			CANENTER	= 0x008,
-			CANMODIFY	= 0x020,
-			TRANSPORT	= 0x040
+			CANENTER	= 0x004,
+			CANMODIFY	= 0x008,
+			TRANSPORT	= 0x020
 		};
 		int flags;
 
@@ -58,10 +57,6 @@ class ObjectType {
 		int cost;
 		char *skill;
 		int level;
-
-		int maxMaintenance;
-		int maxMonthlyDecay;
-		int maintFactor;
 
 		int monster;
 

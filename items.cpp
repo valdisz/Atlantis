@@ -1003,11 +1003,7 @@ AString *ItemDescription(int item, int full)
 		BattleItemType *bt = FindBattleItem(ItemDefs[item].abr);
 		if(bt != NULL) {
 			if(bt->flags & BattleItemType::MAGEONLY) {
-				*temp += " This item may only be used by a mage";
-				if(Globals->APPRENTICES_EXIST) {
-					*temp += " or an apprentice";
-				}
-				*temp += ".";
+				*temp += " This item may only be used by a mage.";
 			}
 			*temp += AString(" ") + "Item can cast " +
 				ShowSpecial(bt->special, bt->skillLevel, 1, 1);

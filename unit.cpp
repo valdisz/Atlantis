@@ -356,6 +356,9 @@ void Unit::WriteReport(Areport *f, int obs, int truesight, int detfac,
 	int stealth = GetAttribute("stealth");
 	if (obs==-1) {
 		/* The unit belongs to the Faction writing the report */
+		// TODO: I'm not too happy about the reuse of variables
+		// maybe there should be seeskills and seefaction instead
+		// of overriding obs and truesight?
 		obs = 2;
 	} else {
 		if (obs < stealth) {
@@ -599,6 +602,7 @@ void Unit::ClearCastOrders()
 void Unit::DefaultOrders(Object *obj)
 {
 	ClearOrders();
+	// TODO: Break monsters out into their own method?
 	if (type == U_WMON) {
 		if (ObjectDefs[obj->type].monster == -1) {
 			MoveOrder *o = new MoveOrder;
@@ -680,7 +684,7 @@ void Unit::SetDescribe(AString *s)
 
 int Unit::IsAlive()
 {
-	if(type == U_MAGE || type == U_APPRENTICE) {
+	if(type == U_MAGE) {
 		return(GetMen());
 	} else {
 		forlist(&items) {
@@ -703,10 +707,13 @@ void Unit::SetMen(int t, int n)
 		}
 	} else {
 		/* This is probably a monster in this case */
+		// TODO: probably?
 		items.SetNum(t, n);
 	}
 }
 
+// TODO: This function looks a bit dodgy
+// should it be GetItems instead?
 int Unit::GetMen(int t)
 {
 	return items.GetNum(t);
@@ -860,15 +867,6 @@ void Unit::ForgetSkill(int sk)
 		}
 		type = U_NORMAL;
 	}
-	if(type == U_APPRENTICE) {
-		forlist(&skills) {
-			Skill *s = (Skill *) elem;
-			if(SkillDefs[s->type].flags & SkillType::APPRENTICE) {
-				return;
-			}
-		}
-		type = U_NORMAL;
-	}
 }
 
 int Unit::CheckDepend(int lev, SkillDepend &dep)
@@ -1009,13 +1007,9 @@ int Unit::IsNormal()
 
 void Unit::AdjustSkills()
 {
-	//
 	// First, is the unit a leader?
-	//
 	if(IsLeader()) {
-		//
 		// Unit is all leaders: Make sure no skills are > max
-		//
 		forlist(&skills) {
 			Skill *theskill = (Skill *) elem;
 			int max = GetSkillMax(theskill->type);
@@ -1025,13 +1019,9 @@ void Unit::AdjustSkills()
 		}
 	} else {
 		if(Globals->SKILL_LIMIT_NONLEADERS) {
-			//
 			// Not a leader, can only know 1 skill
-			//
 			if (skills.Num() > 1) {
-				//
 				// Find highest skill, eliminate others
-				//
 				unsigned int max = 0;
 				Skill *maxskill = 0;
 				forlist(&skills) {
@@ -1053,9 +1043,7 @@ void Unit::AdjustSkills()
 			}
 		}
 
-		//
 		// Limit remaining skill to max
-		//
 		forlist(&skills) {
 			Skill *theskill = (Skill *) elem;
 			int max = GetSkillMax(theskill->type);
@@ -1295,7 +1283,7 @@ int Unit::MoveType()
 	if (CanFly(weight)) return M_FLY;
 	if (CanRide(weight)) return M_RIDE;
 	/* Check if we should be able to 'swim' */
-	/* This should become it's own M_TYPE sometime */
+	/* TODO: This should become it's own M_TYPE sometime */
 	if(TerrainDefs[object->region->type].similar_type == R_OCEAN)
 		if(CanSwim()) return M_WALK;
 	if (CanWalk(weight)) return M_WALK;
@@ -1319,6 +1307,7 @@ int Unit::CalcMovePoints()
 
 int Unit::CanMoveTo(ARegion *r1, ARegion *r2)
 {
+	// TODO: r1 and r2 have to be adjacent?
 	if (r1 == r2) return 1;
 
 	int exit = 1;
@@ -1334,7 +1323,8 @@ int Unit::CanMoveTo(ARegion *r1, ARegion *r2)
 	}
 	if (exit) return 0;
 	exit = 1;
-	for (i=0; i<NDIRS; i++) {
+	// TODO: Why are we checking both directions?
+	for (i=0; i<NDIRS; i++) { 
 		if (r2->neighbors[i] == r1) {
 			exit = 0;
 			break;
@@ -1416,6 +1406,8 @@ int Unit::Forbids(ARegion *r, Unit *u)
 /* This function was modified to either return the amount of
    taxes this unit is eligible for (numtaxers == 0) or the
    number of taxing men (numtaxers > 0).
+   TODO: Break into two functions?
+	 TODO: Break the function up into simpler parts..
 */
 int Unit::Taxers(int numtaxers)
 {
@@ -1450,7 +1442,7 @@ int Unit::Taxers(int numtaxers)
 		// Only consider offensive items
 			if ((Globals->WHO_CAN_TAX & GameDefs::TAX_USABLE_BATTLE_ITEM) &&
 			(!(pBat->flags & BattleItemType::MAGEONLY) ||
-			 type == U_MAGE || type == U_APPRENTICE)) {
+			 type == U_MAGE )) {
 				numUsableBattle += pItem->num;
 				numBattle += pItem->num;
 				continue; // Don't count this as a weapon as well!
@@ -1867,6 +1859,7 @@ void Unit::Error(const AString & s)
 	faction->Error(temp);
 }
 
+// TODO: What the hell does this do?
 int Unit::GetAttribute(char *attrib)
 {
 	AttribModType *ap = FindAttrib(attrib);

@@ -228,8 +228,7 @@ Unit *Object::GetUnitId(UnitId *id, int faction)
 int Object::CanEnter(ARegion *reg, Unit *u)
 {
 	if(!(ObjectDefs[type].flags & ObjectType::CANENTER) &&
-			(u->type == U_MAGE || u->type == U_NORMAL ||
-			 u->type == U_APPRENTICE)) {
+			(u->type == U_MAGE || u->type == U_NORMAL)) {
 		return 0;
 	}
 	return 1;
@@ -284,14 +283,7 @@ void Object::Report(Areport *f, Faction *fac, int obs, int truesight,
 		AString temp = AString("+ ") + *name + " : " + ob->name;
 		if (incomplete > 0) {
 			temp += AString(", needs ") + incomplete;
-		} else if(Globals->DECAY &&
-				!(ob->flags & ObjectType::NEVERDECAY) && incomplete < 1) {
-			if(incomplete > (0 - ob->maxMonthlyDecay)) {
-				temp += ", about to decay";
-			} else if(incomplete > (0 - ob->maxMaintenance/2)) {
-				temp += ", needs maintenance";
-			}
-		}
+		} 
 		if (inner != -1) {
 			temp += ", contains an inner location";
 		}
@@ -475,27 +467,6 @@ AString *ObjectDescription(int obj)
 			*temp += ItemDefs[o->productionAided].names;
 		}
 		*temp += " available in the region.";
-	}
-
-	if(Globals->DECAY) {
-		if(o->flags & ObjectType::NEVERDECAY) {
-			*temp += " This structure will never decay.";
-		} else {
-			*temp += AString(" This structure can take ") + o->maxMaintenance +
-				" units of damage before it begins to decay.";
-			*temp += AString(" Damage can occur at a maximum rate of ") +
-				o->maxMonthlyDecay + " units per month.";
-			if(buildable) {
-				*temp += AString(" Repair of damage is accomplished at ") +
-					"a rate of " + o->maintFactor + " damage units per " +
-					"unit of ";
-				if(o->item == I_WOOD_OR_STONE) {
-					*temp += "wood or stone.";
-				} else {
-					*temp += ItemDefs[o->item].name;
-				}
-			}
-		}
 	}
 
 	return temp;

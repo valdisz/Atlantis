@@ -369,8 +369,8 @@ def generateturn(report, template):
             # for a test, we'll move around randomly
             if random.random() >= 0.5:
                 temp = int(random.random()*len(directions))
-                temp2 = int(random.random()*len(directions))
-                orders += "move "+directions[temp]+" "+directions[temp2]+"\n"
+                #temp2 = int(random.random()*len(directions))
+                orders += "move "+directions[temp]  #+" "+directions[temp2]+"\n"
             #elif random.random() >= 0.6:
             #    orders += "work\n"
                 #print "Moving..."
@@ -392,7 +392,7 @@ def generateturn(report, template):
                 else:
                     orders += ";my combat skill is "+str(combat)+"\n"
                 if combat < 60:
-                    orders += "study combat\n"
+                    orders += "claim 50\nstudy combat\n"
                 else:
                     orders += "buy 1 peas\n"
                     
@@ -402,7 +402,7 @@ def generateturn(report, template):
             # 3. form a new unit (if it has more than 10 men?)
             # 50% chance of new unit
             orders += "tax\n"
-            if random.random() >= 0.8:
+            if random.random() >= 0.5:
                 unitnum = int(random.random()*1000)+1
                 #orders += "give new "+str(unitnum)+" 100 silv"
                 formstring = "form "+str(unitnum)+"\n"

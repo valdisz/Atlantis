@@ -171,8 +171,6 @@ public:
     int lastchange;
     int lastorders;
     int unclaimed;
-	int bankaccount;
-	int interest; // not written to game.out
     AString * name;
     AString * address;
     AString * password;
@@ -184,9 +182,8 @@ public:
     int numshows;
     
     int nummages;
-	int numapprentices;
-	int numqms;
-	int numtacts;
+    int numqms;
+    int numtacts;
     AList war_regions;
     AList trade_regions;
 

@@ -236,12 +236,6 @@ class ARegion : public AListElem
 		int HasConnectingRoad(int realDirection);
 		int GetRoadDirection(int realDirection);
 		int GetRealDirComp(int realDirection);
-		void DoDecayCheck(ARegionList *pRegs);
-		void DoDecayClicks(Object *o, ARegionList *pRegs);
-		void RunDecayEvent(Object *o, ARegionList *pRegs);
-		AString GetDecayFlavor();
-		int GetMaxClicks();
-		int PillageCheck();
 
 		// JR
 		int GetPoleDistance(int dir);

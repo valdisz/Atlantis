@@ -46,7 +46,6 @@ class CastRegionOrder;
 class TeleportOrder;
 class ForgetOrder;
 class EvictOrder;
-class BankOrder;
 class IdleOrder;
 class TransportOrder;
 
@@ -66,7 +65,6 @@ enum {
 	O_ATTACK,
 	O_AUTOTAX,
 	O_AVOID,
-	O_BANK,
 	O_BEHIND,
 	O_BUILD,
 	O_BUY,
@@ -367,16 +365,6 @@ class EvictOrder : public Order {
 		~EvictOrder();
 
 		AList targets;
-};
-
-class BankOrder : public Order {
-	public:
-
-		BankOrder();
-		~BankOrder();
-
-		int what; // 1 == withdraw; 2 == deposit
-		int amount;
 };
 
 class IdleOrder : public Order {

@@ -79,7 +79,7 @@ public:
 	int ViewMap(const AString &, const AString &);
 	// LLS
 	void UnitFactionMap();
-	int GenRules(const AString &, const AString &, const AString &);
+	//int GenRules(const AString &, const AString &, const AString &);
 	int DoOrdersCheck(const AString &strOrders, const AString &strCheck);
 
 	Faction *AddFaction(int noleader=0, ARegion *pStart = NULL);
@@ -140,10 +140,6 @@ private:
 	void ClearOrders(Faction *);
 	void MakeFactionReportLists();
 	void CountAllSpecialists();
-	//void CountAllMages();
-	//void CountAllApprentices();
-	//void CountAllQuarterMasters();
-	//void CountAllTacticians();
 	void WriteReport();
 	// LLS - write order templates
 	void WriteTemplates();
@@ -232,7 +228,6 @@ private:
 	void EnableObject(int ob); // Enables a disabled object
 	void DisableObject(int ob); // Prevents object being built
 	void ModifyObjectFlags(int ob, int flags);
-	void ModifyObjectDecay(int ob, int maxMaint, int maxMonthDecay, int mFact);
 	void ModifyObjectProduction(int ob, int it);
 	void ModifyObjectMonster(int ob, int monster);
 	void ModifyObjectConstruction(int ob, int it, int num, char *sk, int lev);
@@ -381,7 +376,6 @@ private:
 	// This can be called by parse functions
 	//
 	int CountMages(Faction *);
-	int CountApprentices(Faction *);
 	int CountQuarterMasters(Faction *);
 	int CountTacticians(Faction *);
 	
@@ -403,7 +397,6 @@ private:
 	// may return -1 to indicate no limit.
 	//
 	int AllowedMages(Faction *pFac);
-	int AllowedApprentices(Faction *pFact);
 	int AllowedQuarterMasters(Faction *pFact);
 	int AllowedTacticians(Faction *pFact);
 	int AllowedTaxes(Faction *pFac);
@@ -428,13 +421,6 @@ private:
 	void CheckUnitMaintenance(int consume);
 	void CheckFactionMaintenance(int consume);
 	void CheckAllyMaintenance();
-
-	// Bank functions
-	void ProcessBankOrder(Unit *, AString *, OrdersCheck *);
-	void DoBankDepositOrders();
-	void DoBankWithdrawOrders();
-	void BankInterest();
-	void DoBankOrder(ARegion *, Unit *, BankOrder *);
 
 	// Similar to the above, but for minimum food requirements
 	void CheckUnitHunger();

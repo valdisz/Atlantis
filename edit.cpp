@@ -1134,10 +1134,6 @@ void Game::EditGameUnitSkills(Unit *pUnit)
 						(pUnit->type != U_MAGE)) {
 					pUnit->type = U_MAGE;
 				}
-				if((SkillDefs[skillNum].flags & SkillType::APPRENTICE) &&
-						(pUnit->type == U_NORMAL)) {
-					pUnit->type = U_APPRENTICE;
-				}
 				pUnit->skills.SetDays(skillNum, days * pUnit->GetMen());
 				int lvl = pUnit->GetRealSkill(skillNum);
 				if(lvl > pUnit->faction->skills.GetDays(skillNum)) {
@@ -1186,9 +1182,6 @@ void Game::EditGameUnitDetails(Unit *pUnit)
             case U_GUARDMAGE:
 		        temp = AString(" (guardmage)");
 		        break;
-            case U_APPRENTICE:
-		        temp = AString(" (apprentice)");
-		        break;		        
 		}
 		Awrite(AString("Unit type: ") + pUnit->type + temp);
 		

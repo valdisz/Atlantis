@@ -957,7 +957,6 @@ int ARegion::TownHabitat()
 	// Effect of existing buildings
 	int farm = 0;
 	int inn = 0;
-	int bank = 0;
 	int temple = 0;
 	int caravan = 0;
 	int fort = 0;
@@ -967,7 +966,6 @@ int ARegion::TownHabitat()
 		if(ItemDefs[ObjectDefs[obj->type].productionAided].flags & IT_FOOD) farm++;
 		if(ObjectDefs[obj->type].productionAided == I_SILVER) inn++;
 		if(ObjectDefs[obj->type].productionAided == I_HERBS) temple++;
-		if(ObjectDefs[obj->type].name == "Bank") bank++;
 		if((ObjectDefs[obj->type].flags & ObjectType::TRANSPORT)
 			&& (ItemDefs[ObjectDefs[obj->type].productionAided].flags & IT_MOUNT)) caravan++;
 	}
@@ -982,7 +980,6 @@ int ARegion::TownHabitat()
 	if(farm) build++;
 	if(inn) build++;
 	if(temple) build++;
-	if(bank) build++;
 	if(caravan) build++;
 	if(build > 2) build = 2;
 	
@@ -1383,11 +1380,6 @@ void ARegion::Migrate()
 void ARegion::PostTurn(ARegionList *pRegs)
 {
 
-	/* Check decay */
-	if(Globals->DECAY) {
-		DoDecayCheck(pRegs);
-	}
-	
 	/* Check if development level improves
 	 * due to advanced producing and building */
 	// scale improvement

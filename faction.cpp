@@ -154,7 +154,6 @@ Faction::Faction(int n)
 	defaultattitude = A_NEUTRAL;
 	quit = 0;
 	unclaimed = 0;
-	bankaccount = 0;
 	pReg = NULL;
 	pStartLoc = NULL;
 	noStartLeader = 0;
@@ -177,7 +176,6 @@ void Faction::Writeout(Aoutfile *f)
 	f->PutInt(lastchange);
 	f->PutInt(lastorders);
 	f->PutInt(unclaimed);
-	f->PutInt(bankaccount);
 	f->PutStr(*name);
 	f->PutStr(*address);
 	f->PutStr(*password);
@@ -202,7 +200,6 @@ void Faction::Readin(Ainfile *f, ATL_VER v)
 	lastchange = f->GetInt();
 	lastorders = f->GetInt();
 	unclaimed = f->GetInt();
-	bankaccount = f->GetInt();
 
 	name = f->GetStr();
 	address = f->GetStr();
@@ -427,10 +424,6 @@ void Faction::WriteReport(Areport *f, Game *pGame)
 	if(Globals->FACTION_LIMIT_TYPE == GameDefs::FACLIM_MAGE_COUNT) {
 		f->PutStr(AString("Mages: ") + nummages + " (" +
 				pGame->AllowedMages(this) + ")");
-		if(Globals->APPRENTICES_EXIST) {
-			f->PutStr(AString("Apprentices: ") + numapprentices + " (" +
-					pGame->AllowedApprentices(this)+ ")");
-		}
 	} else if(Globals->FACTION_LIMIT_TYPE == GameDefs::FACLIM_FACTION_TYPES) {
 		f->PutStr(AString("Tax Regions: ") + war_regions.Num() + " (" +
 				pGame->AllowedTaxes(this) + ")");
@@ -446,10 +439,6 @@ void Faction::WriteReport(Areport *f, Game *pGame)
 		}
 		f->PutStr(AString("Mages: ") + nummages + " (" +
 				pGame->AllowedMages(this) + ")");
-		if(Globals->APPRENTICES_EXIST) {
-			f->PutStr(AString("Apprentices: ") + numapprentices + " (" +
-					pGame->AllowedApprentices(this)+ ")");
-		}
 	}
 	f->PutStr("");
 
@@ -537,13 +526,7 @@ void Faction::WriteReport(Areport *f, Game *pGame)
 
 	temp = AString("Unclaimed silver: ") + unclaimed + ".";
 	f->PutStr(temp);
-	if (Globals->ALLOW_BANK & GameDefs::BANK_ENABLED) {
-		temp = AString("Silver in the Bank: ") + bankaccount;
-		if (Globals->ALLOW_BANK & GameDefs::BANK_TRADEINTEREST)
-			temp += AString(" (+")+interest+AString(" interest)");
-		temp += + ".";
-		f->PutStr(temp);
-	}	f->PutStr("");
+	f->PutStr("");
 
 	forlist(&present_regions) {
 		((ARegionPtr *) elem)->ptr->WriteReport(f, this, pGame->month, &(pGame->regions));

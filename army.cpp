@@ -291,9 +291,8 @@ void Soldier::SetupCombatItems()
 				continue;
 			}
 			if(pBat->flags & BattleItemType::MAGEONLY &&
-			   unit->type != U_MAGE && unit->type != U_GUARDMAGE &&
-			   unit->type != U_APPRENTICE) {
-				// Only mages/apprentices can use this item so give the
+			   unit->type != U_MAGE && unit->type != U_GUARDMAGE) { 
+				// Only mages can use this item so give the
 				// item back to the unit as they aren't going to use it.
 				unit->items.SetNum(item, unit->items.GetNum(item)+1);
 				continue;

@@ -37,10 +37,6 @@ static int am[] = { 0, 1, 2, 3, 5, 7 };
 int *allowedMages = am;
 int allowedMagesSize = sizeof(am) / sizeof(am[0]);
 
-static int aa[] = { 0, 2, 4, 6, 10, 14 };
-int *allowedApprentices = aa;
-int allowedApprenticesSize = sizeof(aa) / sizeof(aa[0]);
-
 static int aw[] = { 0, 10, 24, 40, 60, 100 };
 int *allowedTaxes = aw;
 int allowedTaxesSize = sizeof(aw) / sizeof(aw[0]);
@@ -149,18 +145,12 @@ static GameDefs g = {
 	0,   // START_CITY_MAGES
 	0,   // START_CITY_TACTICS
 
-	0,   // APPRENTICES_EXIST
-
 	"Atlantis", // WORLD_NAME
 
 	0,  // NEXUS_GATE_OUT
 	0,  // NEXUS_IS_CITY
 	0,	// BATTLE_FACTION_INFO
 	0,	// ALLOW_WITHDRAW
-	0,	// ALLOW_BANK
-	0,	// BANK_FEE
-	0,	// BANK_MAXUNSKILLED
-	0,	// BANK_MAXSKILLPERLEVEL
 	0,	// CITY_RENAME_COST
 	0,	// MULTI_HEX_NEXUS
 	0,	// UNDERWORLD_LEVELS
@@ -182,7 +172,6 @@ static GameDefs g = {
 	0,	// ODD_TERRAIN
 	0,	// IMPROVED_FARSIGHT
 	1,	// GM_REPORT
-	0,	// DECAY
 	1,	// LIMITED_MAGES_PER_BUILDING
 	GameDefs::REPORT_NOTHING, // TRANSIT_REPORT
 	0,  // MARKETS_SHOW_ADVANCED_ITEMS

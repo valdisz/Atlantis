@@ -72,11 +72,6 @@ AString *ShowSkill::Report(Faction *f)
 			    "production. Woods are more often found in forests, but "
 				"may also be found elsewhere.";
 			break;
-		case S_BANKING:
-			if(level > 1) break;
-			*str += "This skill deals with all aspects of depositing and "
-				"withdrawing funds from banks.";
-			break;
 		case S_QUARTERMASTER:
 			if (level > 1) break;
 			if (!(Globals->TRANSPORT & GameDefs::ALLOW_TRANSPORT))
@@ -283,7 +278,7 @@ AString *ShowSkill::Report(Faction *f)
 			if(level > 1) break;
 			break;
 		case S_MAGICAL_HEALING:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level == 1) {
 				*str += "This skill enables the mage to magically heal units "
 					"after battle. A mage at this level can heal up to 10 "
@@ -302,7 +297,7 @@ AString *ShowSkill::Report(Faction *f)
 			}
 			break;
 		case S_GATE_LORE:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level == 1) {
 				*str += "Gate Lore is the art of detecting and using magical "
 					"Gates, which are spread through the world. The Gates are "
@@ -348,7 +343,7 @@ AString *ShowSkill::Report(Faction *f)
 			break;
 		case S_PORTAL_LORE:
 			if(level > 1) break;
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(ITEM_DISABLED(I_PORTAL)) break;
 			*str += "A mage with the Portal Lore skill may, with the aid of "
 				"another mage, make a temporary Gate between two regions, and "
@@ -447,7 +442,7 @@ AString *ShowSkill::Report(Faction *f)
 			}
 			break;
 		case S_MIND_READING:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level == 1) {
 				*str += "A mage with Mind Reading skill 1 may cast the spell "
 					"and determine the faction affiliation of any unit he can "
@@ -467,7 +462,7 @@ AString *ShowSkill::Report(Faction *f)
 			break;
 		case S_TELEPORTATION:
 			if(level > 1) break;
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			*str += "A mage with this skill may teleport himself across"
 				"great distances, even without the use of a gate. The mage "
 				"may teleport up to 15 weight units per skill level.";
@@ -524,7 +519,7 @@ AString *ShowSkill::Report(Faction *f)
 			break;
 		case S_WEATHER_LORE:
 			if(level > 1) break;
-			/* XXX -- This should be templated */
+			/* TODO: This should be templated */
 			*str += "Weather Lore is the magic of the weather; a mage with "
 				"this skill can predict the weather in nearby regions. "
 				"Weather Lore also allows further study into more powerful "
@@ -585,7 +580,7 @@ AString *ShowSkill::Report(Faction *f)
 				"of Weather Lore by any other mage in the same region.";
 			break;
 		case S_SUMMON_WIND:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level == 1) {
 				*str += "A mage with knowledge of Summon Wind can summon "
 					   "up the powers of the wind to aid him in sea or "
@@ -618,7 +613,7 @@ AString *ShowSkill::Report(Faction *f)
 			if(level > 1) break;
 			break;
 		case S_CLEAR_SKIES:
-			/* XXX -- this range stuff needs cleaning up */
+			/* TODO: this range stuff needs cleaning up */
 			if(level > 1) break;
 			if(SkillDefs[skill].flags & SkillType::CAST) {
 				*str += "When cast using the CAST order, it causes the "
@@ -697,7 +692,7 @@ AString *ShowSkill::Report(Faction *f)
 				"the same region.";
 			break;
 		case S_WOLF_LORE:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level > 1) break;
 			if(ITEM_DISABLED(I_WOLF)) break;
 			*str += "A mage with Wolf Lore skill may summon wolves, who will "
@@ -710,7 +705,7 @@ AString *ShowSkill::Report(Faction *f)
 				"Wolf_Lore.";
 			break;
 		case S_BIRD_LORE:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level == 1) {
 				*str += "A mage with Bird Lore may control the birds of the "
 					"sky. At skill level 1, the mage can control small "
@@ -731,7 +726,7 @@ AString *ShowSkill::Report(Faction *f)
 			}
 			break;
 		case S_DRAGON_LORE:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level > 1) break;
 			if(ITEM_DISABLED(I_DRAGON)) break;
 			*str += "A mage with Dragon Lore skill can summon dragons to "
@@ -754,7 +749,7 @@ AString *ShowSkill::Report(Faction *f)
 				"Necromancy by any other mage in the same region.";
 			break;
 		case S_SUMMON_SKELETONS:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level > 1) break;
 			if(ITEM_DISABLED(I_SKELETON)) break;
 			*str += "A mage with the Summon Skeletons skill may summon "
@@ -767,7 +762,7 @@ AString *ShowSkill::Report(Faction *f)
 				"and the mage will summon as many skeletons as he is able.";
 			break;
 		case S_RAISE_UNDEAD:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level > 1) break;
 			if(ITEM_DISABLED(I_UNDEAD)) break;
 			*str += "A mage with the Raise Undead skill may summon undead "
@@ -780,7 +775,7 @@ AString *ShowSkill::Report(Faction *f)
 				"summon as many undead as he is able.";
 			break;
 		case S_SUMMON_LICH:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level > 1) break;
 			if(ITEM_DISABLED(I_LICH)) break;
 			*str += "A mage with the Summon Lich skill may summon a lich "
@@ -810,7 +805,7 @@ AString *ShowSkill::Report(Faction *f)
 				"region.";
 			break;
 		case S_SUMMON_IMPS:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level > 1) break;
 			if(ITEM_DISABLED(I_IMP)) break;
 			*str += "A mage with the Summon Imps skill may summon imps into "
@@ -826,7 +821,7 @@ AString *ShowSkill::Report(Faction *f)
 				"is able.";
 			break;
 		case S_SUMMON_DEMON:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level > 1) break;
 			if(ITEM_DISABLED(I_DEMON)) break;
 			*str += "A mage with the Summon Demon skill may summon demons "
@@ -841,7 +836,7 @@ AString *ShowSkill::Report(Faction *f)
 				"order CAST Summon_Demon.";
 			break;
 		case S_SUMMON_BALROG:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level > 1) break;
 			if(ITEM_DISABLED(I_BALROG)) break;
 			*str += "A mage with the Summon Balrog skill may summon a balrog "
@@ -868,7 +863,7 @@ AString *ShowSkill::Report(Faction *f)
 				"the same region.";
 			break;
 		case S_PHANTASMAL_ENTERTAINMENT:
-			/* XXX -- This should be cleaner somehow */
+			/* TODO: This should be cleaner somehow */
 			if(level > 1) break;
 			*str += "A mage with the Phantasmal Entertainment skill may use "
 				"his powers of Illusion to earn money by creating "
@@ -878,7 +873,7 @@ AString *ShowSkill::Report(Faction *f)
 				"level. To use this skill, use the ENTERTAIN order.";
 			break;
 		case S_CREATE_PHANTASMAL_BEASTS:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level == 1) {
 				*str += "A mage with Create Phantasmal Beasts may summon "
 					"illusionary beasts that appear in the mage's inventory. "
@@ -921,7 +916,7 @@ AString *ShowSkill::Report(Faction *f)
 			}
 			break;
 		case S_CREATE_PHANTASMAL_UNDEAD:
-			/* XXX -- This should be cleaner somehow. */
+			/* TODO: This should be cleaner somehow. */
 			if(level == 1) {
 				*str += "A mage with Create Phantasmal Undead may summon "
 					"illusionary undead that appear in the mage's inventory. "
@@ -1242,14 +1237,6 @@ AString *ShowSkill::Report(Faction *f)
 			*str += ". The mage has a 20 percent times his skill level "
 				"chance of creating a Portal, and the attempt costs 600 "
 				"silver. To use this spell, CAST Construct_Portal.";
-			break;
-		case S_MANIPULATE:
-			if(!Globals->APPRENTICES_EXIST) break;
-			if(level > 1) break;
-			*str += "A unit with this skill becomes an apprentice mage. "
-				"While apprentices cannot cast spells directly, they can "
-				"use magic items normally only usable by mages. Continued "
-				"study of this skill gives no further advantages.";
 			break;
 		case S_WEAPONCRAFT:
 			if(level > 1) break;

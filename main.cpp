@@ -151,10 +151,12 @@ int main(int argc, char *argv[])
 				usage();
 				break;
 			}
+			/*
 			if(!game.GenRules(argv[4], argv[3], argv[2])) {
 				Awrite("Unable to generate rules!");
 				break;
 			}
+			*/
 		}
     } while( 0 );
 

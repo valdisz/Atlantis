@@ -318,16 +318,6 @@ void Game::RunTeachOrders()
 
 void Game::Do1TeachOrder(ARegion * reg,Unit * unit)
 {
-	/* First pass, find how many to teach */
-	if(Globals->LEADERS_EXIST && !unit->IsLeader()) {
-		/* small change to handle Ceran's mercs */
-		if(!unit->GetMen(I_MERC)) {
-			// Mercs can teach even though they are not leaders.
-			// They cannot however improve their own skills
-			unit->Error("TEACH: Only leaders can teach.");
-			return;
-		}
-	}
 
 	int students = 0;
 	TeachOrder * order = (TeachOrder *) unit->monthorders;
@@ -430,54 +420,11 @@ void Game::Run1BuildOrder(ARegion * r,Object * obj,Unit * u)
 		u->monthorders = 0;
 		return;
 	}
-	if ((Globals->ALLOW_BANK & GameDefs::BANK_ENABLED) && (obj->type == O_OBANK)) { // trying to build a bank ?
-		if ((Globals->ALLOW_BANK & GameDefs::BANK_NOTONGUARD) && !(r->CanTax(u))) {
-			u->Error("BUILD: Cannot build banks if there are guarding units.");
-			delete u->monthorders;
-			u->monthorders = 0;
-			return;
-		}
-		if (!r->town && (Globals->ALLOW_BANK & GameDefs::BANK_INSETTLEMENT)) {
-			u->Error("BUILD: Cannot build banks outside settlements.");
-			delete u->monthorders;
-			u->monthorders = 0;
-			return;
-		}
-		if ((Globals->ALLOW_BANK & GameDefs::BANK_SKILLTOBUILD) && (SkillDefs[S_BANKING].flags & SkillType::DISABLED)) {
-			// GM error - requested banking skill to build but skill is disabled
-			u->Error("BUILD: Impossible to build banks due to missing skill.");
-			delete u->monthorders;
-			u->monthorders = 0;
-			return;
-		}
-		if ((Globals->ALLOW_BANK & GameDefs::BANK_SKILLTOBUILD) && (!u->GetSkill(S_BANKING))) {
-			u->Error("BUILD: Can't build that.");
-			delete u->monthorders;
-			u->monthorders = 0;
-			return;
-		}
-	} else if (obj->type == O_OBANK) { // This is only if a dumb GM enables banks but not the gamedef
-		u->Error("BUILD: Bank ? What is that ?"); // maybe give same error "Can't build that." ?
-		delete u->monthorders;
-		u->monthorders = 0;
-		return;
-	}
-
 
 	int needed = obj->incomplete;
 	int type = obj->type;
-	// AS
-	if(((ObjectDefs[type].flags&ObjectType::NEVERDECAY) || !Globals->DECAY) &&
-			needed < 1) {
+	if(needed == 0) {
 		u->Error("BUILD: Object is finished.");
-		delete u->monthorders;
-		u->monthorders = 0;
-		return;
-	}
-
-	// AS
-	if(needed <= -(ObjectDefs[type].maxMaintenance)) {
-		u->Error("BUILD: Object does not yet require maintenance.");
 		delete u->monthorders;
 		u->monthorders = 0;
 		return;
@@ -501,6 +448,7 @@ void Game::Run1BuildOrder(ARegion * r,Object * obj,Unit * u)
 	int num = u->GetMen() * usk;
 
 	/* patched out by Sergey (AB)
+	   TODO: Check why this was commented out!
 	// JLT
 	if(obj->incomplete == ObjectDefs[type].cost) {
 		if(ObjectIsShip(type)) {
@@ -519,35 +467,11 @@ void Game::Run1BuildOrder(ARegion * r,Object * obj,Unit * u)
 		obj->SetName(new AString("Ship"));
 	}
 
-	// AS
-	AString job;
-	if (needed < 1) {
-		// This looks wrong, but isn't.
-		// If a building has a maxMaintainence of 75 and the road is at
-		// -70 (ie, 5 from max) then we want the value of maintMax to be
-		// 5 here.  Then we divide by maintFactor (some things are easier
-		// to refix than others) to get how many items we need to fix it.
-		// Then we fix it by that many items * maintFactor
-		int maintMax = ObjectDefs[type].maxMaintenance + needed;
-		maintMax /= ObjectDefs[type].maintFactor;
-		if (num > maintMax) num = maintMax;
-		if (itn < num) num = itn;
-		job = " maintenance ";
-		obj->incomplete -= (num * ObjectDefs[type].maintFactor);
-		if (obj->incomplete < -(ObjectDefs[type].maxMaintenance))
-			obj->incomplete = -(ObjectDefs[type].maxMaintenance);
-	} else if(needed > 0) {
-		if (num > needed) num = needed;
-		if (itn < num) num = itn;
-		job = " construction ";
-		obj->incomplete -= num;
-		if (obj->incomplete == 0) {
-			obj->incomplete = -(ObjectDefs[type].maxMaintenance);
-		}
-	}
-
-	/* Perform the build */
+	if (num > needed) num = needed;
+	if (itn < num) num = itn;
 	
+	/* Perform the build */
+	obj->incomplete -= num;
 	u->MoveUnit(obj);
 
 	if (it == I_WOOD_OR_STONE) {
@@ -563,10 +487,10 @@ void Game::Run1BuildOrder(ARegion * r,Object * obj,Unit * u)
 	}
 	
 	/* Regional economic improvement */
+	// TODO: Should this be in the economy code?
 	r->improvement += num;
 
-	// AS
-	u->Event(AString("Performs") + job + "on " + *(obj->name) + ".");
+	u->Event(AString("Performs construction on ") + *(obj->name) + ".");
 	u->Practice(sk);
 
 	delete u->monthorders;
@@ -691,6 +615,7 @@ void Game::RunUnitProduce(ARegion * r,Unit * u)
 		count = maxproduced;
 		
 		/* regional economic improvement */
+		// TODO: Again, maybe should be in economy code
 		r->improvement += count;
 
 		// Deduct the items spent
@@ -723,6 +648,7 @@ void Game::RunUnitProduce(ARegion * r,Unit * u)
 		}
 		
 		/* regional economic improvement */
+		// TODO:
 		r->improvement += maxproduced;
 		
 		// Deduct the items spent
@@ -803,6 +729,7 @@ int Game::ValidProd(Unit * u,ARegion * r, Production * p)
 		}
 
 		/* check for bonus production */
+		// TODO: Bonus in what sense?
 		// LLS
 		int bonus = u->GetProductionBonus(p->itemtype);
 		/* Factor for fractional productivity: 10 */
@@ -852,6 +779,8 @@ void Game::RunAProduction(ARegion * r,Production * p)
 			}
 
 			/* We need to implement a hack to avoid overflowing */
+			// TODO: check all of these wacky overflow points
+			//       to make sure they're right
 			int uatt, ubucks;
 
 			uatt = po->productivity;
@@ -959,17 +888,7 @@ void Game::Do1StudyOrder(Unit *u,Object *obj)
 		return;
 	}
 	
-	// Small patch for Ceran Mercs
-	if(u->GetMen(I_MERC)) {
-		u->Error("STUDY: Mercenaries are not allowed to study.");
-		return;
-	}
-
 	if((SkillDefs[sk].flags & SkillType::MAGIC) && u->type != U_MAGE) {
-		if(u->type == U_APPRENTICE) {
-			u->Error("STUDY: An apprentice cannot be made into an mage.");
-			return;
-		}
 		if(Globals->FACTION_LIMIT_TYPE != GameDefs::FACLIM_UNLIMITED) {
 			if (CountMages(u->faction) >= AllowedMages(u->faction)) {
 				u->Error("STUDY: Can't have another magician.");
@@ -980,42 +899,10 @@ void Game::Do1StudyOrder(Unit *u,Object *obj)
 			u->Error("STUDY: Only 1-man units can be magicians.");
 			return;
 		}
-		if(!(Globals->MAGE_NONLEADERS)) {
-			if (u->GetLeaders() != 1) {
-				u->Error("STUDY: Only leaders may study magic.");
-				return;
-			}
-		}
+		// TODO: should we have a type for qm & tacticians?
 		reset_man = u->type;
 		u->type = U_MAGE;
-	}
-
-	if((SkillDefs[sk].flags&SkillType::APPRENTICE) &&
-			u->type != U_APPRENTICE) {
-		if(u->type == U_MAGE) {
-			u->Error("STUDY: A mage cannot be made into an apprentice.");
-			return;
-		}
-
-		if(Globals->FACTION_LIMIT_TYPE != GameDefs::FACLIM_UNLIMITED) {
-			if(CountApprentices(u->faction)>=AllowedApprentices(u->faction)) {
-				u->Error("STUDY: Can't have another apprentice.");
-				return;
-			}
-		}
-		if(u->GetMen() != 1) {
-			u->Error("STUDY: Only 1-man units can be apprentices.");
-			return;
-		}
-		if(!(Globals->MAGE_NONLEADERS)) {
-			if(u->GetLeaders() != 1) {
-				u->Error("STUDY: Only leaders may be apprentices.");
-				return;
-			}
-		}
-		reset_man = u->type;
-		u->type = U_APPRENTICE;
-	}
+	} // end mage check
 
 	if ((Globals->TRANSPORT & GameDefs::ALLOW_TRANSPORT) &&
 			(sk == S_QUARTERMASTER) && (u->GetSkill(S_QUARTERMASTER) == 0) &&
@@ -1029,7 +916,7 @@ void Game::Do1StudyOrder(Unit *u,Object *obj)
 			u->Error("STUDY: Only 1-man units can be quartermasters.");
 			return;
 		}
-	}
+	}  // end quartermaster check
 
 	// If TACTICS_NEEDS_WAR is enabled, and the unit is trying to study to tact-5,
 	// check that there's still space...
@@ -1041,7 +928,7 @@ void Game::Do1StudyOrder(Unit *u,Object *obj)
 			return;
 		}
 		if (u->GetMen() != 1) {
-			u->Error("STUDY: Only 1-man units can study to level 5 in tactics.");
+			u->Error("STUDY: Only 1-man units can be Tacticians.");
 			return;
 		}
 		
@@ -1086,7 +973,7 @@ void Game::Do1StudyOrder(Unit *u,Object *obj)
 		str += ".";
 		u->Event(str);
 	} else {
-		// if we just tried to become a mage or apprentice, but
+		// if we just tried to become a mage but
 		// were unable to study, reset unit to whatever it was before.
 		if(reset_man != -1)
 			u->type = reset_man;
@@ -1125,7 +1012,7 @@ void Game::RunMoveOrders()
 					}
 				}
 			}
-/*
+/* TODO: Is this obsolete?
 	  DoAdvanceAttacks(locs);
 	  locs->DeleteAll();
 */

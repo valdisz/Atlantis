@@ -74,9 +74,9 @@ struct Materials
 class ItemType
 {
 	public:
-		char *name;
-		char *names;
-		char *abr;
+		char *name;   // eg. sword
+		char *names;  // Plural: eg. swords
+		char *abr;    // SWOR
 
 		enum {
 			CANTGIVE = 0x1,
@@ -109,7 +109,8 @@ class ItemType
 		int type;
 		int baseprice;
 		int combat;
-
+		
+		// Carrying capacities, eg. for horses
 		int walk;
 		int ride;
 		int fly;
@@ -124,7 +125,8 @@ class ItemType
 		int max_inventory;  // if non-zero, amount allowed in inventory.
 
 		enum {
-			// LOSE_LINKED only make sense with ESC_LEV_SQUARE or ESC_LEV_QUAD
+			// LOSE_LINKED only makes sense with 
+			// ESC_LEV_SQUARE or ESC_LEV_QUAD
 			LOSE_LINKED = 0x01,		// All items of same type will be lost.
 			// The rest of these are mutually exclusive
 			HAS_SKILL = 0x02,		// Check skill, if exists at level, no loss
