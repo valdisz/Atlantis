@@ -58,7 +58,7 @@ public:
     AString *gettoken();
     int getat();
     AString *getlegal();
-    AString *Trunc(int, int back=15);
+    AString *Trunc(int, int back=30);
     int value();
     AString *StripWhite();
 
