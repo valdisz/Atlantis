@@ -205,6 +205,16 @@ Soldier::Soldier(Unit * u,Object * o,int regtype,int r,int ass)
 		attackBonus = unit->GetSkill(S_COMBAT);
 		defenseBonus = attackBonus;
 		numAttacks = 1;
+	} else {
+		// Okay.  We got a weapon.  If this weapon also has a special
+		// and we don't have a special set, use that special.
+		// Weapons (like Runeswords) which are both weapons and battle
+		// items will be skipped in the battle items setup and handled
+		// here.
+		if ((ItemDefs[weapon].type & IT_BATTLE) && special != -1) {
+			special = BattleItemDefs[ItemDefs[weapon].index].index;
+			slevel = BattleItemDefs[ItemDefs[weapon].index].skillLevel;
+		}
 	}
 
 	// Set the attack and defense skills
