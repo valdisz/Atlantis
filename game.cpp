@@ -92,7 +92,7 @@ AString Game::GetXtraMap(ARegion * reg,int type)
     case 1:
         i = reg->CountWMons();
         return (i ? ((AString) i) : (AString(" ")));
-    case 2:
+    case 2: {
         forlist(&reg->objects) {
             Object * o = (Object *) elem;
             if (!(ObjectDefs[o->type].flags & ObjectType::CANENTER)) {
@@ -104,6 +104,7 @@ AString Game::GetXtraMap(ARegion * reg,int type)
             }
         }
         return " ";
+	}
     case 3:
         if (reg->gate) return "*";
         return " ";

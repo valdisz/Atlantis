@@ -252,7 +252,7 @@ void Game::RunStealOrders()
 		ARegion * r = (ARegion *) elem;
 		forlist(&r->objects) {
 			Object * o = (Object *) elem;
-			forlist(&o->units) {
+			forlist_safe(&o->units) {
 				Unit * u = (Unit *) elem;
 				if (u->stealorders) {
 					if (u->stealorders->type == O_STEAL) {

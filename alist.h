@@ -49,17 +49,32 @@ public:
   AListElem * Next(AListElem *);
   AListElem * First();
   int Num();
+  /* Helper for the fixed forlist */
+  int NextLive(AListElem **copy, int size, int pos);
 private:
   AListElem *list;
   AListElem *lastelem;
   int num;
 };
 
-#define forlist(l)	AListElem * elem, * _elem2; \
-      for ( elem=(l)->First(), \
-      _elem2 = (elem ? (l)->Next(elem) : 0); \
-      elem; \
-      elem = _elem2, \
-      _elem2 = (_elem2 ? ((l)->Next(_elem2)) : 0))
+#define forlist(l) \
+	AListElem *elem, *_elem2; \
+	for (elem=(l)->First(), \
+			_elem2 = (elem ? (l)->Next(elem) : 0); \
+			elem; \
+			elem = _elem2, \
+			_elem2 = (_elem2 ? ((l)->Next(_elem2)) : 0))
+
+#define forlist_safe(l) \
+	int size = (l)->Num(); \
+	AListElem **copy = new AListElem*[size]; \
+	AListElem *elem; \
+	int pos; \
+	for (pos = 0, elem = (l)->First(); elem; elem = elem->next, pos++) { \
+		copy[pos] = elem; \
+	} \
+	for (pos = 0; \
+			pos < size ? (elem = copy[pos], 1) : (delete [] copy, 0); \
+			pos = (l)->NextLive(copy, size, pos))
 
 #endif

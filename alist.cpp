@@ -126,3 +126,14 @@ char AList::Remove(AListElem * e) {
 int AList::Num() {
   return num;
 }
+
+int AList::NextLive(AListElem **copy, int size, int pos) {
+	while (++pos < size) {
+		for (AListElem *elem = First(); elem; elem = elem->next) {
+			if (elem == copy[pos])
+				return pos;
+		}
+	}
+	return pos;
+}
+
