@@ -1616,6 +1616,7 @@ void Game::FixGateNums()
 {
 	for(int i=1; i <= regions.numberofgates; i++) {
 		ARegion *tar = regions.FindGate(i);
+		if(tar) continue; // This gate exists, continue
 		int done = 0;
 		while(!done) {
 			// We have a missing gate, add it
