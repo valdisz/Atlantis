@@ -510,6 +510,12 @@ void Game::ParseOrders(int faction, Aorders *f, OrdersCheck *pCheck)
 		unit->ClearOrders();
 		unit = 0;
 	}
+
+	/* Clean up if we had a bad form order and no end form */
+	if(former && pCheck) {
+		former->ClearOrders();
+		former = 0;
+	}
 }
 
 void Game::ProcessOrder(int orderNum, Unit *unit, AString *o,

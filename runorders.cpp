@@ -1971,6 +1971,12 @@ int Game::DoGiveOrder(ARegion * r,Unit * u,GiveOrder * o)
 		return 0;
 	}
 
+	if(u == t) {
+		u->Error(AString("GIVE: Attempt to give ")+ItemString(o->item,amt)+
+				" to self.");
+		return 0;
+	}
+
 	// New RULE -- Must be able to see unit to give something to them!
 	if(!u->CanSee(r, t) &&
 			(t->faction->GetAttitude(u->faction->num) < A_FRIENDLY)) {
