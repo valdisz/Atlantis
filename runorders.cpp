@@ -1313,7 +1313,6 @@ void Game::DoSell(ARegion * r,Market * m)
 					u->Event(AString("Sells ") + ItemString(o->item,temp)
 							+ " at $" + m->price + " each.");
 					delete o;
-					break;
 				}
 			}
 		}
@@ -1442,7 +1441,6 @@ void Game::DoBuy(ARegion * r,Market * m)
 					u->Event(AString("Buys ") + ItemString(o->item,temp)
 							+ " at $" + m->price + " each.");
 					delete o;
-					break;
 				}
 			}
 		}

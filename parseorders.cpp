@@ -303,6 +303,7 @@ void Game::ParseOrders(int faction, Aorders *f, OrdersCheck *pCheck)
 				}
 
 				if(unit && pCheck) unit->ClearOrders();
+				if(former && pCheck) former->ClearOrders();
 
 				former = 0;
 				unit = 0;
@@ -312,6 +313,7 @@ void Game::ParseOrders(int faction, Aorders *f, OrdersCheck *pCheck)
 			case O_UNIT:
 				if (fac) {
 					if (former) {
+						if (pCheck) former->ClearOrders();
 						former = 0;
 						ParseError( pCheck, 0, fac, "FORM: without END." );
 						formerOnTurnDelay = 0;
@@ -2919,7 +2921,8 @@ void Game::ProcessSailOrder(Unit * u,AString * o, OrdersCheck *pCheck )
 			u->monthorders = &( pCheck->dummyOrder );
 			u->monthorders->type = O_SAIL;
 		} else {
-			if ((u->orderDelayMonthOrders && u->monthorders->type != O_SAIL) ||
+			if ((u->orderDelayMonthOrders &&
+						u->orderDelayMonthOrders->type != O_SAIL) ||
 					(Globals->TAX_PILLAGE_MONTH_LONG &&
 					 ((u->taxing == TAX_TAX) || (u->taxing == TAX_PILLAGE)))) {
 				pCheck->Error("SAIL: Overwriting previous DELAYED month-long "

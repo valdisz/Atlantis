@@ -621,13 +621,13 @@ AString *ShowSkill::Report(Faction *f)
 			*str += "A mage with the Summon Balrog skill may summon a balrog "
 				"into his inventory, to aid him in combat. A mage has a 20 "
 				"percent times his skill level chance of summoning a balrog, "
-				"but may only control one balrog at a time. As with other "
-				"demons, the balrog has a chance of breaking free of the "
-				"mage's control at the end of each turn. This chance is equal "
-				"to 1 over 4 times the mage's skill level to the fourth "
-				"power (or, from 1 over 4 at level 1, to 1 over 250 at "
-				"level 5). To use this spell, the mage should issue the "
-				"order CAST Summon_Balrog.";
+				"but may only summon a balrog if one is not already under "
+				"his control. As with other demons, the balrog has a chance "
+				"of breaking free of the mage's control at the end of each "
+				"turn. This chance is equal to 1 over 4 times the mage's "
+				"skill level to the fourth power (or, from 1 over 4 at "
+				"level 1, to 1 over 2500 at level 5). To use this spell, "
+				"the mage should issue the order CAST Summon_Balrog.";
 			break;
 		case S_BANISH_DEMONS:
 			if(level > 1) break;

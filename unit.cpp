@@ -768,7 +768,7 @@ int Unit::GetAttackRiding()
 				return riding;
 			}
 			/* XXX -- Fix this -- Should also be able to carry the man */
-			if (ItemDefs[i->type].ride - ItemDefs[i->type].weight) {
+			if (ItemDefs[i->type].ride - ItemDefs[i->type].weight >= 10) {
 				if (riding <= 3) return riding;
 				lowriding = 3;
 			}
@@ -1499,7 +1499,7 @@ int Unit::GetWeapon(int index, int riding, int &attackBonus, int &defenseBonus,
 			// returns -1 if weapon cannot be used, else the usable skill level
 			if(baseSkillLevel == -1) continue;
 			// Attack and defense skill
-			if(!pWep->flags & WeaponType::NEEDSKILL)
+			if(!(pWep->flags & WeaponType::NEEDSKILL))
 				baseSkillLevel = combatSkill;
 			attackBonus = baseSkillLevel + pWep->attackBonus;
 			if(pWep->flags & WeaponType::NOATTACKERSKILL)
