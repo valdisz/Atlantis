@@ -477,6 +477,9 @@ void Game::SinkShips()
 								drown = !(u->CanSwim());
 								break;
 							case GameDefs::WFLIGHT_MUST_LAND:
+								drown = !(u->CanReallySwim() || u->leftShip);
+								u->leftShip = 0;
+								break;
 							case GameDefs::WFLIGHT_NONE:
 								drown = !(u->CanReallySwim());
 								break;
@@ -893,6 +896,7 @@ void Game::Do1EnterOrder(ARegion * r,Object * in,Unit * u)
 			u->Error("LEAVE: Can't leave a ship in the ocean.");
 			return;
 		}
+		if(in->IsBoat() && u->CanSwim()) u->leftShip = 1;
 	} else {
 		to = r->GetObject(u->enter);
 		u->enter = 0;

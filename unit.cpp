@@ -529,6 +529,7 @@ void Unit::ClearOrders()
 	canattack = 1;
 	nomove = 0;
 	enter = 0;
+	leftShip = 0;
 	destroy = 0;
 	attackorders = 0;
 	stealorders = 0;
