@@ -1056,38 +1056,13 @@ void Unit::AdjustSkills()
 
 int Unit::MaintCost()
 {
-	int retval = 0;
-	int i;
 	if (type == U_WMON || type == U_GUARD || type == U_GUARDMAGE) return 0;
 
-	int leaders = GetLeaders();
-	if(leaders < 0) leaders = 0;
-	int nonleaders = GetMen() - leaders;
-	if (nonleaders < 0) nonleaders = 0;
-
-	// Handle leaders
-	// Leaders are counted at maintenance_multiplier * skills in all except
-	// the case where it's not being used (mages, leaders, all)
-	if (Globals->MULTIPLIER_USE != GameDefs::MULT_NONE) {
-		i = leaders * SkillLevels() * Globals->MAINTENANCE_MULTIPLIER;
-		if (i < (leaders * Globals->LEADER_COST))
-			i = leaders * Globals->LEADER_COST;
-	} else
-		i = leaders * Globals->LEADER_COST;
-	retval += i;
-
-	// Handle non-leaders
-	// Non leaders are counted at maintenance_multiplier * skills only if
-	// all characters pay that way.
-	if (Globals->MULTIPLIER_USE == GameDefs::MULT_ALL) {
-		i = nonleaders * SkillLevels() * Globals->MAINTENANCE_MULTIPLIER;
-		if (i < (nonleaders * Globals->MAINTENANCE_COST))
-			i = nonleaders * Globals->MAINTENANCE_COST;
-	} else
-		i = nonleaders * Globals->MAINTENANCE_COST;
-	retval += i;
-
-	return retval;
+	if(IsLeader()) {
+		return GetLeaders() * Globals->LEADER_COST;
+	} else {
+		return GetMen() * Globals->MAINTENANCE_COST;
+	}
 }
 
 void Unit::Short(int needed, int hunger)
@@ -1127,14 +1102,7 @@ void Unit::Short(int needed, int hunger)
 				SetMen(i, GetMen(i) - 1);
 				n++;
 			}
-			if (Globals->MULTIPLIER_USE == GameDefs::MULT_ALL) {
-				levels = SkillLevels();
-				i = levels * Globals->MAINTENANCE_MULTIPLIER;
-				if (i < Globals->MAINTENANCE_COST)
-					i = Globals->MAINTENANCE_COST;
-				needed -= i;
-			} else
-				needed -= Globals->MAINTENANCE_COST;
+			needed -= Globals->MAINTENANCE_COST;
 			hunger -= Globals->UPKEEP_MINIMUM_FOOD;
 			if (needed < 1 && hunger < 1) {
 				if (n) Error(AString(n) + " starve to death.");
@@ -1160,14 +1128,7 @@ void Unit::Short(int needed, int hunger)
 				SetMen(i, GetMen(i) - 1);
 				n++;
 			}
-			if (Globals->MULTIPLIER_USE != GameDefs::MULT_NONE) {
-				levels = SkillLevels();
-				i = levels * Globals->MAINTENANCE_MULTIPLIER;
-				if (i < Globals->LEADER_COST)
-					i = Globals->LEADER_COST;
-				needed -= i;
-			} else
-				needed -= Globals->LEADER_COST;
+			needed -= Globals->LEADER_COST;
 			hunger -= Globals->UPKEEP_MINIMUM_FOOD;
 			if (needed < 1 && hunger < 1) {
 				if (n) Error(AString(n) + " starve to death.");
@@ -1679,9 +1640,7 @@ int Unit::Taxers(int numtaxers)
 	
 	if(numtaxers) return(taxers);
 
-	int taxes = Globals->TAX_BASE_INCOME * basetax
-		+ Globals->TAX_BONUS_WEAPON * weapontax
-		+ Globals->TAX_BONUS_ARMOR * armortax;
+	int taxes = Globals->TAX_BASE_INCOME * basetax;
 	return(taxes);
 }
 

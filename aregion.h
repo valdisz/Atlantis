@@ -275,8 +275,6 @@ class ARegion : public AListElem
 		int buildingseq;
 		int weather;
 		int gate;
-		int gatemonth;
-		int gateopen;
 
 		TownInfo *town;
 		int race;

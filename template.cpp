@@ -122,19 +122,6 @@ static char *ter_fill[] = {
  " !!!! ",
  " !!!! ",
 
- // For conquest
- // Island Plain
- "      ",
- "      ",
-
- // Island swamp
- "  v v ",
- " v v  ",
-
- // Island mountain
- " /\\/\\ ",
- "/  \\ \\",
-
  // For Ceran terrains
 
  // plain1

@@ -976,12 +976,6 @@ int Game::RunConstructGate(ARegion *r,Unit *u, int spell)
 	u->Event(AString("Constructs a Gate in ")+r->ShortPrint( &regions )+".");
 	regions.numberofgates++;
 	r->gate = regions.numberofgates;
-	if(Globals->GATES_NOT_PERENNIAL) {
-		int dm = Globals->GATES_NOT_PERENNIAL / 2;
-		int gm = month + 1 - getrandom(dm) - getrandom(dm) - getrandom(Globals->GATES_NOT_PERENNIAL % 2);
-		while(gm < 0) gm += 12;
-		r->gatemonth = gm;
-	}
 	return 1;
 }
 
@@ -1457,7 +1451,7 @@ int Game::RunDetectGates(ARegion *r,Object *o,Unit *u)
 
 	u->Event("Casts Gate Lore, detecting nearby Gates:");
 	int found = 0;
-	if ((r->gate) && (!r->gateopen)) {
+	if (r->gate) {
 	    u->Event(AString("Identified local gate number ") + (r->gate) +
 		" in " + r->ShortPrint(&regions) + ".");
 	}
@@ -1536,11 +1530,6 @@ int Game::RunGateJump(ARegion *r,Object *o,Unit *u)
 		return 0;
 	}
 
-	if (!r->gateopen) {
-	    u->Error("CAST: Gate not open at this time of year.");
-	    return 0;
-	}
-
 	int maxweight = 10;
 	if (order->gate != -1) level -= 2;
 	switch (level) {
@@ -1599,10 +1588,6 @@ int Game::RunGateJump(ARegion *r,Object *o,Unit *u)
 		if (!tar) {
 			u->Error("CAST: No such target gate.");
 			return 0;
-		}
-		if(!tar->gateopen) {
-		    u->Error("CAST: Target gate not open at this time of year.");
-		    return 0;
 		}
 
 		u->Event("Casts Gate Jump.");

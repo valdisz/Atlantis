@@ -294,7 +294,6 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableObject(O_PRESERVE);
 	EnableObject(O_SACGROVE);
 	DisableObject(O_BKEEP);
-	DisableObject(O_PALACE);
 	
 	EnableObject(O_ISLE);
 	EnableObject(O_DERELICT);

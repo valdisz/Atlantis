@@ -486,8 +486,6 @@ void Game::EditGameRegionTerrain( ARegion *pReg )
 		if(Globals->GATES_EXIST && pReg->gate && pReg->gate != -1) {
 			Awrite(AString("There is a Gate here (Gate ") + pReg->gate +
 				" of " + (regions.numberofgates) + ").");
-			if(Globals->GATES_NOT_PERENNIAL) Awrite(AString("This gate opens "
-                "in month ") + pReg->gatemonth);
 			Awrite("");
 		}
 
@@ -590,7 +588,6 @@ void Game::EditGameRegionTerrain( ARegion *pReg )
                     }
                 }
                 pReg->gate = gatenum;
-                pReg->gatemonth = getrandom(12);                
             }
             else if (*pToken == "w") {
                 SAFE_DELETE( pToken );

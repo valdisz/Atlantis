@@ -80,23 +80,6 @@ public:
 	int MAINTENANCE_COST;
 	int LEADER_COST;
 
-	// If we use skill level multiplier then no units, all units, leaders,
-	// or just mages pay X per level of skill they have per man.   The
-	// first value (MAINTENCE_MULTIPLIER) is how much is payed per skill
-	// level.   The second value (MULTIPLIER_USE) is set to one of the
-	// values in the given enumeration.
-	// The costs listed above are used for any units NOT covered by the
-	// multiplier use
-	int MAINTENANCE_MULTIPLIER;
-
-	enum {
-		MULT_NONE,
-		MULT_MAGES,
-		MULT_LEADERS,
-		MULT_ALL,
-	};
-	int MULTIPLIER_USE;
-
 	int STARVE_PERCENT;
 
 	enum {
@@ -119,12 +102,6 @@ public:
 	// base tax income for ANY eligible taxer
 	// AND for pillaging
 	int TAX_BASE_INCOME;
-	// bonus for useable weapons
-	int TAX_BONUS_WEAPON;
-	// bonus for armor (only in conjunction with a weapon)
-	int TAX_BONUS_ARMOR;
-	// bonus for manning a fortification
-	int TAX_BONUS_FORT;
 	
 	// Options to control who is able to tax
 	enum {
@@ -195,7 +172,6 @@ public:
 	int WEATHER_EXISTS;
 	int OPEN_ENDED;
 	int NEXUS_EXISTS;
-	int CONQUEST_GAME;
 
 	//
 	// RANDOM_ECONOMY determines whether the economy for different regions
@@ -594,19 +570,6 @@ public:
 	// portage' that the above allows by default?
 	int ALLOW_TRIVIAL_PORTAGE;
 	
-	// Non-Perennial Gates: setting this between 1 and 11 will cause gates
-	// to open and close. Gates will be open this number of months per year.
-	// Each gate will have a different period of opening (although they are
-	// somewhat related to gate index). A gate will not be detectable or
-	// useable while closed; EXCEPTION: a closed gate may be the TARGET for
-	// a random jump (stranding the jumper until the gate opens). Nexus
-	// gates (and optionally, starting city gates) are open all the time.
-	int GATES_NOT_PERENNIAL;
-	
-	// Are gates in starting cities open all year round? Need only be set
-	// if GATES_NOT_PERENNIAL is selected.
-	int START_GATES_OPEN;
-
 	// Should a message appear in the report that a closed gate exists when
 	// a that is closed would normally be detected (this might affect some
 	// clients with unflexible parsers badly...)

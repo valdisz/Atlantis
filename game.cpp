@@ -1066,8 +1066,6 @@ void Game::PreProcessTurn()
 			ARegion *pReg = (ARegion *) elem;
 			if(Globals->WEATHER_EXISTS)
 				pReg->SetWeather(regions.GetWeather(pReg, month));
-			if(Globals->GATES_NOT_PERENNIAL)
-				pReg->SetGateStatus(month);
 			pReg->DefaultOrders();
 		}
 	}

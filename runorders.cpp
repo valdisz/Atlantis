@@ -642,30 +642,6 @@ void Game::RunTaxOrders()
 	}
 }
 
-// TODO: Haven't heard of this one - what does it do?
-int Game::FortTaxBonus(Object *o, Unit *u)
-{
-	int protect = ObjectDefs[o->type].protect;
-	int fortbonus = 0;
-	forlist(&o->units) {
-		Unit *unit = (Unit *) elem;
-		int men = unit->GetMen();
-		if(unit->num == u->num) {
-			if(unit->taxing == TAX_TAX) {
-				int fortbonus = men;
-				int maxtax = unit->Taxers(1);
-				if(fortbonus > protect) fortbonus = protect;
-				if(fortbonus > maxtax) fortbonus = maxtax;
-				fortbonus *= Globals->TAX_BONUS_FORT;
-				return(fortbonus);
-			}
-		}
-		protect -= men;
-		if(protect < 0) protect = 0;	
-	}
-	return(fortbonus);
-}
-
 int Game::CountTaxes(ARegion *reg)
 {
 	int t = 0;
@@ -684,8 +660,6 @@ int Game::CountTaxes(ARegion *reg)
 					u->taxing = TAX_NONE;
 				} else {
 					int men = u->Taxers(0);
-					int fortbonus = u->GetMen();
-					if(fortbonus > protect) fortbonus = protect;
 					protect -= u->GetMen();
 					if(protect < 0) protect = 0;
 					if (men) {
@@ -694,7 +668,7 @@ int Game::CountTaxes(ARegion *reg)
 									"regions.");
 							u->taxing = TAX_NONE;
 						} else {
-							t += men + fortbonus * Globals->TAX_BONUS_FORT;
+							t += men;
 						}
 					} else {
 						u->Error("TAX: Unit cannot tax.");
@@ -719,9 +693,8 @@ void Game::RunTaxRegion(ARegion *reg)
 			Unit *u = (Unit *) elem;
 			if (u->taxing == TAX_TAX) {
 				int t = u->Taxers(0);
-				t += FortTaxBonus(o, u);
 					// TODO: Is this one of those funky overflow things?
-					double fAmt = ((double) t) *
+				double fAmt = ((double) t) *
 					((double) reg->wealth) / ((double) desired);
 				int amt = (int) fAmt;
 				reg->wealth -= amt;

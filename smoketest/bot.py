@@ -369,8 +369,7 @@ def generateturn(report, template):
             # for a test, we'll move around randomly
             if random.random() >= 0.5:
                 temp = int(random.random()*len(directions))
-                #temp2 = int(random.random()*len(directions))
-                orders += "move "+directions[temp]  #+" "+directions[temp2]+"\n"
+                orders += "move "+directions[temp]+"\n"
             #elif random.random() >= 0.6:
             #    orders += "work\n"
                 #print "Moving..."

@@ -1457,7 +1457,7 @@ void ARegionList::RandomTerrain(ARegionArray *pArr)
 						adjname = newregion->wages;
 					}
 				}
-				if (adjtype && !Globals->CONQUEST_GAME) {
+				if (adjtype) {
 					reg->type = adjtype;
 					reg->wages = adjname;
 				} else {
@@ -1769,11 +1769,6 @@ void ARegionList::FinalSetupGates()
 			}
 			r->gate = index+1;
 			used[index] = 1;
-			// setting up gatemonth
-			int nmon = (getrandom(3) - 1) + (getrandom(3) - 1) + ((index+1) % 12);
-			if (nmon > 11) nmon = nmon - 12;
-			if (nmon < 0) nmon = nmon + 12;
-			r->gatemonth = nmon;
 		}
 	}
 	delete used;
