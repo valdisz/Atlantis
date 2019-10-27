@@ -752,7 +752,7 @@ void Faction::WriteReportJSON(AreportJSON *f, Game *pGame)
 //		f->PutStr("");
 	}
 
-	f->Key("Faction Status");
+	f->Key("factionStatus");
 	f->StartObject();
 //	f->PutStr("Faction Status:");
 	if (Globals->FACTION_LIMIT_TYPE == GameDefs::FACLIM_MAGE_COUNT) {

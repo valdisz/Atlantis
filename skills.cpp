@@ -121,6 +121,15 @@ AString SkillStrs(int i)
 	return temp;
 }
 
+void WriteSkillPropsToJson(AreportJSON *f, int i)
+{
+	f->Key("name");
+	f->String(SkillDefs[i].name);
+
+	f->Key("abbr");
+	f->String(SkillDefs[i].abbr);
+}
+
 int SkillCost(int skill)
 {
 	return SkillDefs[skill].cost;
@@ -450,8 +459,7 @@ void SkillList::ReportJSON(AreportJSON *f, int nummen)
 			i = 1;
 		}
 		f->StartObject();
-		f->Key("name");
-		f->String(SkillStrs(s->type));
+		WriteSkillPropsToJson(f, s->type);
 //		temp += SkillStrs(s->type);
 		f->Key("level");
 		f->String(GetLevelByDays(s->days / nummen));
