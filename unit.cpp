@@ -762,6 +762,8 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 	f->StartObject();
 	f->Key("name");
 	f->String(*name);
+	f->Key("unitNum");
+	f->Int(num);
 
 	AString temp;
 	if (obs == 2) {
@@ -806,6 +808,8 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 	if (obs > 0) {
 		f->Key("faction");
 		f->String(*faction->name);
+		f->Key("factionNum");
+		f->Int(faction->num);
 //		temp += AString(", ") + *faction->name;
 		if (guard == GUARD_AVOID) {
 //			temp += ", avoiding";
