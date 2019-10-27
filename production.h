@@ -40,7 +40,8 @@ public:
 	void Writeout(Aoutfile *);
 	void Readin(Ainfile *);
 	AString WriteReport();
-	
+	void WriteReportJSON(AreportJSON *f);
+
 	int itemtype;
 	int baseamount;
 	int amount;

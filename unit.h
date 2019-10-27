@@ -130,11 +130,15 @@ class Unit : public AListElem
 		void Readin( Ainfile *f, AList *, ATL_VER v );
 
 		AString SpoilsReport(void);
+		void SpoilsReportJSON(AreportJSON *f);
 		int CanGetSpoil(Item *i);
-		void WriteReport(Areport *,int,int,int,int, int, int);
+		void WriteReport(Areport *, int, int, int, int, int, int);
+		void WriteReportJSON(AreportJSON *, int, int, int, int, int, int);
 		AString GetName(int);
 		AString MageReport();
+		void MageReportJSON(AreportJSON *f);
 		AString ReadyItem();
+		void ReadyItemJSON(AreportJSON *f);
 		AString StudyableSkills();
 		AString * BattleReport(int);
 		AString TemplateReport();

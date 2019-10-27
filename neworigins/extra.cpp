@@ -25,9 +25,9 @@
 //
 // This file contains extra game-specific functions
 //
-#include "game.h"
-#include "gamedata.h"
-#include "quests.h"
+#include "../game.h"
+#include "../gamedata.h"
+#include "../quests.h"
 #include <string>
 #include <iterator>
 
@@ -1182,11 +1182,11 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_ADBAXE);
 	EnableItem(I_ADRING);
 	EnableItem(I_ADPLATE);
-	ModifyItemProductionSkill(I_ADMANTIUM, "MINI", 5);
-	ModifyItemProductionSkill(I_ADSWORD, "WEAP", 5);
-	ModifyItemProductionSkill(I_ADBAXE, "WEAP", 5);
-	ModifyItemProductionSkill(I_ADRING, "ARMO", 5);
-	ModifyItemProductionSkill(I_ADPLATE, "ARMO", 5);
+	ModifyItemProductionSkill(I_ADMANTIUM, (char*)&"MINI", 5);
+	ModifyItemProductionSkill(I_ADSWORD, (char*)&"WEAP", 5);
+	ModifyItemProductionSkill(I_ADBAXE, (char*)&"WEAP", 5);
+	ModifyItemProductionSkill(I_ADRING, (char*)&"ARMO", 5);
+	ModifyItemProductionSkill(I_ADPLATE, (char*)&"ARMO", 5);
 	ModifyItemBasePrice(I_ADMANTIUM, 300);
 	ModifyItemBasePrice(I_ADSWORD, 1000);
 	ModifyItemBasePrice(I_ADBAXE, 2000);

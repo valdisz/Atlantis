@@ -131,6 +131,14 @@ AString Market::Report()
 	return temp;
 }
 
+void Market::ReportJSON(AreportJSON *f)
+{
+	ItemStringJSON (f, item, amount);
+
+	f->Key("price");
+	f->Int(price);
+}
+
 void MarketList::PostTurn(int population, int wages)
 {
 	forlist(this) {

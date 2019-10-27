@@ -75,6 +75,16 @@ Areport::~Areport()
 	delete file;
 }
 
+AreportJSON::AreportJSON()
+{
+	writer = new Writer<StringBuffer>(s);
+}
+
+AreportJSON::~AreportJSON()
+{
+	delete writer;
+}
+
 Arules::Arules()
 {
 	file = new ofstream;
@@ -146,6 +156,12 @@ void Aorders::Close()
 void Areport::Close()
 {
 	file->close();
+}
+
+void AreportJSON::Close()
+{
+	json.PutStr(s.GetString());
+	json.Close();
 }
 
 void Arules::Close()
@@ -245,10 +261,20 @@ void Areport::Open(const AString &s)
 	tabs = 0;
 }
 
+void AreportJSON::Open(const AString &s)
+{
+	AString *name = getfilename(s);
+	int i = json.OpenByName(name->Str ());
+
+	if (i != -1)
+	{
+	}
+}
+
 int Areport::OpenByName(const AString &s)
 {
 	AString temp = s;
-	file->open(temp.Str(), ios::out|ios::ate);
+	file->open(temp.Str(), ios::out | ios::ate);
 	if (!file->rdbuf()->is_open()) return -1;
 	// Handle a broke ios::ate implementation on some boxes
 	file->seekp(0, ios::end);
@@ -257,6 +283,18 @@ int Areport::OpenByName(const AString &s)
 		return -1;
 	}
 	tabs = 0;
+	return 0;
+}
+
+int AreportJSON::OpenByName(const AString &s)
+{
+	AString name = s;
+	int i = json.OpenByName(name.Str());
+
+	if (i != -1)
+	{
+	}
+
 	return 0;
 }
 
@@ -467,4 +505,51 @@ AString Arules::Link(const AString &href, const AString &text)
 void Arules::LinkRef(const AString &name)
 {
 	PutStr(AString("<a name=\"")+name+"\"></a>");
+}
+
+void AreportJSON::StartObject()
+{
+	writer->StartObject();
+}
+
+void AreportJSON::EndObject()
+{
+	writer->EndObject();
+}
+
+void AreportJSON::StartArray()
+{
+	writer->StartArray();
+}
+
+void AreportJSON::EndArray()
+{
+	writer->EndArray();
+}
+
+void AreportJSON::Key(const AString &s)
+{
+	AString temp = s;
+	writer->Key(temp.Str ());
+}
+
+void AreportJSON::String(const AString &s)
+{
+	AString temp = s;
+	writer->String(temp.Str());
+}
+
+void AreportJSON::Bool(const bool &b)
+{
+	writer->Bool(b);
+}
+
+void AreportJSON::Int(const int &i)
+{
+	writer->Int(i);
+}
+
+void AreportJSON::Double(const double &i)
+{
+	writer->Double(i);
 }

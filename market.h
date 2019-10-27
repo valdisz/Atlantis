@@ -57,6 +57,7 @@ public:
 	void Writeout(Aoutfile * f);
 	void Readin(Ainfile * f);
 	AString Report();
+	void ReportJSON(AreportJSON *f);
 };
 
 class MarketList : public AList {

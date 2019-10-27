@@ -88,6 +88,13 @@ AString Production::WriteReport()
 	return temp;
 }
 
+void Production::WriteReportJSON(AreportJSON *f)
+{
+	ItemStringJSON(f, itemtype, amount);
+//	AString temp = ItemString(itemtype, amount);
+//	return temp;
+}
+
 void ProductionList::Writeout(Aoutfile *f)
 {
 	f->PutInt(Num());

@@ -153,6 +153,7 @@ class SkillList : public AList {
 		int GetStudyRate(int, int); /* Skill, num of men */
 		SkillList * Split(int,int); /* total men, num to split */
 		AString Report(int); /* Number of men */
+		void ReportJSON(AreportJSON *f, int); /* Number of men */
 		void Readin(Ainfile *);
 		void Writeout(Aoutfile *);
 };

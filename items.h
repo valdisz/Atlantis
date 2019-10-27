@@ -348,7 +348,8 @@ enum {
 	FULLNUM = 0x01,
 	ALWAYSPLURAL = 0x02
 };
-extern AString ItemString(int type, int num, int flags=0);
+extern AString ItemString(int type, int num, int flags = 0);
+extern void ItemStringJSON(AreportJSON *f, int type, int num, int flags = 0);
 extern AString *ItemDescription(int item, int full);
 
 extern int IsSoldier(int);
@@ -363,6 +364,7 @@ class Item : public AListElem
 		void Writeout(Aoutfile *);
 		
 		AString Report(int);
+		void ReportJSON(AreportJSON *f, int seeillusions);
 
 		int type;
 		int num;
@@ -377,8 +379,11 @@ class ItemList : public AList
 		void Writeout(Aoutfile *);
 
 		AString Report(int, int, int);
+		void ReportJSON(AreportJSON *f, int obs, int seeillusions, int nofirstcomma);
 		AString BattleReport();
 		AString ReportByType(int, int, int, int);
+		void ReportByTypeJSON(AreportJSON *f, int type, int obs, int seeillusions,
+			int nofirstcomma);
 
 		int Weight();
 		int GetNum(int);

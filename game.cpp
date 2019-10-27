@@ -23,14 +23,19 @@
 //
 // END A3HEADER
 
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include <string.h>
+
 #ifdef WIN32
 #include <memory.h>	// Needed for memcpy on windows
 #include "io.h"		// Needed for access() on windows
 #define F_OK	0
-#endif
-
-#include <string.h>
+#define access _access
+#else
 #include <unistd.h>
+#endif
 
 #include "game.h"
 #include "unit.h"
@@ -38,6 +43,8 @@
 #include "astring.h"
 #include "gamedata.h"
 #include "quests.h"
+
+using namespace rapidjson;
 
 Game::Game()
 {
@@ -422,6 +429,10 @@ int Game::SaveGame()
 	Aoutfile f;
 	if (f.OpenByName("game.out") == -1) return(0);
 
+	StringBuffer s;
+	Writer<StringBuffer> writer(s);
+	writer.StartObject();
+
 	//
 	// Write out Globals
 	//
@@ -429,6 +440,15 @@ int Game::SaveGame()
 	f.PutInt(CURRENT_ATL_VER);
 	f.PutStr(Globals->RULESET_NAME);
 	f.PutInt(Globals->RULESET_VERSION);
+
+	writer.Key("name");
+	writer.String("atlantis_game");
+	writer.Key("version");
+	writer.Int(CURRENT_ATL_VER);
+	writer.Key("ruleset");
+	writer.String(Globals->RULESET_NAME);
+	writer.Key("ruleset version");
+	writer.Int(Globals->RULESET_VERSION);
 
 	f.PutInt(year);
 	f.PutInt(month);
@@ -438,6 +458,23 @@ int Game::SaveGame()
 	f.PutInt(shipseq);
 	f.PutInt(guardfaction);
 	f.PutInt(monfaction);
+
+	writer.Key("year");
+	writer.Int(year);
+	writer.Key("month");
+	writer.Int(month);
+	writer.Key("seed");
+	writer.Int(getrandom(10000));
+	writer.Key("factionseq");
+	writer.Int(factionseq);
+	writer.Key("unitseq");
+	writer.Int(unitseq);
+	writer.Key("shipseq");
+	writer.Int(shipseq);
+	writer.Key("guardfaction");
+	writer.Int(guardfaction);
+	writer.Key("monfaction");
+	writer.Int(monfaction);
 
 	//
 	// Write out the Factions
@@ -457,6 +494,14 @@ int Game::SaveGame()
 	quests.WriteQuests(&f);
 
 	f.Close();
+
+	writer.EndObject();
+	std::cout << s.GetString() << std::endl;
+
+	Aoutfile json;
+	if (json.OpenByName("game.json") == -1) return(0);
+	json.PutStr(s.GetString ());
+	json.Close();
 	return(1);
 }
 
@@ -1183,10 +1228,17 @@ void Game::WriteReport()
 				((((month == 0) && (year == 1)) || Globals->GM_REPORT) &&
 			(fac->num == 1))) {
 			int i = f.OpenByName(str);
+
+			AreportJSON json;
+			int j = json.OpenByName(str + ".json");
+
 			if (i != -1) {
 				fac->WriteReport(&f, this);
+				fac->WriteReportJSON(&json, this);
 				f.Close();
+				json.Close();
 			}
+
 		}
 		Adot();
 	}
@@ -1851,7 +1903,7 @@ void Game::CreateCityMon(ARegion *pReg, int percent, int needmage)
 	num = num * percent / 100;
 	Faction *pFac = GetFaction(&factions, guardfaction);
 	Unit *u = GetNewUnit(pFac);
-	Unit *u2;
+	Unit *u2 = NULL;
 	AString *s = new AString("City Guard");
 	
 	/*

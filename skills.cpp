@@ -429,6 +429,48 @@ AString SkillList::Report(int nummen)
 	return temp;
 }
 
+void SkillList::ReportJSON(AreportJSON *f, int nummen)
+{
+	AString temp;
+	if (!Num()) {
+//		temp += "none";
+//		return temp;
+		return;
+	}
+	int i = 0;
+	int displayed = 0;
+	forlist(this) {
+		Skill *s = (Skill *)elem;
+		if (s->days == 0) continue;
+		displayed++;
+		if (i) {
+			temp += ", ";
+		}
+		else {
+			i = 1;
+		}
+		f->StartObject();
+		f->Key("name");
+		f->String(SkillStrs(s->type));
+//		temp += SkillStrs(s->type);
+		f->Key("level");
+		f->String(GetLevelByDays(s->days / nummen));
+		f->Key("amount");
+		f->Int(s->days / nummen);
+
+//		temp += AString(" ") + GetLevelByDays(s->days / nummen) +
+//			AString(" (") + AString(s->days / nummen);
+		if (Globals->REQUIRED_EXPERIENCE) {
+//			temp += AString("+") + AString(GetStudyRate(s->type, nummen));
+			f->Key("study");
+			f->Int(GetStudyRate(s->type, nummen));
+		}
+//		temp += AString(")");
+		f->EndObject();
+	}
+	//if (!displayed) temp += "none";
+}
+
 void SkillList::Readin(Ainfile *f)
 {
 	int n = f->GetInt();

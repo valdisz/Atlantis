@@ -177,11 +177,17 @@ class ARegion : public AListElem
 		int CanMakeAdv(Faction *, int);
 		int HasItem(Faction *, int);
 		void WriteProducts(Areport *, Faction *, int);
+		void WriteProductsJSON(AreportJSON *, Faction *, int);
 		void WriteMarkets(Areport *, Faction *, int);
+		void WriteMarketsJSON(AreportJSON *, Faction *, int);
 		void WriteEconomy(Areport *, Faction *, int);
+		void WriteEconomyJSON(AreportJSON *, Faction *, int);
 		void WriteExits(Areport *, ARegionList *pRegs, int *exits_seen);
+		void WriteExitsJSON(AreportJSON *, ARegionList *pRegs, int *exits_seen);
 		void WriteReport(Areport *f, Faction *fac, int month,
-				ARegionList *pRegions);
+			ARegionList *pRegions);
+		void WriteReportJSON(AreportJSON *f, Faction *fac, int month,
+			ARegionList *pRegions);
 		// DK
 		void WriteTemplate(Areport *, Faction *, ARegionList *, int);
 		void WriteTemplateHeader(Areport *, Faction *, ARegionList *, int);
@@ -189,6 +195,8 @@ class ARegion : public AListElem
 
 		AString ShortPrint(ARegionList *pRegs);
 		AString Print(ARegionList *pRegs);
+		void ShortPrintJSON(AreportJSON *f, ARegionList *pRegs);
+		void PrintJSON(AreportJSON *f, ARegionList *pRegs);
 
 		void Kill(Unit *);
 		void ClearHell();
@@ -281,6 +289,7 @@ class ARegion : public AListElem
 
 		int Wages();
 		AString WagesForReport();
+		void WagesForReportJSON(AreportJSON *f);
 		int Population();
 
 		AString *name;

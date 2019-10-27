@@ -138,7 +138,8 @@ public:
 	void Event(const AString &);
 	
 	AString FactionTypeStr();
-	void WriteReport( Areport *f, Game *pGame );
+	void WriteReport(Areport *f, Game *pGame);
+	void WriteReportJSON(AreportJSON *f, Game *pGame);
 	// LLS - write order template
 	void WriteTemplate(Areport *f, Game *pGame);
 	void WriteFacInfo(Aoutfile *);

@@ -29,7 +29,13 @@
 
 #include <iostream>
 #include <fstream>
+
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 using namespace std;
+using namespace rapidjson;
 
 class Ainfile {
 	public:
@@ -78,24 +84,50 @@ class Aorders {
 };
 
 class Areport {
-	public:
-		Areport();
-		~Areport();
+public:
+	Areport();
+	~Areport();
 
-		void Open(const AString &);
-		int OpenByName(const AString &);
-		void Close();
+	void Open(const AString &);
+	int OpenByName(const AString &);
+	void Close();
 
-		void AddTab();
-		void DropTab();
-		void ClearTab();
+	void AddTab();
+	void DropTab();
+	void ClearTab();
 
-		void PutStr(const AString &,int = 0);
-		void PutNoFormat(const AString &);
-		void EndLine();
+	void PutStr(const AString &, int = 0);
+	void PutNoFormat(const AString &);
+	void EndLine();
 
-		ofstream *file;
-		int tabs;
+	ofstream *file;
+	int tabs;
+};
+
+class AreportJSON {
+public:
+	AreportJSON();
+	~AreportJSON();
+
+	void Open(const AString &);
+	int OpenByName(const AString &);
+	void Close();
+
+	void StartObject();
+	void EndObject();
+
+	void StartArray();
+	void EndArray();
+
+	void Key(const AString &);
+	void String(const AString &);
+	void Bool(const bool &);
+	void Int(const int &);
+	void Double(const double &);
+
+	StringBuffer s;
+	Writer<StringBuffer> *writer;
+	Aoutfile json;
 };
 
 class Arules {

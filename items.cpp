@@ -245,18 +245,69 @@ AString ItemString(int type, int num, int flags)
 			temp += AString(num) + " ";
 		temp +=
 			AString((flags & ALWAYSPLURAL) ?
-				ItemDefs[type].names: ItemDefs[type].name) +
+				ItemDefs[type].names : ItemDefs[type].name) +
 			" [" + ItemDefs[type].abr + "]";
-	} else {
+	}
+	else {
 		if (num == -1) {
 			temp += AString("unlimited ") + ItemDefs[type].names + " [" +
 				ItemDefs[type].abr + "]";
-		} else {
+		}
+		else {
 			temp += AString(num) + " " + ItemDefs[type].names + " [" +
 				ItemDefs[type].abr + "]";
 		}
 	}
 	return temp;
+}
+
+void ItemStringJSON (AreportJSON *f, int type, int num, int flags)
+{
+	if (num == 1) {
+		if (flags & FULLNUM)
+		{
+//			temp += AString(num) + " ";
+			f->Key("amount");
+			f->Int(num);
+		}
+
+		f->Key("type");
+		(flags & ALWAYSPLURAL) ?
+			f->String(ItemDefs[type].names) :
+			f->String(ItemDefs[type].name);
+		f->Key("abr");
+		f->String(ItemDefs[type].abr);
+//		temp +=
+//			AString((flags & ALWAYSPLURAL) ?
+//				ItemDefs[type].names : ItemDefs[type].name) +
+//			" [" + ItemDefs[type].abr + "]";
+	}
+	else {
+		if (num == -1) {
+			f->Key("amount");
+			f->String("unlimited");
+
+			f->Key("type");
+			f->String(ItemDefs[type].names);
+			f->Key("abr");
+			f->String(ItemDefs[type].abr);
+
+//			temp += AString("unlimited ") + ItemDefs[type].names + " [" +
+//				ItemDefs[type].abr + "]";
+		}
+		else {
+			f->Key("amount");
+			f->Int(num);
+
+			f->Key("type");
+			f->String(ItemDefs[type].names);
+			f->Key("abr");
+			f->String(ItemDefs[type].abr);
+
+//			temp += AString(num) + " " + ItemDefs[type].names + " [" +
+//				ItemDefs[type].abr + "]";
+		}
+	}
 }
 
 static AString EffectStr(char const *effect)
@@ -1254,11 +1305,40 @@ AString Item::Report(int seeillusions)
 	if (ItemDefs[type].type & IT_SHIP) {
 		ret += AString("unfinished ") + ItemDefs[type].name +
 			" [" + ItemDefs[type].abr + "] (needs " + num + ")";
-	} else ret += ItemString(type,num);
+	}
+	else ret += ItemString(type, num);
 	if (seeillusions && (ItemDefs[type].type & IT_ILLUSION)) {
 		ret = ret + " (illusion)";
 	}
 	return ret;
+}
+
+void Item::ReportJSON(AreportJSON *f, int seeillusions)
+{
+	// special handling of the unfinished ship items
+	if (ItemDefs[type].type & IT_SHIP) {
+		f->Key("finished");
+		f->Bool(false);
+
+		f->Key("type");
+		f->String(ItemDefs[type].name);
+		f->Key("abr");
+		f->String(ItemDefs[type].abr);
+		f->Key("needs");
+		f->String(num);
+
+//		ret += AString("unfinished ") + ItemDefs[type].name +
+//			" [" + ItemDefs[type].abr + "] (needs " + num + ")";
+	}
+	else {
+//		ret += ItemString(type, num);
+		ItemStringJSON(f, type, num);
+	}
+	if (seeillusions && (ItemDefs[type].type & IT_ILLUSION)) {
+		f->Key("illusion");
+		f->Bool(true);
+//		ret = ret + " (illusion)";
+	}
 }
 
 void Item::Writeout(Aoutfile *f)
@@ -1356,7 +1436,7 @@ void ItemList::UncheckAll()
 	}
 }
 
-AString ItemList::Report(int obs,int seeillusions,int nofirstcomma)
+AString ItemList::Report(int obs, int seeillusions, int nofirstcomma)
 {
 	UncheckAll();
 	AString temp;
@@ -1365,6 +1445,20 @@ AString ItemList::Report(int obs,int seeillusions,int nofirstcomma)
 		if (temp.Len()) nofirstcomma = 0;
 	}
 	return temp;
+}
+
+void ItemList::ReportJSON(AreportJSON *f, int obs, int seeillusions, int nofirstcomma)
+{
+	f->Key("items");
+	f->StartArray();
+	UncheckAll();
+	AString temp;
+	for (int s = 0; s < 7; s++) {
+//		temp += ReportByType(s, obs, seeillusions, nofirstcomma);
+		ReportByTypeJSON(f, s, obs, seeillusions, nofirstcomma);
+		//		if (temp.Len()) nofirstcomma = 0;
+	}
+	f->EndArray();
 }
 
 AString ItemList::BattleReport()
@@ -1459,6 +1553,84 @@ AString ItemList::ReportByType(int type, int obs, int seeillusions,
 		}
 	}
 	return temp;
+}
+
+void ItemList::ReportByTypeJSON(AreportJSON *f, int type, int obs, int seeillusions,
+	int nofirstcomma)
+{
+//	AString temp;
+	forlist(this) {
+		int report = 0;
+		Item *i = (Item *)elem;
+		if (i->checked) continue;
+		switch (type) {
+		case 0:
+			if (ItemDefs[i->type].type & IT_MAN)
+				report = 1;
+			break;
+		case 1:
+			if (ItemDefs[i->type].type & IT_MONSTER)
+				report = 1;
+			break;
+		case 2:
+			if ((ItemDefs[i->type].type & IT_WEAPON) ||
+				(ItemDefs[i->type].type & IT_BATTLE) ||
+				(ItemDefs[i->type].type & IT_ARMOR) ||
+				(ItemDefs[i->type].type & IT_MAGIC))
+				report = 1;
+			break;
+		case 3:
+			if (ItemDefs[i->type].type & IT_MOUNT)
+				report = 1;
+			break;
+		case 4:
+			if ((i->type == I_WAGON) || (i->type == I_MWAGON))
+				report = 1;
+			break;
+		case 5:
+			report = 1;
+			if (ItemDefs[i->type].type & IT_MAN)
+				report = 0;
+			if (ItemDefs[i->type].type & IT_MONSTER)
+				report = 0;
+			if (i->type == I_SILVER)
+				report = 0;
+			if ((ItemDefs[i->type].type & IT_WEAPON) ||
+				(ItemDefs[i->type].type & IT_BATTLE) ||
+				(ItemDefs[i->type].type & IT_ARMOR) ||
+				(ItemDefs[i->type].type & IT_MAGIC))
+				report = 0;
+			if (ItemDefs[i->type].type & IT_MOUNT)
+				report = 0;
+			if ((i->type == I_WAGON) ||
+				(i->type == I_MWAGON))
+				report = 0;
+			break;
+		case 6:
+			if (i->type == I_SILVER)
+				report = 1;
+		}
+		if (report) {
+			f->StartObject();
+
+			if (obs == 2) {
+				if (nofirstcomma) nofirstcomma = 0;
+//				else temp += ", ";
+//				temp += i->Report(seeillusions);
+				i->ReportJSON(f, seeillusions);
+			}
+			else {
+				if (ItemDefs[i->type].weight) {
+					if (nofirstcomma) nofirstcomma = 0;
+//					else temp += ", ";
+//					temp += i->Report(seeillusions);
+					i->ReportJSON(f, seeillusions);
+				}
+			}
+			i->checked = 1;
+			f->EndObject();
+		}
+	}
 }
 
 void ItemList::SetNum(int t,int n)

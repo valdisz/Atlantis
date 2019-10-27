@@ -408,15 +408,29 @@ void Battle::WriteSides(ARegion * r,
 	AddLine("");
 }
 
-void Battle::Report(Areport * f,Faction * fac) {
+void Battle::Report(Areport * f, Faction * fac) {
 	if (assassination == ASS_SUCC && fac != attacker) {
 		f->PutStr(*asstext);
 		f->PutStr("");
 		return;
 	}
 	forlist(&text) {
-		AString * s = (AString *) elem;
+		AString * s = (AString *)elem;
 		f->PutStr(*s);
+	}
+}
+
+void Battle::ReportJSON(AreportJSON * f, Faction * fac) {
+	if (assassination == ASS_SUCC && fac != attacker) {
+		f->String(*asstext);
+//		f->PutStr(*asstext);
+//		f->PutStr("");
+		return;
+	}
+	forlist(&text) {
+		AString * s = (AString *)elem;
+		f->String(*s);
+//		f->PutStr(*s);
 	}
 }
 

@@ -274,6 +274,15 @@ AString Unit::MageReport()
 	return temp;
 }
 
+void Unit::MageReportJSON(AreportJSON *f)
+{
+	if (combat != -1) {
+		f->Key("combatSpell");
+		f->String(SkillStrs(combat));
+//		temp = AString(". Combat spell: ") + SkillStrs(combat);
+	}
+}
+
 AString Unit::ReadyItem()
 {
 	AString temp, weaponstr, armorstr, battlestr;
@@ -325,6 +334,60 @@ AString Unit::ReadyItem()
 		}
 	}
 	return temp;
+}
+
+void Unit::ReadyItemJSON(AreportJSON *f)
+{
+//	AString temp, weaponstr, armorstr, battlestr;
+	AString weaponstr, armorstr, battlestr;
+	int weapon, armor, item, i, ready;
+
+	item = 0;
+	for (i = 0; i < MAX_READY; ++i) {
+		ready = readyWeapon[i];
+		if (ready != -1) {
+			if (item) weaponstr += ", ";
+			weaponstr += ItemString(ready, 1);
+			++item;
+		}
+	}
+	if (item > 0)
+		weaponstr = AString("Ready weapon") + (item == 1 ? "" : "s") + ": " +
+		weaponstr;
+	weapon = item;
+
+	item = 0;
+	for (i = 0; i < MAX_READY; ++i) {
+		ready = readyArmor[i];
+		if (ready != -1) {
+			if (item) armorstr += ", ";
+			armorstr += ItemString(ready, 1);
+			++item;
+		}
+	}
+	if (item > 0)
+		armorstr = AString("Ready armor: ") + armorstr;
+	armor = item;
+
+	if (readyItem != -1) {
+		battlestr = AString("Ready item: ") + ItemString(readyItem, 1);
+		item = 1;
+	}
+	else
+		item = 0;
+
+	if (weapon || armor || item) {
+		temp += AString(". ");
+		if (weapon) temp += weaponstr;
+		if (armor) {
+			if (weapon) temp += ". ";
+			temp += armorstr;
+		}
+		if (item) {
+			if (armor || weapon) temp += ". ";
+			temp += battlestr;
+		}
+	}
 }
 
 AString Unit::StudyableSkills()
@@ -424,6 +487,34 @@ AString Unit::SpoilsReport() {
 	else if (GetFlag(FLAG_RIDESPOILS)) temp = ", riding battle spoils";
 	else if (GetFlag(FLAG_SAILSPOILS)) temp = ", sailing battle spoils";
 	return temp;
+}
+
+void Unit::SpoilsReportJSON(AreportJSON *f) {
+	AString temp;
+	f->Key("spoils");
+	f->StartArray();
+	if (GetFlag(FLAG_NOSPOILS)) {
+		//temp = ", weightless battle spoils";
+		f->String("weightless");
+	}
+	else if (GetFlag(FLAG_FLYSPOILS)) {
+		//temp = ", flying battle spoils";
+		f->String("flying");
+	}
+	else if (GetFlag(FLAG_WALKSPOILS)) {
+//		temp = ", walking battle spoils";
+		f->String("walking");
+	}
+	else if (GetFlag(FLAG_RIDESPOILS)) {
+		//temp = ", riding battle spoils";
+		f->String("riding");
+	}
+	else if (GetFlag(FLAG_SAILSPOILS)) {
+//		temp = ", sailing battle spoils";
+		f->String("sailing");
+	}
+//	return temp;
+	f->EndArray();
 }
 
 void Unit::WriteReport(Areport *f, int obs, int truesight, int detfac,
@@ -572,6 +663,251 @@ void Unit::WriteReport(Areport *f, int obs, int truesight, int detfac,
 	}
 	temp += ".";
 	f->PutStr(temp);
+}
+
+void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
+	int autosee, int attitude, int showattitudes)
+{
+	int stealth = GetAttribute("stealth");
+
+	if (obs == -1) {
+		/* The unit belongs to the Faction writing the report */
+		obs = 2;
+	}
+	else {
+		if (obs < stealth) {
+			/* The unit cannot be seen */
+			if (reveal == REVEAL_FACTION) {
+				obs = 1;
+			}
+			else {
+				if (guard == GUARD_GUARD || reveal == REVEAL_UNIT || autosee) {
+					obs = 0;
+				}
+				else {
+					return;
+				}
+			}
+		}
+		else {
+			if (obs == stealth) {
+				/* Can see unit, but not Faction */
+				if (reveal == REVEAL_FACTION) {
+					obs = 1;
+				}
+				else {
+					obs = 0;
+				}
+			}
+			else {
+				/* Can see unit and Faction */
+				obs = 1;
+			}
+		}
+	}
+
+	/* Setup True Sight */
+	if (obs == 2) {
+		truesight = 1;
+	}
+	else {
+		if (GetSkill(S_ILLUSION) > truesight) {
+			truesight = 0;
+		}
+		else {
+			truesight = 1;
+		}
+	}
+
+	if (detfac && obs != 2) obs = 1;
+
+	/* Write the report */
+	f->StartObject();
+	AString temp;
+	if (obs == 2) {
+		f->Key("attitude");
+		f->String("city guard");
+		//		temp += AString("* ") + *name;
+	}
+	else {
+		if (showattitudes) {
+			f->Key("attitude");
+			switch (attitude) {
+			case A_ALLY:
+				f->String("ally");
+//				temp += AString("= ") + *name;
+				break;
+			case A_FRIENDLY:
+				f->String("friendly");
+//				temp += AString(": ") + *name;
+				break;
+			case A_NEUTRAL:
+//				temp += AString("- ") + *name;
+				f->String("neutal");
+				break;
+			case A_UNFRIENDLY:
+//				temp += AString("% ") + *name;
+				f->String("unfriendly");
+				break;
+			case A_HOSTILE:
+//				temp += AString("! ") + *name;
+				f->String("hostile");
+				break;
+			}
+		}
+		else {
+//			temp += AString("- ") + *name;
+		}
+	}
+
+	if (guard == GUARD_GUARD) {
+//		temp += ", on guard";
+		f->Key("guard");
+		f->Bool(true);
+	}
+	if (obs > 0) {
+		temp += AString(", ") + *faction->name;
+		if (guard == GUARD_AVOID) {
+//			temp += ", avoiding";
+			f->Key("avoid");
+			f->Bool(true);
+		}
+		if (GetFlag(FLAG_BEHIND)) {
+//			temp += ", behind";
+			f->Key("behind");
+			f->Bool(true);
+		}
+	}
+
+	if (obs == 2) {
+		if (reveal == REVEAL_UNIT) {
+//			temp += ", revealing unit";
+			f->Key("revealing");
+			f->String("unit");
+		}
+		if (reveal == REVEAL_FACTION) {
+//			temp += ", revealing faction";
+			f->Key("revealing");
+			f->String("faction");
+		}
+		if (GetFlag(FLAG_HOLDING)) {
+			//			temp += ", holding";
+			f->Key("holding");
+			f->Bool(true);
+		}
+		if (GetFlag(FLAG_AUTOTAX)) {
+			//temp += ", taxing";
+			f->Key("taxing");
+			f->Bool(true);
+		}
+		if (GetFlag(FLAG_NOAID)) {
+//			temp += ", receiving no aid";
+			f->Key("noAid");
+			f->Bool(true);
+		}
+		if (GetFlag(FLAG_SHARING)) {
+			//temp += ", sharing";
+			f->Key("sharing");
+			f->Bool(true);
+		}
+		if (GetFlag(FLAG_CONSUMING_UNIT)) {
+//			temp += ", consuming unit's food";
+			f->Key("consume");
+			f->String ("unit");
+		}
+		if (GetFlag(FLAG_CONSUMING_FACTION))
+		{
+//			temp += ", consuming faction's food";
+			f->Key("consume");
+			f->String("faction");
+		}
+		if (GetFlag(FLAG_NOCROSS_WATER)) {
+			//temp += ", won't cross water";
+			f->Key("noCross");
+			f->Bool(true);
+		}
+//		temp += SpoilsReport();
+		SpoilsReportJSON(f);
+	}
+
+//	temp += items.Report(obs, truesight, 0);
+	items.ReportJSON(f, obs, truesight, 0);
+
+	if (obs == 2) {
+		f->Key("weight");
+		f->Int(items.Weight());
+		f->Key("capacity");
+		f->StartObject();
+		f->Key("flying");
+		f->Int(FlyingCapacity());
+		f->Key("riding");
+		f->Int(RidingCapacity());
+		f->Key("walking");
+		f->Int(WalkingCapacity());
+		f->Key("swimming");
+		f->Int(SwimmingCapacity());
+		f->EndObject();
+		f->Key("skills");
+		f->StartArray();
+
+//		temp += ". Weight: ";
+//		temp += AString(items.Weight());
+//		temp += ". Capacity: ";
+//		temp += AString(FlyingCapacity());
+//		temp += "/";
+//		temp += AString(RidingCapacity());
+//		temp += "/";
+//		temp += AString(WalkingCapacity());
+//		temp += "/";
+//		temp += AString(SwimmingCapacity());
+//		temp += ". Skills: ";
+//		temp += skills.Report(GetMen());
+		skills.ReportJSON(f, GetMen());
+
+		f->EndArray();
+	}
+
+	if (obs == 2 && (type == U_MAGE || type == U_GUARDMAGE)) {
+//		temp += MageReport();
+		MageReportJSON(f);
+	}
+
+	// todo
+#if 0
+	if (obs == 2) {
+//		temp += ReadyItem();
+		ReadyItemJSON(f);
+		temp += StudyableSkills();
+		if (visited.size() > 0) {
+			set<string>::iterator it;
+			unsigned int count;
+
+			count = 0;
+			temp += ". Has visited ";
+			for (it = visited.begin();
+				it != visited.end();
+				it++) {
+				count++;
+				if (count > 1) {
+					if (count == visited.size())
+						temp += " and ";
+					else
+						temp += ", ";
+				}
+				temp += it->c_str();
+			}
+		}
+	}
+#endif
+
+	if (describe) {
+//		temp += AString("; ") + *describe;
+		f->Key("description");
+		f->String(*describe);
+	}
+//	temp += ".";
+//	f->PutStr(temp);
+	f->EndObject();
 }
 
 AString Unit::TemplateReport()

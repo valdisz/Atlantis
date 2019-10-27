@@ -84,8 +84,29 @@ AString ARegion::WagesForReport()
 	if (p) {
 		return AString("$") + (p->productivity / 10) +
 			"." + (p->productivity % 10) + " (Max: $" + p->amount + ")";
-	} else
+	}
+	else
 		return AString("$") + 0;
+}
+
+void ARegion::WagesForReportJSON(AreportJSON *f)
+{
+	Production *p = products.GetProd(I_SILVER, -1);
+	if (p) {
+		f->Key("wages");
+		f->Double((p->productivity / 10));
+		f->Key("maxWages");
+		f->Double(p->amount);
+
+//		return AString("$") + (p->productivity / 10) +
+//			"." + (p->productivity % 10) + " (Max: $" + p->amount + ")";
+	}
+	else
+	{
+		f->Key("wages");
+		f->Double(0);
+	}
+//		return AString("$") + 0;
 }
 
 void ARegion::SetupPop()

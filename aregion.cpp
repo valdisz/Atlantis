@@ -721,6 +721,63 @@ AString ARegion::ShortPrint(ARegionList *pRegs)
 	return temp;
 }
 
+void ARegion::ShortPrintJSON(AreportJSON *f, ARegionList *pRegs)
+{
+	f->Key("type");
+	f->String(TerrainDefs[type].name);
+//	AString temp = TerrainDefs[type].name;
+
+	f->Key("x");
+	f->Int(xloc);
+	f->Key("y");
+	f->Int(yloc);
+
+//	temp += AString(" (") + xloc + "," + yloc;
+
+	ARegionArray *pArr = pRegs->pRegionArrays[zloc];
+	if (pArr->strName) {
+//		temp += ",";
+		if (Globals->EASIER_UNDERWORLD &&
+			(Globals->UNDERWORLD_LEVELS + Globals->UNDERDEEP_LEVELS > 1)) {
+//			temp += AString("") + zloc + " <";
+			f->Key("z");
+			f->Int(zloc);
+		}
+		else {
+			f->Key("z");
+			f->Int(zloc);
+// TODO
+/*			// add less explicit multilevel information about the underworld
+			if (zloc > 2 && zloc < Globals->UNDERWORLD_LEVELS + 2) {
+				for (int i = zloc; i > 3; i--) {
+					temp += "very ";
+				}
+				temp += "deep ";
+			}
+			else if ((zloc > Globals->UNDERWORLD_LEVELS + 2) &&
+				(zloc < Globals->UNDERWORLD_LEVELS +
+					Globals->UNDERDEEP_LEVELS + 2)) {
+				for (int i = zloc; i > Globals->UNDERWORLD_LEVELS + 3; i--) {
+					temp += "very ";
+				}
+				temp += "deep ";
+			}
+*/		}
+		f->Key("level");
+		f->String(*pArr->strName);
+//		temp += *pArr->strName;
+		if (Globals->EASIER_UNDERWORLD &&
+			(Globals->UNDERWORLD_LEVELS + Globals->UNDERDEEP_LEVELS > 1)) {
+//			temp += ">";
+		}
+	}
+//	temp += ")";
+
+	f->Key("region");
+	f->String(*name);
+//	temp += AString(" in ") + *name;
+}
+
 AString ARegion::Print(ARegionList *pRegs)
 {
 	AString temp = ShortPrint(pRegs);
@@ -729,6 +786,19 @@ AString ARegion::Print(ARegionList *pRegs)
 			TownString(town->TownType()) + "]";
 	}
 	return temp;
+}
+
+void ARegion::PrintJSON(AreportJSON *f, ARegionList *pRegs)
+{
+	ShortPrintJSON(f, pRegs);
+	if (town) {
+		f->Key("townName");
+		f->String(*(town->name));
+		f->Key("townType");
+		f->String(TownString(town->TownType()));
+//		temp += AString(", contains ") + *(town->name) + " [" +
+//			TownString(town->TownType()) + "]";
+	}
 }
 
 void ARegion::SetLoc(int x, int y, int z)
@@ -1183,6 +1253,72 @@ void ARegion::WriteProducts(Areport *f, Faction *fac, int present)
 	f->PutStr(temp);
 }
 
+void ARegion::WriteProductsJSON(AreportJSON *f, Faction *fac, int present)
+{
+	f->Key("products");
+	f->StartArray();
+//	AString temp = "Products: ";
+	int has = 0;
+	forlist((&products)) {
+		Production *p = ((Production *)elem);
+		if (ItemDefs[p->itemtype].type & IT_ADVANCED) {
+			if (CanMakeAdv(fac, p->itemtype) || (fac->IsNPC())) {
+				if (has) {
+//					temp += AString(", ") + p->WriteReport();
+				}
+				else {
+					has = 1;
+//					temp += p->WriteReport();
+					f->StartObject();
+					p->WriteReportJSON(f);
+					f->EndObject();
+				}
+			}
+		}
+		else {
+			if (p->itemtype == I_SILVER) {
+				if (p->skill == S_ENTERTAINMENT) {
+					f->StartObject();
+					if ((Globals->TRANSIT_REPORT &
+						GameDefs::REPORT_SHOW_ENTERTAINMENT) || present) {
+//						f->PutStr(AString("Entertainment available: $") +
+//							p->amount + ".");
+						f->Key("entertainment");
+						f->Int(p->amount);
+					}
+					else {
+//						f->PutStr(AString("Entertainment available: $0."));
+						f->Key("entertainment");
+						f->Int(0);
+					}
+					f->EndObject();
+				}
+			}
+			else {
+				if (!present &&
+					!(Globals->TRANSIT_REPORT &
+						GameDefs::REPORT_SHOW_RESOURCES))
+					continue;
+				f->StartObject();
+				if (has) {
+//					temp += AString(", ") + p->WriteReport();
+				}
+				else {
+					has = 1;
+//					temp += p->WriteReport();
+				}
+				p->WriteReportJSON(f);
+				f->EndObject();
+			}
+		}
+	}
+
+//	if (has == 0) temp += "none";
+//	temp += ".";
+//	f->PutStr(temp);
+	f->EndArray();
+}
+
 int ARegion::HasItem(Faction *fac, int item)
 {
 	forlist(&objects) {
@@ -1251,6 +1387,74 @@ void ARegion::WriteMarkets(Areport *f, Faction *fac, int present)
 	f->PutStr(temp);
 }
 
+void ARegion::WriteMarketsJSON(AreportJSON *f, Faction *fac, int present)
+{
+	f->Key("wanted");
+	f->StartArray();
+
+	AString temp = "Wanted: ";
+	int has = 0;
+	forlist(&markets) {
+		Market *m = (Market *)elem;
+		if (!m->amount) continue;
+		if (!present &&
+			!(Globals->TRANSIT_REPORT & GameDefs::REPORT_SHOW_MARKETS))
+			continue;
+		if (m->type == M_SELL) {
+			if (ItemDefs[m->item].type & IT_ADVANCED) {
+				if (!Globals->MARKETS_SHOW_ADVANCED_ITEMS) {
+					if (!HasItem(fac, m->item)) {
+						continue;
+					}
+				}
+			}
+			if (has) {
+				temp += ", ";
+			}
+			else {
+				has = 1;
+			}
+			f->StartObject();
+			m->ReportJSON(f);
+			f->EndObject();
+		}
+	}
+//	if (!has) temp += "none";
+//	temp += ".";
+	//f->PutStr(temp);
+	f->EndArray();
+
+//	temp = "For Sale: ";
+	has = 0;
+	f->Key("forSale");
+	f->StartArray();
+	{
+		forlist(&markets) {
+			Market *m = (Market *)elem;
+			if (!m->amount) continue;
+			if (!present &&
+				!(Globals->TRANSIT_REPORT & GameDefs::REPORT_SHOW_MARKETS))
+				continue;
+			if (m->type == M_BUY) {
+				if (has) {
+					temp += ", ";
+				}
+				else {
+					has = 1;
+				}
+//				temp += m->Report();
+				f->StartObject();
+				m->ReportJSON(f);
+				f->EndObject();
+			}
+		}
+	}
+//	if (!has) temp += "none";
+//	temp += ".";
+//	f->PutStr(temp);
+	f->EndArray();
+}
+
 void ARegion::WriteEconomy(Areport *f, Faction *fac, int present)
 {
 	f->AddTab();
@@ -1269,22 +1473,68 @@ void ARegion::WriteEconomy(Areport *f, Faction *fac, int present)
 	f->DropTab();
 }
 
+void ARegion::WriteEconomyJSON(AreportJSON *f, Faction *fac, int present)
+{
+//	f->AddTab();
+	f->Key("economy");
+	f->StartObject();
+
+	if ((Globals->TRANSIT_REPORT & GameDefs::REPORT_SHOW_WAGES) || present) {
+//		f->PutStr(AString("Wages: ") + WagesForReport() + ".");
+		WagesForReport();
+	}
+	else {
+//		f->PutStr(AString("Wages: $0."));
+		f->Key("Wages");
+		f->Int(0);
+	}
+
+	WriteMarketsJSON(f, fac, present);
+	WriteProductsJSON(f, fac, present);
+
+//	f->EndLine();
+//	f->DropTab();
+	f->EndObject();
+}
+
 void ARegion::WriteExits(Areport *f, ARegionList *pRegs, int *exits_seen)
 {
 	f->PutStr("Exits:");
 	f->AddTab();
 	int y = 0;
-	for (int i=0; i<NDIRS; i++) {
+	for (int i = 0; i < NDIRS; i++) {
 		ARegion *r = neighbors[i];
 		if (r && exits_seen[i]) {
 			f->PutStr(AString(DirectionStrs[i]) + " : " +
-					r->Print(pRegs) + ".");
+				r->Print(pRegs) + ".");
 			y = 1;
 		}
 	}
 	if (!y) f->PutStr("none");
 	f->DropTab();
 	f->EndLine();
+}
+
+void ARegion::WriteExitsJSON(AreportJSON *f, ARegionList *pRegs, int *exits_seen)
+{
+//	f->PutStr("Exits:");
+//	f->AddTab();
+	int y = 0;
+	for (int i = 0; i < NDIRS; i++) {
+		ARegion *r = neighbors[i];
+		if (r && exits_seen[i]) {
+			f->Key(DirectionStrs[i]);
+			f->StartObject();
+			r->PrintJSON(f, pRegs);
+			f->EndObject();
+//			f->PutStr(AString(DirectionStrs[i]) + " : " +
+//				r->Print(pRegs) + ".");
+			y = 1;
+		}
+	}
+//	if (!y) f->PutStr("none");
+//	f->DropTab();
+//	f->EndLine();
 }
 
 #define AC_STRING "%s Nexus is a magical place: the entryway " \
@@ -1497,6 +1747,254 @@ void ARegion::WriteReport(Areport *f, Faction *fac, int month,
 			}
 			f->EndLine();
 		}
+	}
+}
+
+void ARegion::WriteReportJSON(AreportJSON *f, Faction *fac, int month,
+	ARegionList *pRegions)
+{
+	Farsight *farsight = GetFarsight(&farsees, fac);
+	Farsight *passer = GetFarsight(&passers, fac);
+	int present = Present(fac) || fac->IsNPC();
+
+	if (farsight || passer || present) {
+		f->StartObject();
+		AString temp;
+//		AString temp = Print(pRegions);
+		PrintJSON(f, pRegions);
+		if (Population() &&
+			(present || farsight ||
+			(Globals->TRANSIT_REPORT & GameDefs::REPORT_SHOW_PEASANTS))) {
+			f->Key("population");
+			f->String(Population());
+//			temp += AString(", ") + Population() + " peasants";
+			if (Globals->RACES_EXIST) {
+//				temp += AString(" (") + ItemDefs[race].names + ")";
+				f->Key("populationRace");
+				f->String(ItemDefs[race].names);
+			}
+			if (present || farsight ||
+				Globals->TRANSIT_REPORT & GameDefs::REPORT_SHOW_REGION_MONEY) {
+//				temp += AString(", $") + wealth;
+				f->Key("wealth");
+				f->Int(wealth);
+			}
+			else {
+				f->Key("wealth");
+				f->Int(0);
+//				temp += AString(", $0");
+			}
+		}
+//		temp += ".";
+//		f->PutStr(temp);
+//		f->PutStr("-------------------------------------------------"
+//			"-----------");
+
+//		f->AddTab();
+		if (Globals->WEATHER_EXISTS) {
+			temp = "It was ";
+			if (clearskies) temp += "unnaturally clear ";
+			else {
+				if (weather == W_BLIZZARD) temp = "There was an unnatural ";
+				else if (weather == W_NORMAL) temp = "The weather was ";
+				temp += SeasonNames[weather];
+			}
+			temp += " last month; ";
+			int nxtweather = pRegions->GetWeather(this, (month + 1) % 12);
+			temp += "it will be ";
+			temp += SeasonNames[nxtweather];
+			temp += " next month.";
+//			f->PutStr(temp);
+			f->Key("description");
+			f->String(temp);
+		}
+
+#if 0
+		f->PutStr("");
+		temp = "Elevation is ";
+		f->PutStr(temp + elevation);
+		temp = "Humidity is ";
+		f->PutStr(temp + humidity);
+		temp = "Temperature is ";
+		f->PutStr(temp + temperature);
+#endif
+
+		if (type == R_NEXUS) {
+			int len = strlen(AC_STRING) + 2 * strlen(Globals->WORLD_NAME);
+			char *nexus_desc = new char[len];
+			sprintf(nexus_desc, AC_STRING, Globals->WORLD_NAME,
+				Globals->WORLD_NAME);
+			f->Key("description");
+			f->String(nexus_desc);
+//			f->PutStr("");
+//			f->PutStr(nexus_desc);
+//			f->PutStr("");
+			delete[] nexus_desc;
+		}
+
+//		f->DropTab();
+
+//		WriteEconomy(f, fac, present || farsight);
+		WriteEconomyJSON(f, fac, present || farsight);
+
+		int exits_seen[NDIRS];
+		if (present || farsight ||
+			(Globals->TRANSIT_REPORT & GameDefs::REPORT_SHOW_ALL_EXITS)) {
+			for (int i = 0; i < NDIRS; i++)
+				exits_seen[i] = 1;
+		}
+		else {
+			// This is just a transit report and we're not showing all
+			// exits.   See if we are showing used exits.
+
+			// Show none by default.
+			int i;
+			for (i = 0; i < NDIRS; i++)
+				exits_seen[i] = 0;
+			// Now, if we should, show the ones actually used.
+			if (Globals->TRANSIT_REPORT & GameDefs::REPORT_SHOW_USED_EXITS) {
+				forlist(&passers) {
+					Farsight *p = (Farsight *)elem;
+					if (p->faction == fac) {
+						for (i = 0; i < NDIRS; i++) {
+							exits_seen[i] |= p->exits_used[i];
+						}
+					}
+				}
+			}
+		}
+
+		f->Key("exits");
+		f->StartObject();
+		WriteExitsJSON(f, pRegions, exits_seen);
+
+		if (Globals->GATES_EXIST && gate && gate != -1) {
+			int sawgate = 0;
+			if (fac->IsNPC())
+				sawgate = 1;
+			if (Globals->IMPROVED_FARSIGHT && farsight) {
+				forlist(&farsees) {
+					Farsight *watcher = (Farsight *)elem;
+					if (watcher && watcher->faction == fac && watcher->unit) {
+						if (watcher->unit->GetSkill(S_GATE_LORE)) {
+							sawgate = 1;
+						}
+					}
+				}
+			}
+			if (Globals->TRANSIT_REPORT & GameDefs::REPORT_USE_UNIT_SKILLS) {
+				forlist(&passers) {
+					Farsight *watcher = (Farsight *)elem;
+					if (watcher && watcher->faction == fac && watcher->unit) {
+						if (watcher->unit->GetSkill(S_GATE_LORE)) {
+							sawgate = 1;
+						}
+					}
+				}
+			}
+			forlist(&objects) {
+				Object *o = (Object *)elem;
+				forlist(&o->units) {
+					Unit *u = (Unit *)elem;
+					if (!sawgate &&
+						((u->faction == fac) &&
+							u->GetSkill(S_GATE_LORE))) {
+						sawgate = 1;
+					}
+				}
+			}
+			if (sawgate) {
+				f->Key("Gate");
+				f->StartObject();
+				if (gateopen) {
+
+					f->Key("open");
+					f->Bool(true);
+					f->Key("num");
+					f->Int(gate);
+
+//					AString temp;
+//					temp = "There is a Gate here (Gate ";
+//					temp += gate;
+					if (!Globals->DISPERSE_GATE_NUMBERS) {
+//						temp += " of ";
+//						temp += pRegions->numberofgates;
+						f->Key("numGates");
+						f->Int(pRegions->numberofgates);
+					}
+//					temp += ").";
+//					f->PutStr(temp);
+//					f->PutStr("");
+				}
+				else if (Globals->SHOW_CLOSED_GATES) {
+//					f->PutStr(AString("There is a closed Gate here."));
+//					f->PutStr("");
+					f->Key("open");
+					f->Bool(false);
+				}
+				f->EndObject();
+			}
+		}
+		f->EndObject();
+
+		int obs = GetObservation(fac, 0);
+		int truesight = GetTrueSight(fac, 0);
+		int detfac = 0;
+
+		int passobs = GetObservation(fac, 1);
+		int passtrue = GetTrueSight(fac, 1);
+		int passdetfac = detfac;
+
+		if (fac->IsNPC()) {
+			obs = 10;
+			passobs = 10;
+		}
+
+		forlist(&objects) {
+			Object *o = (Object *)elem;
+			forlist(&o->units) {
+				Unit *u = (Unit *)elem;
+				if (u->faction == fac && u->GetSkill(S_MIND_READING) > 2) {
+					detfac = 1;
+				}
+			}
+		}
+		if (Globals->IMPROVED_FARSIGHT && farsight) {
+			forlist(&farsees) {
+				Farsight *watcher = (Farsight *)elem;
+				if (watcher && watcher->faction == fac && watcher->unit) {
+					if (watcher->unit->GetSkill(S_MIND_READING) > 2) {
+						detfac = 1;
+					}
+				}
+			}
+		}
+
+		if ((Globals->TRANSIT_REPORT & GameDefs::REPORT_USE_UNIT_SKILLS) &&
+			(Globals->TRANSIT_REPORT & GameDefs::REPORT_SHOW_UNITS)) {
+			forlist(&passers) {
+				Farsight *watcher = (Farsight *)elem;
+				if (watcher && watcher->faction == fac && watcher->unit) {
+					if (watcher->unit->GetSkill(S_MIND_READING) > 2) {
+						passdetfac = 1;
+					}
+				}
+			}
+		}
+
+		if (objects.Num ())
+		{
+			f->Key("units");
+			f->StartArray();
+			forlist(&objects) {
+				((Object *)elem)->ReportJSON(f, fac, obs, truesight, detfac,
+					passobs, passtrue, passdetfac,
+					present || farsight);
+			}
+//			f->EndLine();
+			f->EndArray();
+		}
+		f->EndObject();
 	}
 }
 
