@@ -1617,24 +1617,26 @@ void ItemList::ReportByTypeJSON(AreportJSON *f, int type, int obs, int seeillusi
 				report = 1;
 		}
 		if (report) {
-			f->StartObject();
-
+			
 			if (obs == 2) {
 				if (nofirstcomma) nofirstcomma = 0;
 //				else temp += ", ";
 //				temp += i->Report(seeillusions);
+				f->StartObject();
 				i->ReportJSON(f, seeillusions);
+				f->EndObject();
 			}
 			else {
 				if (ItemDefs[i->type].weight) {
 					if (nofirstcomma) nofirstcomma = 0;
 //					else temp += ", ";
 //					temp += i->Report(seeillusions);
+					f->StartObject();
 					i->ReportJSON(f, seeillusions);
+					f->EndObject();
 				}
 			}
 			i->checked = 1;
-			f->EndObject();
 		}
 	}
 }

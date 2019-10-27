@@ -140,6 +140,7 @@ class Unit : public AListElem
 		AString ReadyItem();
 		void ReadyItemJSON(AreportJSON *f);
 		AString StudyableSkills();
+		void StudyableSkillsJSON(AreportJSON *f);
 		AString * BattleReport(int);
 		AString TemplateReport();
 

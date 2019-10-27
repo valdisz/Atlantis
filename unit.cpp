@@ -414,6 +414,31 @@ AString Unit::StudyableSkills()
 	return temp;
 }
 
+void Unit::StudyableSkillsJSON(AreportJSON *f)
+{
+//	AString temp;
+	int j = 0;
+	f->Key("canStudy");
+	f->StartArray();
+	for (int i = 0; i < NSKILLS; i++) {
+		if (SkillDefs[i].depends[0].skill != NULL) {
+			if (CanStudy(i)) {
+				if (j) {
+//					temp += ", ";
+				}
+				else {
+//					temp += ". Can Study: ";
+					j = 1;
+				}
+//				temp += SkillStrs(i);
+				f->String(SkillStrs(i));
+			}
+		}
+	}
+	f->EndArray();
+//	return temp;
+}
+
 AString Unit::GetName(int obs)
 {
 	AString ret = *name;
@@ -494,30 +519,37 @@ AString Unit::SpoilsReport() {
 
 void Unit::SpoilsReportJSON(AreportJSON *f) {
 	AString temp;
-	f->Key("spoils");
-	f->StartArray();
-	if (GetFlag(FLAG_NOSPOILS)) {
-		//temp = ", weightless battle spoils";
-		f->String("weightless");
+	if (GetFlag(FLAG_NOSPOILS) || 
+		GetFlag(FLAG_FLYSPOILS) || 
+		GetFlag(FLAG_SAILSPOILS) ||
+		GetFlag(FLAG_WALKSPOILS) || 
+		GetFlag(FLAG_RIDESPOILS)) 
+	{
+		f->Key("spoils");
+		f->StartArray();
+		if (GetFlag(FLAG_NOSPOILS)) {
+			//temp = ", weightless battle spoils";
+			f->String("weightless");
+		}
+		else if (GetFlag(FLAG_FLYSPOILS)) {
+			//temp = ", flying battle spoils";
+			f->String("flying");
+		}
+		else if (GetFlag(FLAG_WALKSPOILS)) {
+			//		temp = ", walking battle spoils";
+			f->String("walking");
+		}
+		else if (GetFlag(FLAG_RIDESPOILS)) {
+			//temp = ", riding battle spoils";
+			f->String("riding");
+		}
+		else if (GetFlag(FLAG_SAILSPOILS)) {
+			//		temp = ", sailing battle spoils";
+			f->String("sailing");
+		}
+		//	return temp;
+		f->EndArray();
 	}
-	else if (GetFlag(FLAG_FLYSPOILS)) {
-		//temp = ", flying battle spoils";
-		f->String("flying");
-	}
-	else if (GetFlag(FLAG_WALKSPOILS)) {
-//		temp = ", walking battle spoils";
-		f->String("walking");
-	}
-	else if (GetFlag(FLAG_RIDESPOILS)) {
-		//temp = ", riding battle spoils";
-		f->String("riding");
-	}
-	else if (GetFlag(FLAG_SAILSPOILS)) {
-//		temp = ", sailing battle spoils";
-		f->String("sailing");
-	}
-//	return temp;
-	f->EndArray();
 }
 
 void Unit::WriteReport(Areport *f, int obs, int truesight, int detfac,
@@ -726,10 +758,11 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 
 	/* Write the report */
 	f->StartObject();
+	f->Key("name");
+	f->String(*name);
+
 	AString temp;
 	if (obs == 2) {
-		f->Key("attitude");
-		f->String("city guard");
 		//		temp += AString("* ") + *name;
 	}
 	else {
@@ -769,7 +802,9 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 		f->Bool(true);
 	}
 	if (obs > 0) {
-		temp += AString(", ") + *faction->name;
+		f->Key("faction");
+		f->String(*faction->name);
+//		temp += AString(", ") + *faction->name;
 		if (guard == GUARD_AVOID) {
 //			temp += ", avoiding";
 			f->Key("avoid");
@@ -876,11 +911,12 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 	}
 
 	// todo
-#if 0
 	if (obs == 2) {
 //		temp += ReadyItem();
 		ReadyItemJSON(f);
-		temp += StudyableSkills();
+//		temp += StudyableSkills();
+		StudyableSkillsJSON(f);
+#if 0
 		if (visited.size() > 0) {
 			set<string>::iterator it;
 			unsigned int count;
@@ -900,8 +936,8 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 				temp += it->c_str();
 			}
 		}
-	}
 #endif
+	}
 
 	if (describe) {
 //		temp += AString("; ") + *describe;

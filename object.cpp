@@ -434,9 +434,9 @@ void Object::ReportJSON(AreportJSON *f, Faction *fac, int obs, int truesight,
 	f->StartObject();
 
 // TODO
-#if 0
 	/* Fleet Report */
 	if (IsFleet()) {
+#if 0
 		AString temp = AString("+ ") + *name + " : " + FleetDefinition();
 		/* report ships:
 		for (int item=0; item<NITEMS; item++) {
@@ -465,68 +465,90 @@ void Object::ReportJSON(AreportJSON *f, Faction *fac, int obs, int truesight,
 		temp += ".";
 		f->PutStr(temp);
 		f->AddTab();
+#endif
 	}
 	else if (type != O_DUMMY) {
-		AString temp = AString("+ ") + *name + " : " + ob->name;
+		f->Key("name");
+		f->String(*name);
+		f->Key("type");
+		f->String(ob->name);
+		//		AString temp = AString("+ ") + *name + " : " + ob->name;
 		if (incomplete > 0) {
-			temp += AString(", needs ") + incomplete;
+//			temp += AString(", needs ") + incomplete;
+			f->Key("incomplete");
+			f->String(incomplete);
 		}
 		else if (Globals->DECAY &&
 			!(ob->flags & ObjectType::NEVERDECAY) && incomplete < 1) {
 			if (incomplete > (0 - ob->maxMonthlyDecay)) {
-				temp += ", about to decay";
+//				temp += ", about to decay";
+				f->Key("decay");
+				f->Bool(true);
 			}
 			else if (incomplete > (0 - ob->maxMaintenance / 2)) {
-				temp += ", needs maintenance";
+				f->Key("maintenance");
+				f->Bool(true);
+//				temp += ", needs maintenance";
 			}
 		}
 		if (inner != -1) {
-			temp += ", contains an inner location";
+			f->Key("inner");
+			f->Bool(true);
+//			temp += ", contains an inner location";
 		}
 		if (runes) {
-			temp += ", engraved with Runes of Warding";
+			f->Key("engraved");
+			f->Bool(true);
+//			temp += ", engraved with Runes of Warding";
 		}
 		if (describe) {
-			temp += AString("; ") + *describe;
+//			temp += AString("; ") + *describe;
+			f->Key("description");
+			f->String(*describe);
 		}
 		if (!(ob->flags & ObjectType::CANENTER)) {
-			temp += ", closed to player units";
+//			temp += ", closed to player units";
+			f->Key("close");
+			f->Bool(true);
 		}
-		temp += ".";
-		f->PutStr(temp);
-		f->AddTab();
+//		temp += ".";
+//		f->PutStr(temp);
+//		f->AddTab();
 	}
-#endif
 
-	f->Key("unitsInfo");
-	f->StartArray();
-	forlist((&units)) {
-		Unit *u = (Unit *)elem;
-		int attitude = fac->GetAttitude(u->faction->num);
-		if (u->faction == fac) {
-			u->WriteReportJSON(f, -1, 1, 1, 1, attitude, fac->showunitattitudes);
-		}
-		else {
-			if (present) {
-				u->WriteReportJSON(f, obs, truesight, detfac, type != O_DUMMY, attitude, fac->showunitattitudes);
+	if (units.Num())
+	{
+		f->Key("unitInfo");
+		f->StartArray();
+		forlist((&units)) {
+			Unit *u = (Unit *)elem;
+			int attitude = fac->GetAttitude(u->faction->num);
+			if (u->faction == fac) {
+				u->WriteReportJSON(f, -1, 1, 1, 1, attitude, fac->showunitattitudes);
 			}
 			else {
-				if (((type == O_DUMMY) &&
-					(Globals->TRANSIT_REPORT &
-						GameDefs::REPORT_SHOW_OUTDOOR_UNITS)) ||
-						((type != O_DUMMY) &&
-					(Globals->TRANSIT_REPORT &
-						GameDefs::REPORT_SHOW_INDOOR_UNITS)) ||
-						((u->guard == GUARD_GUARD) &&
-					(Globals->TRANSIT_REPORT &
-						GameDefs::REPORT_SHOW_GUARDS))) {
-					u->WriteReportJSON(f, passobs, passtrue, passdetfac,
-						type != O_DUMMY, attitude, fac->showunitattitudes);
+				if (present) {
+					u->WriteReportJSON(f, obs, truesight, detfac, type != O_DUMMY, attitude, fac->showunitattitudes);
+				}
+				else {
+					if (((type == O_DUMMY) &&
+						(Globals->TRANSIT_REPORT &
+							GameDefs::REPORT_SHOW_OUTDOOR_UNITS)) ||
+							((type != O_DUMMY) &&
+						(Globals->TRANSIT_REPORT &
+							GameDefs::REPORT_SHOW_INDOOR_UNITS)) ||
+							((u->guard == GUARD_GUARD) &&
+						(Globals->TRANSIT_REPORT &
+							GameDefs::REPORT_SHOW_GUARDS))) {
+						u->WriteReportJSON(f, passobs, passtrue, passdetfac,
+							type != O_DUMMY, attitude, fac->showunitattitudes);
+					}
 				}
 			}
 		}
+		f->EndArray();
 	}
-	f->EndArray();
+
 //	f->EndLine();
 	if (type != O_DUMMY) {
 //		f->DropTab();
