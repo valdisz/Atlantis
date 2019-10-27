@@ -106,6 +106,7 @@ int LookupSkill(AString *);
 int ParseSkill(AString *);
 AString SkillStrs(int);
 AString SkillStrs(SkillType *);
+void WriteSkillPropsToJson(AreportJSON *, int);
 
 class ShowType {
 	public:

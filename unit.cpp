@@ -431,7 +431,9 @@ void Unit::StudyableSkillsJSON(AreportJSON *f)
 					j = 1;
 				}
 //				temp += SkillStrs(i);
-				f->String(SkillStrs(i));
+				f->StartObject();
+				WriteSkillPropsToJson(f, i);
+				f->EndObject();
 			}
 		}
 	}
