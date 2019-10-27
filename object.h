@@ -122,6 +122,7 @@ class Object : public AListElem
 		AString FleetDefinition();
 		int FleetCapacity();
 		int FleetLoad();
+		int SailThroughCheck(int dir);
 		int FleetSailingSkill(int);
 		int GetFleetSize();
 		int GetFleetSpeed(int);
