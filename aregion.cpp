@@ -1987,11 +1987,37 @@ void ARegion::WriteReportJSON(AreportJSON *f, Faction *fac, int month,
 			f->Key("units");
 			f->StartArray();
 			forlist(&objects) {
-				((Object *)elem)->ReportJSON(f, fac, obs, truesight, detfac,
-					passobs, passtrue, passdetfac,
-					present || farsight);
+				Object *o = (Object *)elem;
+				if (!o->IsFleet() && o->type == O_DUMMY) {
+					o->ReportJSON(f, fac, obs, truesight, detfac,
+						passobs, passtrue, passdetfac,
+						present || farsight);
+				}
 			}
-//			f->EndLine();
+			f->EndArray();
+
+			f->Key("buildings");
+			f->StartArray();
+			forlist(&objects) {
+				Object *o = (Object *)elem;
+				if (!o->IsFleet() && o->type != O_DUMMY) {
+					o->ReportJSON(f, fac, obs, truesight, detfac,
+						passobs, passtrue, passdetfac,
+						present || farsight);
+				}
+			}
+			f->EndArray();
+
+			f->Key("fleets");
+			f->StartArray();
+			forlist(&objects) {
+				Object *o = (Object *)elem;
+				if (o->IsFleet()) {
+					o->ReportJSON(f, fac, obs, truesight, detfac,
+						passobs, passtrue, passdetfac,
+						present || farsight);
+				}
+			}
 			f->EndArray();
 		}
 		f->EndObject();
