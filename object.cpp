@@ -436,8 +436,11 @@ void Object::ReportJSON(AreportJSON *f, Faction *fac, int obs, int truesight,
 // TODO
 	/* Fleet Report */
 	if (IsFleet()) {
-#if 0
-		AString temp = AString("+ ") + *name + " : " + FleetDefinition();
+		f->Key("name");
+		f->String(*name);
+		f->Key("definition");
+		f->String(FleetDefinition());
+//		AString temp = AString("+ ") + *name + " : " + FleetDefinition();
 		/* report ships:
 		for (int item=0; item<NITEMS; item++) {
 			int num = GetNumShips(item);
@@ -451,21 +454,35 @@ void Object::ReportJSON(AreportJSON *f, Faction *fac, int obs, int truesight,
 		}
 		*/
 		if ((GetOwner() && fac == GetOwner()->faction) || (obs > 9)) {
-			temp += ";";
+//			temp += ";";
 			if (incomplete > 0) {
-				temp += AString(" ") + incomplete + "% damaged;";
+				f->Key("incomplete");
+				f->Double(incomplete);
+//				temp += AString(" ") + incomplete + "% damaged;";
 			}
-			temp += AString(" Load: ") + FleetLoad() + "/" + FleetCapacity() + ";";
-			temp += AString(" Sailors: ") + FleetSailingSkill(1) + "/" + GetFleetSize() + ";";
-			temp += AString(" MaxSpeed: ") + GetFleetSpeed(1);
+			f->Key("load");
+			f->String(FleetLoad());
+			f->Key("capacity");
+			f->String(FleetCapacity());
+			f->Key("sailors");
+			f->Int(FleetSailingSkill(1));
+			f->Key("sailorRequired");
+			f->Int(GetFleetSize());
+			f->Key("maxSpeed");
+			f->Int(GetFleetSpeed(1));
+//			temp += AString(" Load: ") + FleetLoad() + "/" + FleetCapacity() + ";";
+//			temp += AString(" Sailors: ") + FleetSailingSkill(1) + "/" + GetFleetSize() + ";";
+//			temp += AString(" MaxSpeed: ") + GetFleetSpeed(1);
 		}
 		if (describe) {
-			temp += AString("; ") + *describe;
+			f->Key("description");
+			f->String(*describe);
+
+//			temp += AString("; ") + *describe;
 		}
-		temp += ".";
-		f->PutStr(temp);
-		f->AddTab();
-#endif
+//		temp += ".";
+//		f->PutStr(temp);
+//		f->AddTab();
 	}
 	else if (type != O_DUMMY) {
 		f->Key("name");
