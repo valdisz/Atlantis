@@ -339,6 +339,8 @@ AString Unit::ReadyItem()
 void Unit::ReadyItemJSON(AreportJSON *f)
 {
 //	AString temp, weaponstr, armorstr, battlestr;
+// TODO
+#if 0
 	AString weaponstr, armorstr, battlestr;
 	int weapon, armor, item, i, ready;
 
@@ -388,6 +390,7 @@ void Unit::ReadyItemJSON(AreportJSON *f)
 			temp += battlestr;
 		}
 	}
+#endif
 }
 
 AString Unit::StudyableSkills()
