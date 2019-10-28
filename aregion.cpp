@@ -1764,28 +1764,16 @@ void WriteUnitsJson(AList *objects, AreportJSON *f, Faction *fac, int obs, int t
 			}
 }
 
-void WriteBuildingsJson(AList *objects, AreportJSON *f, Faction *fac, int obs, int truesight,
+void WriteStructuresJson(AList *objects, AreportJSON *f, Faction *fac, int obs, int truesight,
 	int detfac, int passobs, int passtrue, int passdetfac, int present) {
 			forlist(objects) {
 				Object *o = (Object *)elem;
-				if (!o->IsFleet() && o->type != O_DUMMY) {
+				if (o->type != O_DUMMY) {
 					o->ReportJSON(f, fac, obs, truesight, detfac,
 						passobs, passtrue, passdetfac,
 						present);
 				}
 			}
-}
-
-void WriteFleetsJson(AList *objects, AreportJSON *f, Faction *fac, int obs, int truesight,
-	int detfac, int passobs, int passtrue, int passdetfac, int present) {
-    forlist(objects) {
-		Object *o = (Object *)elem;
-		if (o->IsFleet()) {
-			o->ReportJSON(f, fac, obs, truesight, detfac,
-				passobs, passtrue, passdetfac,
-				present);
-		}
-	}
 }
 
 void ARegion::WriteReportJSON(AreportJSON *f, Faction *fac, int month,
@@ -2027,14 +2015,9 @@ void ARegion::WriteReportJSON(AreportJSON *f, Faction *fac, int month,
             WriteUnitsJson(&objects, f, fac, obs, truesight, detfac, passobs, passtrue, passdetfac, present || farsight);
 			f->EndArray();
 
-			f->Key("buildings");
+			f->Key("structures");
 			f->StartArray();
-            WriteBuildingsJson(&objects, f, fac, obs, truesight, detfac, passobs, passtrue, passdetfac, present || farsight);
-			f->EndArray();
-
-			f->Key("fleets");
-			f->StartArray();
-            WriteFleetsJson(&objects, f, fac, obs, truesight, detfac, passobs, passtrue, passdetfac, present || farsight);
+            WriteStructuresJson(&objects, f, fac, obs, truesight, detfac, passobs, passtrue, passdetfac, present || farsight);
 			f->EndArray();
 		}
 		f->EndObject();
