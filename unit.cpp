@@ -278,8 +278,9 @@ void Unit::MageReportJSON(AreportJSON *f)
 {
 	if (combat != -1) {
 		f->Key("combatSpell");
-		f->String(SkillStrs(combat));
-//		temp = AString(". Combat spell: ") + SkillStrs(combat);
+		f->StartObject();
+		WriteSkillPropsToJson(f, combat);
+		f->EndObject();
 	}
 }
 
@@ -338,59 +339,38 @@ AString Unit::ReadyItem()
 
 void Unit::ReadyItemJSON(AreportJSON *f)
 {
-//	AString temp, weaponstr, armorstr, battlestr;
-// TODO
-#if 0
-	AString weaponstr, armorstr, battlestr;
-	int weapon, armor, item, i, ready;
+	int i, ready;
 
-	item = 0;
-	for (i = 0; i < MAX_READY; ++i) {
-		ready = readyWeapon[i];
-		if (ready != -1) {
-			if (item) weaponstr += ", ";
-			weaponstr += ItemString(ready, 1);
-			++item;
+	f->Key("ready");
+	f->StartObject();
+		f->Key("weapon");
+		f->StartArray();
+		for (i = 0; i < MAX_READY; ++i) {
+			ready = readyWeapon[i];
+			if (ready != -1) {
+				ItemStringJSON(f, ready, 1);
+			}
 		}
-	}
-	if (item > 0)
-		weaponstr = AString("Ready weapon") + (item == 1 ? "" : "s") + ": " +
-		weaponstr;
-	weapon = item;
+		f->EndArray();
 
-	item = 0;
-	for (i = 0; i < MAX_READY; ++i) {
-		ready = readyArmor[i];
-		if (ready != -1) {
-			if (item) armorstr += ", ";
-			armorstr += ItemString(ready, 1);
-			++item;
+		f->Key("armor");
+		f->StartArray();
+		for (i = 0; i < MAX_READY; ++i) {
+			ready = readyArmor[i];
+			if (ready != -1) {
+				ItemStringJSON(f, ready, 1);
+			}
 		}
-	}
-	if (item > 0)
-		armorstr = AString("Ready armor: ") + armorstr;
-	armor = item;
+		f->EndArray();
 
-	if (readyItem != -1) {
-		battlestr = AString("Ready item: ") + ItemString(readyItem, 1);
-		item = 1;
-	}
-	else
-		item = 0;
-
-	if (weapon || armor || item) {
-		temp += AString(". ");
-		if (weapon) temp += weaponstr;
-		if (armor) {
-			if (weapon) temp += ". ";
-			temp += armorstr;
+		f->Key("item");
+		if (readyItem != -1) {
+			ItemStringJSON(f, readyItem, 1);
 		}
-		if (item) {
-			if (armor || weapon) temp += ". ";
-			temp += battlestr;
+		else {
+			f->Null();
 		}
-	}
-#endif
+	f->EndObject();
 }
 
 AString Unit::StudyableSkills()
@@ -416,21 +396,11 @@ AString Unit::StudyableSkills()
 
 void Unit::StudyableSkillsJSON(AreportJSON *f)
 {
-//	AString temp;
-	int j = 0;
 	f->Key("canStudy");
 	f->StartArray();
 	for (int i = 0; i < NSKILLS; i++) {
 		if (SkillDefs[i].depends[0].skill != NULL) {
 			if (CanStudy(i)) {
-				if (j) {
-//					temp += ", ";
-				}
-				else {
-//					temp += ". Can Study: ";
-					j = 1;
-				}
-//				temp += SkillStrs(i);
 				f->StartObject();
 				WriteSkillPropsToJson(f, i);
 				f->EndObject();
@@ -438,7 +408,6 @@ void Unit::StudyableSkillsJSON(AreportJSON *f)
 		}
 	}
 	f->EndArray();
-//	return temp;
 }
 
 AString Unit::GetName(int obs)
@@ -520,7 +489,6 @@ AString Unit::SpoilsReport() {
 }
 
 void Unit::SpoilsReportJSON(AreportJSON *f) {
-	AString temp;
 	if (GetFlag(FLAG_NOSPOILS) || 
 		GetFlag(FLAG_FLYSPOILS) || 
 		GetFlag(FLAG_SAILSPOILS) ||
@@ -760,198 +728,167 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 
 	/* Write the report */
 	f->StartObject();
+
+    AString *cleanName = GetCleanName(name, num);
+
 	f->Key("name");
-	f->String(*name);
-	f->Key("unitNum");
+	f->String(*cleanName);
+
+    delete cleanName;
+
+	f->Key("num");
 	f->Int(num);
 
-	AString temp;
-	if (obs == 2) {
-		//		temp += AString("* ") + *name;
-	}
-	else {
-		if (showattitudes) {
-			f->Key("attitude");
-			switch (attitude) {
-			case A_ALLY:
-				f->String("ally");
-//				temp += AString("= ") + *name;
-				break;
-			case A_FRIENDLY:
-				f->String("friendly");
-//				temp += AString(": ") + *name;
-				break;
-			case A_NEUTRAL:
-//				temp += AString("- ") + *name;
-				f->String("neutal");
-				break;
-			case A_UNFRIENDLY:
-//				temp += AString("% ") + *name;
-				f->String("unfriendly");
-				break;
-			case A_HOSTILE:
-//				temp += AString("! ") + *name;
-				f->String("hostile");
-				break;
-			}
-		}
-		else {
-//			temp += AString("- ") + *name;
-		}
-	}
-
-	if (guard == GUARD_GUARD) {
-//		temp += ", on guard";
-		f->Key("guard");
-		f->Bool(true);
-	}
 	if (obs > 0) {
 		f->Key("faction");
+		f->StartObject();
+		f->Key("name");
 		f->String(*faction->name);
-		f->Key("factionNum");
+		
+		f->Key("num");
 		f->Int(faction->num);
-//		temp += AString(", ") + *faction->name;
-		if (guard == GUARD_AVOID) {
-//			temp += ", avoiding";
-			f->Key("avoid");
-			f->Bool(true);
-		}
-		if (GetFlag(FLAG_BEHIND)) {
-//			temp += ", behind";
-			f->Key("behind");
-			f->Bool(true);
+		f->EndObject();
+	}
+
+	if (describe) {
+		f->Key("description");
+		f->String(*describe);
+	}
+
+	f->Key("own");
+	f->Bool(obs == 2);
+
+	if (obs != 2 && showattitudes) {
+		f->Key("attitude");
+		switch (attitude) {
+		case A_ALLY:
+			f->String("ally");
+			break;
+		case A_FRIENDLY:
+			f->String("friendly");
+			break;
+		case A_NEUTRAL:
+			f->String("neutal");
+			break;
+		case A_UNFRIENDLY:
+			f->String("unfriendly");
+			break;
+		case A_HOSTILE:
+			f->String("hostile");
+			break;
 		}
 	}
 
 	if (obs == 2) {
-		if (reveal == REVEAL_UNIT) {
-//			temp += ", revealing unit";
-			f->Key("revealing");
-			f->String("unit");
-		}
-		if (reveal == REVEAL_FACTION) {
-//			temp += ", revealing faction";
-			f->Key("revealing");
-			f->String("faction");
-		}
-		if (GetFlag(FLAG_HOLDING)) {
-			//			temp += ", holding";
-			f->Key("holding");
-			f->Bool(true);
-		}
-		if (GetFlag(FLAG_AUTOTAX)) {
-			//temp += ", taxing";
-			f->Key("taxing");
-			f->Bool(true);
-		}
-		if (GetFlag(FLAG_NOAID)) {
-//			temp += ", receiving no aid";
-			f->Key("noAid");
-			f->Bool(true);
-		}
-		if (GetFlag(FLAG_SHARING)) {
-			//temp += ", sharing";
-			f->Key("sharing");
-			f->Bool(true);
-		}
-		if (GetFlag(FLAG_CONSUMING_UNIT)) {
-//			temp += ", consuming unit's food";
-			f->Key("consume");
-			f->String ("unit");
-		}
-		if (GetFlag(FLAG_CONSUMING_FACTION))
+		f->Key("revealing");
+		switch (reveal)
 		{
-//			temp += ", consuming faction's food";
-			f->Key("consume");
-			f->String("faction");
-		}
-		if (GetFlag(FLAG_NOCROSS_WATER)) {
-			//temp += ", won't cross water";
-			f->Key("noCross");
-			f->Bool(true);
-		}
-//		temp += SpoilsReport();
-		SpoilsReportJSON(f);
-	}
+			case REVEAL_UNIT:
+				f->String("unit");
+				break;
 
-//	temp += items.Report(obs, truesight, 0);
-	items.ReportJSON(f, obs, truesight, 0);
+			case REVEAL_FACTION:
+				f->String("faction");
+				break;
 
-	if (obs == 2) {
+			default:
+				f->Bool(0);
+				break;
+		}
+
+		f->Key("consume");
+		if (GetFlag(FLAG_CONSUMING_UNIT)) {
+			f->String ("consuming unit's food");
+		}
+		else if (GetFlag(FLAG_CONSUMING_FACTION)) {
+			f->String("consuming faction's food");
+		}
+		else {
+			f->String("silver");
+		}
+
 		f->Key("weight");
 		f->Int(items.Weight());
+
 		f->Key("capacity");
 		f->StartObject();
 		f->Key("flying");
 		f->Int(FlyingCapacity());
+		
 		f->Key("riding");
 		f->Int(RidingCapacity());
+		
 		f->Key("walking");
 		f->Int(WalkingCapacity());
+		
 		f->Key("swimming");
 		f->Int(SwimmingCapacity());
 		f->EndObject();
+
 		f->Key("skills");
 		f->StartArray();
-
-//		temp += ". Weight: ";
-//		temp += AString(items.Weight());
-//		temp += ". Capacity: ";
-//		temp += AString(FlyingCapacity());
-//		temp += "/";
-//		temp += AString(RidingCapacity());
-//		temp += "/";
-//		temp += AString(WalkingCapacity());
-//		temp += "/";
-//		temp += AString(SwimmingCapacity());
-//		temp += ". Skills: ";
-//		temp += skills.Report(GetMen());
 		skills.ReportJSON(f, GetMen());
-
 		f->EndArray();
+
+		SpoilsReportJSON(f);
 	}
 
+	f->Key("flags");
+	f->StartArray();
+	if (guard == GUARD_GUARD) {
+		f->String("on guard");
+	}
+
+	if (obs > 0) {
+		if (guard == GUARD_AVOID) {
+			f->String("avoiding");
+		}
+
+		if (GetFlag(FLAG_BEHIND)) {
+			f->String("behind");
+		}
+	}
+
+	if (obs == 2) {
+		if (GetFlag(FLAG_HOLDING)) {
+			f->String("holding");
+		}
+		if (GetFlag(FLAG_AUTOTAX)) {
+			f->String("taxing");
+		}
+		if (GetFlag(FLAG_NOAID)) {
+			f->String("receiving no aid");
+		}
+		if (GetFlag(FLAG_SHARING)) {
+			f->String("sharing");
+		}
+		if (GetFlag(FLAG_NOCROSS_WATER)) {
+			f->String("won't cross water");
+		}
+	}
+	f->EndArray();
+
+	items.ReportJSON(f, obs, truesight, 0);
+
 	if (obs == 2 && (type == U_MAGE || type == U_GUARDMAGE)) {
-//		temp += MageReport();
 		MageReportJSON(f);
 	}
 
 	if (obs == 2) {
-//		temp += ReadyItem();
 		ReadyItemJSON(f);
-//		temp += StudyableSkills();
 		StudyableSkillsJSON(f);
-// todo
-#if 0
+
 		if (visited.size() > 0) {
+			f->Key("visited");
+			f->StartArray();
 			set<string>::iterator it;
-			unsigned int count;
-
-			count = 0;
-			temp += ". Has visited ";
-			for (it = visited.begin();
-				it != visited.end();
-				it++) {
-				count++;
-				if (count > 1) {
-					if (count == visited.size())
-						temp += " and ";
-					else
-						temp += ", ";
-				}
-				temp += it->c_str();
+			for (it = visited.begin(); it != visited.end(); it++) {
+				f->String(it->c_str());
 			}
+			f->EndArray();
 		}
-#endif
 	}
 
-	if (describe) {
-//		temp += AString("; ") + *describe;
-		f->Key("description");
-		f->String(*describe);
-	}
-//	temp += ".";
-//	f->PutStr(temp);
 	f->EndObject();
 }
 

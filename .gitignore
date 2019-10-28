@@ -17,4 +17,7 @@ havilah/html/havilah.html
 neworigins/obj
 neworigins/neworigins
 neworigins/html/neworigins.html
-
+Debug/
+.vs/
+*.user
+*.filters

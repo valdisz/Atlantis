@@ -124,6 +124,7 @@ public:
 	void Bool(const bool &);
 	void Int(const int &);
 	void Double(const double &);
+	void Null();
 
 	StringBuffer s;
 	Writer<StringBuffer> *writer;

@@ -553,3 +553,8 @@ void AreportJSON::Double(const double &i)
 {
 	writer->Double(i);
 }
+
+void AreportJSON::Null()
+{
+	writer->Null();
+}
