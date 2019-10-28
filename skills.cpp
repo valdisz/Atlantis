@@ -461,9 +461,11 @@ void SkillList::ReportJSON(AreportJSON *f, int nummen)
 		f->StartObject();
 		WriteSkillPropsToJson(f, s->type);
 //		temp += SkillStrs(s->type);
+		
 		f->Key("level");
 		f->Int(GetLevelByDays(s->days / nummen));
-		f->Key("amount");
+		
+		f->Key("days");
 		f->Int(s->days / nummen);
 
 //		temp += AString(" ") + GetLevelByDays(s->days / nummen) +

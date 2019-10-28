@@ -72,3 +72,5 @@ private:
 };
 
 #endif
+
+AString* GetCleanName(AString *, int);
