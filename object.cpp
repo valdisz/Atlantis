@@ -408,7 +408,7 @@ void Object::Report(Areport *f, Faction *fac, int obs, int truesight,
 	}
 }
 
-void WriteUnitPropsToJson(AreportJSON *f, Faction *fac, Unit *u, int obs, int truesight,
+void WriteUnitToJson(AreportJSON *f, Faction *fac, Unit *u, int obs, int truesight,
 	int detfac, int passobs, int passtrue, int passdetfac, int present, int outdoorUnit) {
 	int attitude = fac->GetAttitude(u->faction->num);
 	if (u->faction == fac) {
@@ -438,9 +438,7 @@ void WriteObjectUnitsJson(AreportJSON *f, Faction *fac, Object *o, int obs, int 
 	if (o->units.Num()) {
 		forlist((&(o->units))) {
 			Unit *u = (Unit *)elem;
-			f->StartObject();
-			WriteUnitPropsToJson(f, fac, u, obs, truesight, detfac, passobs, passtrue, passdetfac, present, o->type == O_DUMMY);
-			f->EndObject();
+			WriteUnitToJson(f, fac, u, obs, truesight, detfac, passobs, passtrue, passdetfac, present, o->type == O_DUMMY);
 		}
 	}
 }
@@ -448,8 +446,11 @@ void WriteObjectUnitsJson(AreportJSON *f, Faction *fac, Object *o, int obs, int 
 void WriteBuildingPropsToJson(AreportJSON *f, Faction *fac, ObjectType *ob, Object *o, int obs, int truesight,
 	int detfac, int passobs, int passtrue, int passdetfac, int present) {
 
+    AString *cleanName = GetCleanName(o->name, o->num);
+
 	f->Key("name");
-	f->String(*(o->name));
+	f->String(*cleanName);
+    delete cleanName;
 
 	f->Key("num");
 	f->Int(o->num);
@@ -462,12 +463,14 @@ void WriteBuildingPropsToJson(AreportJSON *f, Faction *fac, ObjectType *ob, Obje
 		f->String(*(o->describe));
 	}
 
+    int incomplete = 0;
 	int willDecay = 0;
 	int maintenance = 0;
 
 	if (o->incomplete > 0) {
 		f->Key("needs");
 		f->Int(o->incomplete);
+        incomplete = 1;
 	}
 	else if (Globals->DECAY && !(ob->flags & ObjectType::NEVERDECAY) && o->incomplete < 1) {
 		if (o->incomplete > (0 - ob->maxMonthlyDecay)) {
@@ -480,6 +483,10 @@ void WriteBuildingPropsToJson(AreportJSON *f, Faction *fac, ObjectType *ob, Obje
 
 	f->Key("flags");
 	f->StartArray();
+    if (incomplete) {
+        f->String("incomplete");
+    }
+
 	if (willDecay) {
 		f->String("about to decay");
 	}
@@ -557,8 +564,11 @@ void WriteFleetTypeAndStructure(AreportJSON *f, Object *o) {
 void WriteFleetPropsToJson(AreportJSON *f, Faction *fac, ObjectType *ob, Object *o, int obs, int truesight,
 	int detfac, int passobs, int passtrue, int passdetfac, int present) {
 
+    AString *cleanName = GetCleanName(o->name, o->num);
+
 	f->Key("name");
-	f->String(*(o->name));
+	f->String(*cleanName);
+    delete cleanName;
 
 	f->Key("num");
 	f->Int(o->num);
@@ -572,29 +582,47 @@ void WriteFleetPropsToJson(AreportJSON *f, Faction *fac, ObjectType *ob, Object 
 
 	if ((o->GetOwner() && fac == o->GetOwner()->faction) || (obs > 9)) {
 		if (o->incomplete > 0) {
-			f->Key("incomplete");
+            f->Key("flags");
+            f->StartArray();
+                f->String("incomplete");
+            f->EndArray();
+
+			f->Key("needs");
 			f->Int(o->incomplete);
 		}
 
 		f->Key("load");
-		f->String(o->FleetLoad());
+		f->Int(o->FleetLoad());
 		
 		f->Key("capacity");
-		f->String(o->FleetCapacity());
+		f->Int(o->FleetCapacity());
 		
 		f->Key("sailors");
 		f->StartObject();
-		
-		f->Key("avaliable");
-		f->Int(o->FleetSailingSkill(1));
+		    f->Key("avaliable");
+		    f->Int(o->FleetSailingSkill(1));
 
-		f->Key("required");
-		f->Int(o->GetFleetSize());
-
+		    f->Key("required");
+		    f->Int(o->GetFleetSize());
 		f->EndObject();
 
 		f->Key("maxSpeed");
 		f->Int(o->GetFleetSpeed(1));
+	}
+
+	if ((Globals->PREVENT_SAIL_THROUGH) && (!Globals->ALLOW_TRIVIAL_PORTAGE)) {
+		if ((o->flying < 1) && (TerrainDefs[o->region->type].similar_type != R_OCEAN)) {
+			int dir = 0;
+			int first = 1;
+			f->Key("sailDirections");
+			f->StartArray();
+			for (dir = 0; dir < NDIRS; dir++) {
+				if (o->SailThroughCheck(dir) == 1) {
+					f->String(DirectionAbrs[dir]);
+				}
+			}
+			f->EndArray();
+		}
 	}
 
 	f->Key("units");

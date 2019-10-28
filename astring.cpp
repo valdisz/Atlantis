@@ -24,6 +24,7 @@
 // END A3HEADER
 #include "astring.h"
 #include <string.h>
+#include <string>
 #include <stdio.h>
 
 AString::AString()
@@ -367,4 +368,20 @@ istream & operator >>(istream & is,AString & s)
 	strcpy(s.str,buf);
 	delete[] buf;
 	return is;
+}
+
+AString* GetCleanName(AString *v, int num) {
+    // determine length of string representing number
+    string numStr = to_string(num);
+    int numLen = numStr.length();
+
+    // make new buffer for string in the Heap
+    // it will be less then numLen + 3 characters
+    // because "Name [1234]"
+    int bufferLen = v->Len() + 1 - numLen - 3;
+    char *strPtr = new char[bufferLen];
+    strncpy(strPtr, v->Str(), bufferLen - 1);
+    strPtr[bufferLen - 1] = NULL;
+
+    return new AString(strPtr);
 }

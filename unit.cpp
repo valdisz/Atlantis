@@ -750,8 +750,12 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 	/* Write the report */
 	f->StartObject();
 
+    AString *cleanName = GetCleanName(name, num);
+
 	f->Key("name");
-	f->String(*name);
+	f->String(*cleanName);
+
+    delete cleanName;
 
 	f->Key("num");
 	f->Int(num);
