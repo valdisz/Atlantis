@@ -339,59 +339,38 @@ AString Unit::ReadyItem()
 
 void Unit::ReadyItemJSON(AreportJSON *f)
 {
-//	AString temp, weaponstr, armorstr, battlestr;
-// TODO
-/*
-	AString weaponstr, armorstr, battlestr;
-	int weapon, armor, item, i, ready;
+	int i, ready;
 
-	item = 0;
-	for (i = 0; i < MAX_READY; ++i) {
-		ready = readyWeapon[i];
-		if (ready != -1) {
-			if (item) weaponstr += ", ";
-			weaponstr += ItemString(ready, 1);
-			++item;
+	f->Key("ready");
+	f->StartObject();
+		f->Key("weapon");
+		f->StartArray();
+		for (i = 0; i < MAX_READY; ++i) {
+			ready = readyWeapon[i];
+			if (ready != -1) {
+				ItemStringJSON(f, ready, 1);
+			}
 		}
-	}
-	if (item > 0)
-		weaponstr = AString("Ready weapon") + (item == 1 ? "" : "s") + ": " +
-		weaponstr;
-	weapon = item;
+		f->EndArray();
 
-	item = 0;
-	for (i = 0; i < MAX_READY; ++i) {
-		ready = readyArmor[i];
-		if (ready != -1) {
-			if (item) armorstr += ", ";
-			armorstr += ItemString(ready, 1);
-			++item;
+		f->Key("armor");
+		f->StartArray();
+		for (i = 0; i < MAX_READY; ++i) {
+			ready = readyArmor[i];
+			if (ready != -1) {
+				ItemStringJSON(f, ready, 1);
+			}
 		}
-	}
-	if (item > 0)
-		armorstr = AString("Ready armor: ") + armorstr;
-	armor = item;
+		f->EndArray();
 
-	if (readyItem != -1) {
-		battlestr = AString("Ready item: ") + ItemString(readyItem, 1);
-		item = 1;
-	}
-	else
-		item = 0;
-
-	if (weapon || armor || item) {
-		temp += AString(". ");
-		if (weapon) temp += weaponstr;
-		if (armor) {
-			if (weapon) temp += ". ";
-			temp += armorstr;
+		f->Key("item");
+		if (readyItem != -1) {
+			ItemStringJSON(f, readyItem, 1);
 		}
-		if (item) {
-			if (armor || weapon) temp += ". ";
-			temp += battlestr;
+		else {
+			f->Null();
 		}
-	}
-*/
+	f->EndObject();
 }
 
 AString Unit::StudyableSkills()
@@ -895,35 +874,19 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 		MageReportJSON(f);
 	}
 
-	// todo
 	if (obs == 2) {
-//		temp += ReadyItem();
 		ReadyItemJSON(f);
-
 		StudyableSkillsJSON(f);
 
-/*
 		if (visited.size() > 0) {
+			f->Key("visited");
+			f->StartArray();
 			set<string>::iterator it;
-			unsigned int count;
-
-			count = 0;
-			temp += ". Has visited ";
-			for (it = visited.begin();
-					it != visited.end();
-					it++) {
-				count++;
-				if (count > 1) {
-					if (count == visited.size())
-						temp += " and ";
-					else
-						temp += ", ";
-				}
-				temp += it->c_str();
+			for (it = visited.begin(); it != visited.end(); it++) {
+				f->String(it->c_str());
 			}
+			f->EndArray();
 		}
-
-*/
 	}
 
 	f->EndObject();
