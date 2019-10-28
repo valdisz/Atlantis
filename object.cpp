@@ -483,9 +483,9 @@ void WriteBuildingPropsToJson(AreportJSON *f, Faction *fac, ObjectType *ob, Obje
 
 	f->Key("flags");
 	f->StartArray();
-    if (incomplete) {
-        f->String("incomplete");
-    }
+    //if (incomplete) {
+    //    f->String("incomplete");
+    //}
 
 	if (willDecay) {
 		f->String("about to decay");
@@ -537,7 +537,7 @@ void WriteFleetTypeAndStructure(AreportJSON *f, Object *o) {
 		f->String(ObjectDefs[o->type].name);
 	}
 
-	f->Key("structure");
+	f->Key("contents");
 	f->StartArray();
 	for (int item = 0; item < NITEMS; item++) {
 		num = o->GetNumShips(item);
@@ -545,13 +545,16 @@ void WriteFleetTypeAndStructure(AreportJSON *f, Object *o) {
 
 		f->StartObject();
 		
-		f->Key("type");
+		f->Key("name");
 		if (num > 1) {
 			f->String(ItemDefs[item].names);
 		}
 		else {
 			f->String(ItemDefs[item].name);
 		}
+        
+        f->Key("type");
+		f->String(ItemDefs[item].name);
 
 		f->Key("count");
 		f->Int(num);
@@ -582,10 +585,10 @@ void WriteFleetPropsToJson(AreportJSON *f, Faction *fac, ObjectType *ob, Object 
 
 	if ((o->GetOwner() && fac == o->GetOwner()->faction) || (obs > 9)) {
 		if (o->incomplete > 0) {
-            f->Key("flags");
-            f->StartArray();
-                f->String("incomplete");
-            f->EndArray();
+            //f->Key("flags");
+            //f->StartArray();
+            //    f->String("incomplete");
+            //f->EndArray();
 
 			f->Key("needs");
 			f->Int(o->incomplete);
