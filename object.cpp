@@ -553,7 +553,7 @@ void WriteFleetTypeAndStructure(AreportJSON *f, Object *o) {
 			f->String(ItemDefs[item].name);
 		}
 
-		f->Key("num");
+		f->Key("count");
 		f->Int(num);
 
 		f->EndObject();
