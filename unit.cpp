@@ -877,16 +877,6 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 	if (obs == 2) {
 		ReadyItemJSON(f);
 		StudyableSkillsJSON(f);
-
-		if (visited.size() > 0) {
-			f->Key("visited");
-			f->StartArray();
-			set<string>::iterator it;
-			for (it = visited.begin(); it != visited.end(); it++) {
-				f->String(it->c_str());
-			}
-			f->EndArray();
-		}
 	}
 
 	f->EndObject();
