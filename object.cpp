@@ -433,7 +433,6 @@ void Object::ReportJSON(AreportJSON *f, Faction *fac, int obs, int truesight,
 
 	f->StartObject();
 
-// TODO
 	/* Fleet Report */
 	if (IsFleet()) {
 		f->Key("name");

@@ -127,32 +127,7 @@ AString *ShowSkill::Report(Faction *f)
 				*str += "The mining skill is overrated.";
 			}
 			break;
-		case S_LUMBERJACK:
-			if (level > 1) break;
-			*str += "This skill deals with all aspects of various wood "
-				"production. Wood is most often found in forests, but "
-				"may also be found elsewhere.";
-			break;
-		case S_QUARTERMASTER:
-			if (level > 1) break;
-			if (!(Globals->TRANSPORT & GameDefs::ALLOW_TRANSPORT))
-				break;
-			*str += "This skill deals with transporting and "
-				"distributing goods between non-local units "
-				"and transport structures.";
-			if (Globals->SHIPPING_COST > 0) {
-				*str += " The cost of shipping one weight unit from one "
-					"transport structure to another transport structure is ";
-				if (Globals->TRANSPORT & GameDefs::QM_AFFECT_COST)
-					*str += AString("4-((level+1)/2) * ");
-				*str += AString(Globals->SHIPPING_COST) + " silver.";
-				if (Globals->FRACTIONAL_WEIGHT) {
-					*str += " Items with a normal weight of 0 are "
-						"treated as if ";
-					*str += Globals->FRACTIONAL_WEIGHT;
-					*str += " of the item in question weigh one weight unit.";
-				}
-			}
+``
 
 			if (Globals->NONLOCAL_TRANSPORT > 0) {
 				*str += " Items may be shipped between two transport "

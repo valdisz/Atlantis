@@ -916,12 +916,12 @@ void Unit::WriteReportJSON(AreportJSON *f, int obs, int truesight, int detfac,
 		MageReportJSON(f);
 	}
 
-	// todo
 	if (obs == 2) {
 //		temp += ReadyItem();
 		ReadyItemJSON(f);
 //		temp += StudyableSkills();
 		StudyableSkillsJSON(f);
+// todo
 #if 0
 		if (visited.size() > 0) {
 			set<string>::iterator it;
