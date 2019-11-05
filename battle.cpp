@@ -315,6 +315,17 @@ int Battle::Run( ARegion * region,
 	armies[0] = new Army(att,atts,region->type,ass);
 	armies[1] = new Army(tar,defs,region->type,ass);
 
+	if (Globals->EXTENDED_FORT_DEFENCE_COVERAGE) {
+		forlist(defs) {
+			Object * o = ((Location *)elem)->obj;
+			if (o && o->capacity > 0) {
+				AddLine(*(armies[1]->leader->name) + " is under siege!");
+				AddLine("");
+				break;
+			}
+		}
+	}
+
 	if (ass) {
 		FreeRound(armies[0],armies[1], ass);
 	} else {
@@ -603,6 +614,12 @@ int Game::CanAttack(ARegion * r,AList * afacs,Unit * u)
 	return 0;
 }
 
+void ClearFortDefense(Object * o)
+{
+	o->capacity = 0;
+	o->shipno = o->ships.Num();
+}
+
 void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 		AList &defs, Unit *att, Unit *tar, int ass, int adv)
 {
@@ -627,18 +644,30 @@ void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 	int noaida = 0, noaidd = 0;
 	for (int i=-1;i<j;i++) {
 		ARegion * r2 = r;
-		if (i>=0) {
+		bool fromNeighboar = i >= 0;
+
+		if (fromNeighboar) {
+			// get neighbor region
 			r2 = r->neighbors[i];
+
+			// look for another neighbor if in current direction not neighbor exist
 			if (!r2) continue;
-			forlist(&r2->objects) {
-				/* Can't get building bonus in another region */
-				((Object *) elem)->capacity = 0;
-				((Object *) elem)->shipno = ((Object *) elem)->ships.Num();
-			}
-		} else {
-			forlist(&r2->objects) {
-				Object * o = (Object *) elem;
-				/* Set building capacity */
+		}
+
+		forlist (&r2->objects) {
+			Object * o = (Object *) elem;
+			bool extendFortDefence =
+				   Globals->EXTENDED_FORT_DEFENCE_COVERAGE
+				&& o->IsBuilding()
+				&& !o->IsFleet();
+			bool fortDefenceCleared = false;
+
+			if (fromNeighboar && !extendFortDefence) {
+				// Can't get building bonus in another region unless EXTENDED_FORT_DEFENCE_COVERAGE is enabled
+				ClearFortDefense(o);
+				fortDefenceCleared = true;
+			} else {
+				// Set building capacity
 				if (o->incomplete < 1 && o->IsBuilding()) {
 					o->capacity = ObjectDefs[o->type].protect;
 					o->shipno = 0;
@@ -647,9 +676,7 @@ void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 					o->shipno = 0;
 				}
 			}
-		}
-		forlist (&r2->objects) {
-			Object * o = (Object *) elem;
+
 			forlist (&o->units) {
 				Unit * u = (Unit *) elem;
 				int add = 0;
@@ -721,6 +748,12 @@ void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 				}
 
 				if (add == ADD_ATTACK) {
+					if (extendFortDefence && !fortDefenceCleared) {
+						// EXTENDED_FORT_DEFENCE_COVERAGE is not working for attacker garrisons
+						ClearFortDefense(o);
+						fortDefenceCleared = true;
+					}
+
 					Location * l = new Location;
 					l->unit = u;
 					l->obj = o;

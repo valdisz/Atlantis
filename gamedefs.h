@@ -714,6 +714,16 @@ public:
 
 	// Combat overwhelming.
 	int OVERWHELMING;
+
+	// Extend fort defense on adjacent regions. This creates a fort control
+	// area around the fort and all battles where fort garrison is defenders
+	// will be held with fort defense bonus.
+	// It will make forts more viable as they will start protecting the land
+	// where it is built. Now there is a reason to build forts except
+	// roleplaying or unit sorting in the region.
+	// !!!! Protection will be added only when garrison is joining the battle
+	// in its own or adjacent region as defenders !!!!
+	int EXTENDED_FORT_DEFENSE_COVERAGE;
 };
 
 extern GameDefs *Globals;

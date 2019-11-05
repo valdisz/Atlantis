@@ -207,6 +207,7 @@ static GameDefs g = {
 	1,  // DETECT_GATE_NUMBERS
 	GameDefs::ARMY_ROUT_HITS_FIGURE,  // ARMY_ROUT
 	1,  // ADVANCED_FORTS
+	0,	// EXTENDED_FORT_DEFENCE_COVERAGE
 	0,	// FULL_TRUESEEING_BONUS  - zero with Arcadia
 	0,	// IMPROVED_AMTS 
 	0,	// FULL_INVIS_ON_SELF     - zero with Arcadia
