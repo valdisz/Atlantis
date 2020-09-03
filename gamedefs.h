@@ -714,6 +714,17 @@ public:
 
 	// Combat overwhelming.
 	int OVERWHELMING;
+
+	// This setting makes buildings with defence to be exclusive in region.
+	// When enabled only one defence structure can be built in any given region.
+	// This is needed to prevent situation when there are two or more forts
+	// belonging to different factions and a battle is started... both sides would
+	// receive defense bonus... how one castle can attack another castle?
+	// No way!!
+	// It is possible to upgrade/extend stucture to bigger one. Just enter fort
+	// and start building bigger structure with the BUILD command. No downgrades
+	// are possible, structure must be destroyed first.
+	int EXCLUSIVE_FORTS;
 };
 
 extern GameDefs *Globals;

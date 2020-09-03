@@ -553,9 +553,54 @@ void Game::Run1BuildOrder(ARegion *r, Object *obj, Unit *u)
 		u->monthorders = 0;
 		return;
 	}
+
+	// this is what we want to build
+	int type = buildobj->type;
+
+	if (Globals->EXCLUSIVE_FORTS && ObjectDefs[type].protect > 0) {
+		// find if region contains defense strcture
+		Object *defStructure = 0;
+		forlist (&r->objects) {
+			Object * o = (Object *) elem;
+			if (o->IsBuilding() && ObjectDefs[o->type].protect > 0) {
+				defStructure = o;
+				break;
+			}
+		}
+
+		if (defStructure) {
+			// defense structure was found
+
+			// if unit is outside of this structure, fail build
+			if (u->build != defStructure->num) {
+				u->Error("BUILD: Cannot build another defense structure in this region.");
+				delete u->monthorders;
+				u->monthorders = 0;
+				return;
+			}
+
+			if (type != defStructure->type) {
+				// unit is INSIDE defense structure, we can upgrade it if new structure will be bigger and will remain defense structure
+
+				int currentType = defStructure->type;
+				if (ObjectDefs[type].protect < ObjectDefs[currentType].protect || ObjectDefs[type].cost < ObjectDefs[currentType].cost) {
+					u->Error("BUILD: Cannot downsize this defense structure, it must be destroyed first.");
+					delete u->monthorders;
+					u->monthorders = 0;
+					return;
+				}
+
+				int leftToBuild = buildobj->incomplete;
+				int costDelta = ObjectDefs[currentType].cost - ObjectDefs[type].cost;
+
+				buildobj = defStructure;
+				buildobj->type = type;
+				buildobj->incomplete = leftToBuild + costDelta;
+			}
+		}
+	}
 	
 	int needed = buildobj->incomplete;
-	int type = buildobj->type;
 	// AS
 	if (((ObjectDefs[type].flags & ObjectType::NEVERDECAY) || !Globals->DECAY) &&
 			needed < 1) {
