@@ -590,12 +590,16 @@ void Game::Run1BuildOrder(ARegion *r, Object *obj, Unit *u)
 					return;
 				}
 
-				int leftToBuild = buildobj->incomplete;
-				int costDelta = ObjectDefs[currentType].cost - ObjectDefs[type].cost;
+				int buildingCost = buildobj->incomplete + ObjectDefs[currentType].cost - ObjectDefs[type].cost;
+
+				if (ObjectDefs[type].item != ObjectDefs[currentType].item) {
+					buildingCost = ObjectDefs[type].cost;
+					u->Error("Warning: because original building was built from another materials, builders started from scratch.");
+				}
 
 				buildobj = defStructure;
 				buildobj->type = type;
-				buildobj->incomplete = leftToBuild + costDelta;
+				buildobj->incomplete = buildingCost;
 			}
 		}
 	}
