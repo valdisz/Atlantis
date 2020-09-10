@@ -537,7 +537,12 @@ void Game::Run1BuildOrder(ARegion *r, Object *obj, Unit *u)
 		u->monthorders = 0;
 		return;
 	}
-	AString skname = ObjectDefs[buildobj->type].skill;
+
+	// this is what we want to build or upgrade to
+	int type = buildobj->type;
+	if (u->buildUpgradeTo) type = u->buildUpgradeTo;
+
+	AString skname = ObjectDefs[type].skill;
 	int sk = LookupSkill(&skname);
 	if (sk == -1) {
 		u->Error("BUILD: Can't build that.");
@@ -547,18 +552,16 @@ void Game::Run1BuildOrder(ARegion *r, Object *obj, Unit *u)
 	}
 
 	int usk = u->GetSkill(sk);
-	if (usk < ObjectDefs[buildobj->type].level) {
+	if (usk < ObjectDefs[type].level) {
 		u->Error("BUILD: Can't build that.");
 		delete u->monthorders;
 		u->monthorders = 0;
 		return;
 	}
 
-	// this is what we want to build
-	int type = buildobj->type;
-
+	// if exclusive forts and we wan't to build or upgrade defense structure
 	if (Globals->EXCLUSIVE_FORTS && ObjectDefs[type].protect > 0) {
-		// find if region contains defense strcture
+		// find if region already contains defense strcture
 		Object *defStructure = 0;
 		forlist (&r->objects) {
 			Object * o = (Object *) elem;
@@ -572,7 +575,7 @@ void Game::Run1BuildOrder(ARegion *r, Object *obj, Unit *u)
 			// defense structure was found
 
 			// if unit is outside of this structure, fail build
-			if (u->build != defStructure->num) {
+			if (buildobj->num != defStructure->num) {
 				u->Error("BUILD: Cannot build another defense structure in this region.");
 				delete u->monthorders;
 				u->monthorders = 0;
@@ -590,14 +593,16 @@ void Game::Run1BuildOrder(ARegion *r, Object *obj, Unit *u)
 					return;
 				}
 
-				int buildingCost = buildobj->incomplete + ObjectDefs[currentType].cost - ObjectDefs[type].cost;
+				int buildingCost = ObjectDefs[type].cost - ObjectDefs[currentType].cost;
+				if (buildobj->incomplete > 0) {
+					buildingCost += buildobj->incomplete;
+				}
 
 				if (ObjectDefs[type].item != ObjectDefs[currentType].item) {
 					buildingCost = ObjectDefs[type].cost;
 					u->Error("Warning: because original building was built from another materials, builders started from scratch.");
 				}
 
-				buildobj = defStructure;
 				buildobj->type = type;
 				buildobj->incomplete = buildingCost;
 			}

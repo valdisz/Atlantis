@@ -270,6 +270,8 @@ class Unit : public AListElem
 		int destroy;
 		int enter;
 		int build;
+		int buildUpgradeTo;
+
 		UnitId *promote;
 		AList findorders;
 		AList giveorders;

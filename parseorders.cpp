@@ -1567,7 +1567,51 @@ void Game::ProcessBuildOrder(Unit *unit, AString *o, OrdersCheck *pCheck)
 				}
 			}
 			order->target = targ;	// set the order's target to the unit number helped
-		} else {
+		}
+		else if (*token == "upgrade") {
+			delete token;
+
+			if (!Globals->EXCLUSIVE_FORTS) {
+				ParseError(pCheck, unit, 0, "BUILD UPGRADE_TO command is disabled in this game.");
+				return;
+			}
+
+			AString * objTypeStr = o->gettoken();
+			int ot = ParseObject(objTypeStr, 0);
+			delete objTypeStr;
+
+			if (ot == -1) {
+				ParseError(pCheck, unit, 0, "BUILD: Not a valid defense building name.");
+				return;
+			}
+
+			if (ObjectDefs[ot].flags & ObjectType::DISABLED) {
+				ParseError(pCheck, unit, 0, "BUILD: Not a valid defense building name.");
+				return;
+			}
+
+			if (!(ObjectDefs[ot].flags & ObjectType::CANENTER)) {
+				ParseError(pCheck, unit, 0, "BUILD: Can't upgrade that.");
+				return;
+			}
+
+			if (ObjectDefs[ot].protect <= 0) {
+				ParseError(pCheck, unit, 0, "BUILD: Can upgrade only defense structures.");
+				return;
+			}
+
+			AString skname = ObjectDefs[ot].skill;
+			int sk = LookupSkill(&skname);
+			if (sk == -1) {
+				ParseError(pCheck, unit, 0, "BUILD: Can't upgrade that.");
+				return;
+			}
+
+			order->target = NULL;
+			unit->build = 0;
+			unit->buildUpgradeTo = ot;
+		}
+		else {
 			// token exists and != "help": must be something like 'build tower'
 			int ot = ParseObject(token, 1);
 			delete token;
