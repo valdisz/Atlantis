@@ -2765,7 +2765,7 @@ WeaponType wepd[] = {
 	 WeaponType::NEEDSKILL | WeaponType::RANGED | WeaponType::NOATTACKERSKILL,
 	 "LBOW", NULL,
 	 PIERCING, ATTACK_RANGED, 1,
-	 0, 0, 0},
+	 -1, 0, 0},
 	// WEAPON_HEAVYCROSSBOW
 	{"HXBO",
 	 WeaponType::NEEDSKILL | WeaponType::RANGED | WeaponType::NOATTACKERSKILL,
