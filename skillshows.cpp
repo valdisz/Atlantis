@@ -1104,8 +1104,8 @@ AString *ShowSkill::Report(Faction *f)
 				*str += "Create Phantasmal Undead at level 3 allows the mage "
 					"to summon an illusionary lich into his inventory. To "
 					"summon an illusionary lich, the mage should CAST "
-					"Create_Phantasmal_Undead LICH; the mage can only have "
-					"one illusionary lich in his inventory at one time.";
+					"Create_Phantasmal_Undead LICH; The number of liches that a "
+					"mage may have in his inventory is equal to mage's skill level.";
 			}
 			break;
 		case S_CREATE_PHANTASMAL_DEMONS:
