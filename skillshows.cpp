@@ -577,7 +577,7 @@ AString *ShowSkill::Report(Faction *f)
 			/* XXX -- This should be cleaner somehow. */
 			*str += "A mage with this skill may teleport himself across "
 				"great distances, even without the use of a gate. The mage "
-				"may teleport up to 30 weight units per skill level.";
+				"may teleport up to 50 weight units per skill level.";
 			range = FindRange(SkillDefs[skill].range);
 			if (range) {
 				if (range->flags & RangeType::RNG_SURFACE_ONLY) {

@@ -1135,8 +1135,8 @@ AString *ItemDescription(int item, int full)
 		case I_HEALPOTION:
 			*temp += " This item allows its possessor to heal wounded units after battle."
 				" No skill is necessary to use this item; it will be used automatically"
-				" when the possessor is involved in a battle. It can heal up to 10"
-				" casualties, with a 50 percent success rate. Healing consumes an item.";
+				" when the possessor is involved in a battle. It can heal up to 1"
+				" casualties, with a 70 percent success rate. Healing consumes an item.";
 			break;
 		default:
 			break;
