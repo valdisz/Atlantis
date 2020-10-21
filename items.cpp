@@ -535,6 +535,25 @@ static AString MonResist(int type, int val, int full)
 	return temp;
 }
 
+static AString FMIResist(int type, int val, int full)
+{
+	AString temp = "This FMI ";
+	if (full) {
+		temp += AString("has a resistance of ") + val;
+	} else {
+		temp += "is ";
+		if (val < 1) temp += "very susceptible";
+		else if (val == 1) temp += "susceptible";
+		else if (val > 1 && val < 3) temp += "typically resistant";
+		else if (val > 2 && val < 5) temp += "slightly resistant";
+		else temp += "very resistant";
+	}
+	temp += " to ";
+	temp += AttType(type);
+	temp += " attacks.";
+	return temp;
+}
+
 static AString WeapClass(int wclass)
 {
 	switch(wclass) {
@@ -740,7 +759,8 @@ AString *ItemDescription(int item, int full)
 			*temp += AString("all skills to level ") + mt->defaultlevel + ".";
 		}
 	}
-	if (ItemDefs[item].type & IT_MONSTER) {
+	if ((ItemDefs[item].type & IT_MONSTER) &&
+			!(ItemDefs[item].flags & ItemType::MANPRODUCE)) {
 		*temp += " This is a monster.";
 		MonType *mp = FindMonster(ItemDefs[item].abr,
 				(ItemDefs[item].type & IT_ILLUSION));
@@ -782,6 +802,53 @@ AString *ItemDescription(int item, int full)
 			}
 		}
 		*temp += "silver as treasure.";
+	}
+
+	if(ItemDefs[item].flags & ItemType::MANPRODUCE) {
+		*temp += " This is a free-moving-item (FMI).";
+		MonType *mp = FindMonster(ItemDefs[item].abr,
+				(ItemDefs[item].type & IT_ILLUSION));
+		*temp += AString(" This FMI attacks with a combat skill of ") +
+			mp->attackLevel + ".";
+		for (int c = 0; c < NUM_ATTACK_TYPES; c++) {
+			*temp += AString(" ") + FMIResist(c,mp->defense[c], full);
+		}
+		if (mp->special && mp->special != NULL) {
+			*temp += AString(" ") +
+				"FMI can cast " +
+				ShowSpecial(mp->special, mp->specialLevel, 1, 0);
+		}
+		if (full) {
+			int hits = mp->hits;
+			int atts = mp->numAttacks;
+			int regen = mp->regen;
+			if (!hits) hits = 1;
+			if (!atts) atts = 1;
+			*temp += AString(" This FMI has ") + atts + " melee " +
+				((atts > 1)?"attacks":"attack") + " per round and takes " +
+				hits + " " + ((hits > 1)?"hits":"hit") + " to kill.";
+			if (regen > 0) {
+				*temp += AString(" This FMI regenerates ") + regen +
+					" hits per round of battle.";
+			}
+			*temp += AString(" This FMI has a tactics score of ") +
+				mp->tactics + ", a stealth score of " + mp->stealth +
+				", and an observation score of " + mp->obs + ".";
+		}
+
+		if (mp->spoiltype != -1) {
+			*temp += " This FMI might have ";
+
+			if (mp->spoiltype & IT_MAGIC) {
+				*temp += "magic items and ";
+			} else if (mp->spoiltype & IT_ADVANCED) {
+				*temp += "advanced items and ";
+			} else if (mp->spoiltype & IT_NORMAL) {
+				*temp += "normal or trade items and ";
+			}
+
+			*temp += "silver as treasure.";
+		}
 	}
 
 	if (ItemDefs[item].type & IT_WEAPON) {

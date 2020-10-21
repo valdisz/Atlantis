@@ -2307,6 +2307,28 @@ ItemType id[] =
 	 I_NET,1, 0,
 	 0, NULL, 0,
 	 "", { "", "", "", "" }, 0, 0},
+
+	{"catapult","catapults","CATP",
+	ItemType::DISABLED | ItemType::MANPRODUCE,
+	"CARP",5,5,1,{{I_IRONWOOD,130},{I_ROOTSTONE,30},{I_MITHRIL,50},{-1,0}},
+	NULL,0,0,{{-1,0},{-1,0},{-1,0},{-1,0}},
+	1600,IT_MONSTER,2000,1,
+	1600,0,0,0,2,
+	-1,0,
+	-1,0, 0,
+	0, NULL, 0,
+	"", { "", "", "", "" }, 0, 0},
+
+	{"steel defender","steel defenders","STED",
+	ItemType::DISABLED | ItemType::MANPRODUCE,
+	"CARP",5,5,1, {{I_IRONWOOD,30},{I_IRON,130},{I_MITHRIL,60},{-1,0}},
+	NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
+	800,IT_MONSTER,500,0,
+	800,0,0,0,2,
+	-1,0,
+	-1,0, 0,
+	0, NULL, 0,
+	"", { "", "", "", "" }, 0, 0},
 };
 ItemType *ItemDefs = id;
 
@@ -2715,6 +2737,18 @@ MonType md[] = {
 	 2,0,3,
 	 "icebreath", 4,
 	 8000,IT_MAGIC,50,1,"Ice Dragon", "IDRA"},
+
+   {0,{0,0,0,0,0,0},
+   0,30,0,
+   0,0,0,
+   "catapult strike",8,
+   0,-1,0,0,"Catapult", "CATP"},
+
+   {0,{3,1,5,2,2,1},
+   0,150,0,
+   0,0,0,
+   NULL,0,
+   0,-1,0,0,"Steel Defender","STED"},
 };
 
 MonType *MonDefs = md;
@@ -4976,6 +5010,22 @@ static SpecialType spd[] = {
 	  {-1, 0, 0, 0, 0, 0},
 	  {-1, 0, 0, 0, 0, 0}},
 	 "casts something that is not a spell", "annoying ", ""},
+
+  // SPECIAL_CATAPULT_STRIKE,
+  {"catapult strike", "a catapult strike",
+  0,
+   {-1, -1, -1, -1, -1},
+   {-1, -1, -1, -1, -1, -1, -1},
+   {NULL, NULL, NULL},
+   SpecialType::FX_DAMAGE|SpecialType::FX_USE_LEV,
+   {-1, -1, -1, -1},
+   {{-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}},
+   "a non-shield attack",
+	{{ATTACK_RANGED,2,10,WeaponType::ALWAYSREADY|WeaponType::RANGED,ARMORPIERCING,0},
+	{-1, 0, 0, 0, 0, 0},
+	{-1, 0, 0, 0, 0, 0},
+	{-1, 0, 0, 0, 0, 0}},
+   "strikes, dealing damage, thus killing ", "annoying", ""},
 };
 
 SpecialType *SpecialDefs = spd;

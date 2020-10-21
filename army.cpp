@@ -115,7 +115,7 @@ Soldier::Soldier(Unit * u,Object * o,int regtype,int r,int ass)
 	if (ItemDefs[r].type & IT_MONSTER) {
 		MonType *mp = FindMonster(ItemDefs[r].abr,
 				(ItemDefs[r].type & IT_ILLUSION));
-		if (u->type == U_WMON)
+		if((u->type == U_WMON) || (ItemDefs[r].flags & ItemType::MANPRODUCE))
 			name = AString(mp->name) + " in " + *(unit->name);
 		else
 			name = AString(mp->name) + " controlled by " + *(unit->name);
