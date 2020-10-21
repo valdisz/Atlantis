@@ -748,12 +748,6 @@ void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 				}
 
 				if (add == ADD_ATTACK) {
-					if (extendFortDefence && !fortDefenceCleared) {
-						// EXTENDED_FORT_DEFENCE_COVERAGE is not working for attacker garrisons
-						ClearFortDefense(o);
-						fortDefenceCleared = true;
-					}
-
 					Location * l = new Location;
 					l->unit = u;
 					l->obj = o;
