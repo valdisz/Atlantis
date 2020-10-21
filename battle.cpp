@@ -614,12 +614,6 @@ int Game::CanAttack(ARegion * r,AList * afacs,Unit * u)
 	return 0;
 }
 
-void ClearFortDefense(Object * o)
-{
-	o->capacity = 0;
-	o->shipno = o->ships.Num();
-}
-
 void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 		AList &defs, Unit *att, Unit *tar, int ass, int adv)
 {
@@ -645,6 +639,7 @@ void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 	for (int i=-1;i<j;i++) {
 		ARegion * r2 = r;
 		bool fromNeighbor = i >= 0;
+		bool isRegionProtected = !fromNeighbor || Globals->EXTENDED_FORT_DEFENSE_COVERAGE;
 
 		if (fromNeighbor) {
 			// get neighbor region
@@ -656,22 +651,20 @@ void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 
 		forlist (&r2->objects) {
 			Object * o = (Object *) elem;
-			bool extendFortDefence =
-				   Globals->EXTENDED_FORT_DEFENSE_COVERAGE
-				&& o->IsBuilding()
-				&& !o->IsFleet();
-			bool fortDefenceCleared = false;
 
-			if (fromNeighbor && !extendFortDefence) {
-				// Can't get building bonus in another region unless EXTENDED_FORT_DEFENCE_COVERAGE is enabled
-				ClearFortDefense(o);
-				fortDefenceCleared = true;
-			} else {
-				// Set building capacity
-				if (o->incomplete < 1 && o->IsBuilding()) {
+			bool isCompleatedBuilding = o->incomplete < 1 && o->IsBuilding();
+			bool isFleet = o->IsFleet();
+
+			if (!isRegionProtected || (fromNeighbor && isFleet)) {
+				o->capacity = 0;
+				o->shipno = o->ships.Num();
+			}
+			else {
+				if (isCompleatedBuilding) {
 					o->capacity = ObjectDefs[o->type].protect;
 					o->shipno = 0;
-				} else if (o->IsFleet()) {
+				}
+				else if (isFleet) {
 					o->capacity = 0;
 					o->shipno = 0;
 				}
