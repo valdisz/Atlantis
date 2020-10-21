@@ -644,9 +644,9 @@ void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 	int noaida = 0, noaidd = 0;
 	for (int i=-1;i<j;i++) {
 		ARegion * r2 = r;
-		bool fromNeighboar = i >= 0;
+		bool fromNeighbor = i >= 0;
 
-		if (fromNeighboar) {
+		if (fromNeighbor) {
 			// get neighbor region
 			r2 = r->neighbors[i];
 
@@ -657,12 +657,12 @@ void Game::GetSides(ARegion *r, AList &afacs, AList &dfacs, AList &atts,
 		forlist (&r2->objects) {
 			Object * o = (Object *) elem;
 			bool extendFortDefence =
-				   Globals->EXTENDED_FORT_DEFENCE_COVERAGE
+				   Globals->EXTENDED_FORT_DEFENSE_COVERAGE
 				&& o->IsBuilding()
 				&& !o->IsFleet();
 			bool fortDefenceCleared = false;
 
-			if (fromNeighboar && !extendFortDefence) {
+			if (fromNeighbor && !extendFortDefence) {
 				// Can't get building bonus in another region unless EXTENDED_FORT_DEFENCE_COVERAGE is enabled
 				ClearFortDefense(o);
 				fortDefenceCleared = true;
