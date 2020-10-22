@@ -2657,6 +2657,15 @@ int Game::GenRules(const AString &rules, const AString &css,
 		"require more advanced resources, or odd skills to construct.   "
 		"The description of a skill will include any buildings which "
 		"it allows to be built.";
+
+	f.Paragraph(temp);
+	temp = "Forifications are special buildings as they are protecting garrison in the battle.";
+	if (Globals->EXCLUSIVE_FORTS) {
+		temp += "Just one such building can be built in the region."
+		" Fortfications are also the only buildings what are possible to upgrade into bigger buildings.";
+	}
+	temp += " When such building is built it will boost region economy and provide strategical benefits for the defenders.";
+
 	f.Paragraph(temp);
 	temp = "There are other structures that increase the maximum production "
 		"of certain items in regions";
@@ -4541,6 +4550,9 @@ int Game::GenRules(const AString &rules, const AString &css,
 	f.LinkRef("build");
 	f.TagText("h4", "BUILD");
 	f.TagText("h4", "BUILD [object type]");
+	if (Globals->EXCLUSIVE_FORTS) {
+		f.TagText("h4", "BUILD UPGRADE [object type]");
+	}
 	f.TagText("h4", "BUILD HELP [unit]");
 	temp = "BUILD given with no parameters causes the unit to perform "
 		"work on ";
@@ -4549,6 +4561,16 @@ int Game::GenRules(const AString &rules, const AString &css,
 	temp += "the object that it is currently inside.  BUILD given with an "
 		"[object type] (such as \"Tower\" or \"Galleon\") instructs "
 		"the unit to begin work on a new object of the type given. ";
+	if (Globals->EXCLUSIVE_FORTS) {
+		temp += "If region already contains any fortification then other"
+		" fortifications cannot be built there. The only way how to change them"
+		" is BUILD UPGRADE command, which will try to perform forification upgrade."
+		" It is worth to mention that [object type] must be larger structure"
+		" than currently built. Unit must be inside the structure which he wants to upgrade."
+		" It is not possible to upgrade wooden building into stone building"
+		" or stone building into rootstone building, etc.."
+		" This command is applicable only for the foritification buildings.";
+	}
 	temp += "The final form instructs the unit to assist the target unit "
 		"in its current building task, even if that task was begun "
 		"this same turn. This help will be rejected if the unit you "

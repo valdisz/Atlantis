@@ -1572,7 +1572,7 @@ void Game::ProcessBuildOrder(Unit *unit, AString *o, OrdersCheck *pCheck)
 			delete token;
 
 			if (!Globals->EXCLUSIVE_FORTS) {
-				ParseError(pCheck, unit, 0, "BUILD UPGRADE_TO command is disabled in this game.");
+				ParseError(pCheck, unit, 0, "BUILD UPGRADE command is disabled in this game.");
 				return;
 			}
 
