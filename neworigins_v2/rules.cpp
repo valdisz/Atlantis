@@ -238,7 +238,8 @@ static GameDefs g = {
 	1,	// DISPERSE_GATE_NUMBERS
 	40,	// UNDEATH_CONTAGION
 	1,   // REGIONS_ECONOMY
-	1   // ADVANCED_TACTICS
+	1,   // ADVANCED_TACTICS
+	0,	// OVERWHELMING
 };
 
 GameDefs *Globals = &g;
