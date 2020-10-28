@@ -29,7 +29,6 @@
 #include <map>
 using namespace std;
 
-class Soldier;
 class Army;
 
 #include "unit.h"
@@ -38,67 +37,7 @@ class Army;
 #include "object.h"
 #include "shields.h"
 #include "helper.h"
-
-class Soldier {
-	public:
-		Soldier(Unit *unit, Object *object, int regType, int race, int ass=0);
-
-		void SetupSpell();
-		void SetupCombatItems();
-
-		//
-		// SetupHealing is actually game-specific, and appears in specials.cpp
-		//
-		void SetupHealing();
-
-		int HasEffect(char const *);
-		void SetEffect(char const *);
-		void ClearEffect(char const *);
-		void ClearOneTimeEffects(void);
-		int ArmorProtect(int weaponClass );
-
-		void RestoreItems();
-		void Alive(int);
-		void Dead();
-
-		/* Unit info */
-		AString name;
-		Unit * unit;
-		int race;
-		int riding;
-		int building;
-
-		/* Healing information */
-		int healing;
-		int healtype;
-		int healitem;
-		int canbehealed;
-		int regen;
-
-		/* Attack info */
-		int weapon;
-		int attacktype;
-		int askill;
-		int attacks;
-		char const *special;
-		int slevel;
-
-		/* Defense info */
-		int dskill[NUM_ATTACK_TYPES];
-		int protection[NUM_ATTACK_TYPES];
-		int armor;
-		int hits;
-		int maxhits;
-		int damage;
-
-		BITFIELD battleItems;
-		int amuletofi;
-
-		/* Effects */
-		map< char const *, int > effects;
-};
-
-typedef Soldier * SoldierPtr;
+#include "soldier.h"
 
 class Army
 {
