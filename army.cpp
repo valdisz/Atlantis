@@ -581,8 +581,8 @@ Army::Army(Unit * ldr,AList * locs,int regtype,int ass)
 			do {
 				if (IsSoldier(it->type)) {
 					for (int i = 0; i < it->num; i++) {
-						if ((ItemDefs[ it->type ].type & IT_MAN) &&
-								u->GetFlag(FLAG_BEHIND)) {
+						ItemType &item = ItemDefs[ it->type ];
+						if (((item.type & IT_MAN) || (item.flags & ItemType::MANPRODUCE)) && u->GetFlag(FLAG_BEHIND)) {
 							--y;
 							soldiers[y] = new Soldier(u, obj, regtype,
 									it->type);
@@ -1261,7 +1261,7 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 		if (tar->riding != -1) attackLevel += mountBonus;
 
 		// 4.4 Check for weapon inflicted bonuses
-		if (attacker->weapon && tar->weapon) {
+		if (attacker->weapon != -1 && tar->weapon != -1) {
 			WeaponType *attackerWeapon = FindWeapon(ItemDefs[attacker->weapon].abr);
 			WeaponType *targetWeapon = FindWeapon(ItemDefs[tar->weapon].abr);
 

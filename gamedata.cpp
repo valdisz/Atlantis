@@ -2323,7 +2323,7 @@ ItemType id[] =
 	ItemType::DISABLED | ItemType::MANPRODUCE,
 	"CARP",5,5,1, {{I_IRONWOOD,30},{I_IRON,130},{I_MITHRIL,60},{-1,0}},
 	NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
-	800,IT_MONSTER,500,0,
+	800,IT_MONSTER,500,1,
 	800,0,0,0,2,
 	-1,0,
 	-1,0, 0,
@@ -5111,7 +5111,7 @@ static SpecialType spd[] = {
 	{-1, 0, 0, 0, 0, 0, 1},
 	{-1, 0, 0, 0, 0, 0, 1},
 	{-1, 0, 0, 0, 0, 0, 1}},
-   "strikes, dealing damage, thus killing ", "annoying", ""},
+    "strikes", "killing ", ""},
 };
 
 SpecialType *SpecialDefs = spd;
