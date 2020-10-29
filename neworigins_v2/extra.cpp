@@ -874,6 +874,8 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableSkill(S_TRANSMUTATION);
 	EnableSkill(S_ENDURANCE);
 	EnableSkill(S_GEMCUTTING);
+	EnableSkill(S_MAGIC_ARMOR);
+	EnableSkill(S_BLASPHEMOUS_RITUAL);
 	DisableSkill(S_CAMELTRAINING);
 	DisableSkill(S_RANCHING);
 

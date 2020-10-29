@@ -1737,19 +1737,50 @@ int Game::RunGateJump(ARegion *r,Object *o,Unit *u)
 	}
 
 	int maxweight = 10;
-	if (order->gate != -1 && order->gate != -2) level -= 2;
-	switch (level) {
-		case 1:
-			maxweight = 15;
-			break;
-		case 2:
-			maxweight = 100;
-			break;
-		case 3:
-		case 4:
-		case 5:
-			maxweight = 1000;
-			break;
+
+	// -2 means random jump between levels
+	// We need to reduce capacity by 1 level
+	if (order->gate == -2) {
+		level = level - 1;
+	}
+
+	// -1 means no gate selected - random jump
+	// -2 means random jump between levels
+	if (order->gate == -1 || order->gate == -2) {
+		switch (level) {
+			case 1:
+				maxweight = 15;
+				break;
+			case 2:
+				maxweight = 500;
+				break;
+			case 3:
+				maxweight = 1500;
+				break;
+			case 4:
+				maxweight = 3000;
+				break;
+			case 5:
+				maxweight = 6000;
+				break;
+		}
+	} else {
+		// Gate selected
+		switch (level) {
+			case 1:
+			case 2:
+				maxweight = 0;
+				break;
+			case 3:
+				maxweight = 500;
+				break;
+			case 4:
+				maxweight = 1500;
+				break;
+			case 5:
+				maxweight = 3000;
+				break;
+		}
 	}
 
 	int weight = u->Weight();
@@ -1766,6 +1797,7 @@ int Game::RunGateJump(ARegion *r,Object *o,Unit *u)
 	}
 
 	ARegion *tar;
+	AString jump_text;
 	if (order->gate < 0) {
 		int good = 0;
 
@@ -1785,7 +1817,8 @@ int Game::RunGateJump(ARegion *r,Object *o,Unit *u)
 				good = 0;
 		} while (!good);
 
-		u->Event("Casts Random Gate Jump.");
+		jump_text = AString("Casts Random Gate Jump. Capacity: ") + AString(weight) + AString("/") + AString(maxweight) + ".";
+		u->Event(jump_text);
 	} else {
 		tar = regions.FindGate(order->gate);
 		if (!tar) {
@@ -1797,7 +1830,8 @@ int Game::RunGateJump(ARegion *r,Object *o,Unit *u)
 			return 0;
 		}
 
-		u->Event("Casts Gate Jump.");
+		jump_text = AString("Casts Gate Jump. Capacity: ") + AString(weight) + "/" + AString(maxweight) + ".";
+		u->Event(jump_text);
 	}
 
 	int comma = 0;

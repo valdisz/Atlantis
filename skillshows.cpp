@@ -261,12 +261,12 @@ AString *ShowSkill::Report(Faction *f)
 			if (level == 1) {
 				*str += "A unit with this skill has begun the process of building "
 					"on their combat experience to learn how to survive wounds "
-					"that would lay low a less grizzled warrior.  This is an "
+					"that would lay low a less grizzled warrior. This is an "
 					"arduous process, and doesn't yet provide any advantage "
 					"at this skill level.";
 			} else if (level == 3) {
 				*str += "The process of building up combat endurance is starting "
-					"to yield results.  At this level the men in the unit can "
+					"to yield results. At this level the men in the unit can "
 					"survive one extra hit in combat before being overcome.";
 			} else if (level == 5) {
 				*str += "The men of this unit are now hardened veterans, and can "
@@ -426,8 +426,10 @@ AString *ShowSkill::Report(Faction *f)
 					"Also at level 2 Gate Lore, the mage may perform a "
 					"random gate jump without being restricted to the same "
 					"level; use CAST Gate_Lore RANDOM LEVEL UNITS <unit> ... "
-					"to use this option.  The mage may also now carry 100 "
-					"weight units through a Gate when doing a random jump.";
+					"to use this option; when calculating weight for multi "
+					"level jump, skill level is reduced by 1. The mage may "
+					"also now carry 500 weight units through a Gate when doing "
+					"a random jump.";
 			} else if (level == 3) {
 				*str += "A mage with Gate Lore skill 3 and higher can step "
 					"through a Gate into another region containing a specific "
@@ -436,16 +438,17 @@ AString *ShowSkill::Report(Faction *f)
 					"Gate that the mage will jump to. UNITS is followed by a "
 					"list of units to follow the mage through the gate (the "
 					"mage always jumps through the gate). At level 3, the "
-					"mage may carry 15 weight units through the Gate "
-					"(including the mage). Also, a level 3 or higher mage "
-					"doing a random gate jump may carry 1000 weight units "
-					"through the Gate.";
+					"mage may carry 500 weight units through the Gate "
+					"(including the mage). Also, a level 3 mage doing a random "
+					"gate jump may carry 1500 weight units through the Gate.";
 			} else if (level == 4) {
-				*str += "A mage with Gate Lore skill 4 may carry 100 weight "
-					"units through a Gate.";
+				*str += "A mage with Gate Lore skill 4 may carry 1500 weight "
+					"units through a Gate. Also, a level 4 mage doing a random "
+					"gate jump may carry 3000 weight units through the Gate.";
 			} else if (level == 5) {
-				*str += "A mage with Gate Lore skill 5 may carry 1000 weight "
-					"units through a Gate.";
+				*str += "A mage with Gate Lore skill 5 may carry 3000 weight "
+					"units through a Gate. Also, a level 5 mage doing a random "
+					"gate jump may carry 6000 weight units through the Gate.";
 			}
 			break;
 		case S_PORTAL_LORE:
@@ -1378,6 +1381,13 @@ AString *ShowSkill::Report(Faction *f)
 					*str += ".";
 				}
 			}
+			break;
+		case S_MAGIC_ARMOR:
+			if (level > 1) break;
+			*str += "Magic Armor gives the mage magical protection granting extra "
+					"hit point for every level in this skill. No order is necessary "
+					"to use this spell; it will be used automatically when the mage "
+					"is involved in a battle.";
 			break;
 		case S_BLASPHEMOUS_RITUAL:
 			if (level > 1) break;

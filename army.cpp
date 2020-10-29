@@ -1293,6 +1293,10 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 			tar->SetEffect(effect);
 			ret++;
 		}
+
+		AString test1;
+		test1 = AString(attacker->name) + AString(" attacked solder from: ") + AString(tar->name);
+		b->AddLine(test1 + ".");
 	}
 	return ret;
 }
