@@ -1718,7 +1718,7 @@ int Game::RunGateJump(ARegion *r,Object *o,Unit *u)
 
 	TeleportOrder *order = u->teleportorders;
 
-	if ((order->gate > 0 && level < 3) ||
+	if ((order->gate > 0 && level < 2) ||
 			(order->gate == -2 && level < 2)) {
 		u->Error("CAST: Unit Doesn't know Gate Lore at that level.");
 		return 0;
@@ -1768,8 +1768,10 @@ int Game::RunGateJump(ARegion *r,Object *o,Unit *u)
 		// Gate selected
 		switch (level) {
 			case 1:
-			case 2:
 				maxweight = 0;
+				break;
+			case 2:
+				maxweight = 15;
 				break;
 			case 3:
 				maxweight = 500;

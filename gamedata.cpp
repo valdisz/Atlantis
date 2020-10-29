@@ -2226,7 +2226,7 @@ ItemType id[] =
 	 -1,0,
 	 -1,0, 0,
 	 0, NULL, 0,
-	 "GATE", { "MANI", "PATT", "FORC", "SPIR" }, 1, 3},
+	 "GATE", { "MANI", "PATT", "FORC", "SPIR" }, 1, 2},
 	{"staff of healing","staves of healing","STAH",
 	 ItemType::DISABLED | ItemType::NOMARKET | ItemType::NOTRANSPORT,
 	 NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},

@@ -429,17 +429,19 @@ AString *ShowSkill::Report(Faction *f)
 					"to use this option; when calculating weight for multi "
 					"level jump, skill level is reduced by 1. The mage may "
 					"also now carry 500 weight units through a Gate when doing "
-					"a random jump.";
-			} else if (level == 3) {
-				*str += "A mage with Gate Lore skill 3 and higher can step "
+					"a random jump. "
+					"A mage with Gate Lore skill 2 and higher can step "
 					"through a Gate into another region containing a specific "
 					"Gate. To use this spell, use the syntax CAST Gate_Lore "
 					"GATE <number> UNITS <unit> ... <number> specifies the "
 					"Gate that the mage will jump to. UNITS is followed by a "
 					"list of units to follow the mage through the gate (the "
-					"mage always jumps through the gate). At level 3, the "
-					"mage may carry 500 weight units through the Gate "
-					"(including the mage). Also, a level 3 mage doing a random "
+					"mage always jumps through the gate). At level 2, the "
+					"mage may carry 15 weight units through the specific Gate "
+					"(including the mage).";
+			} else if (level == 3) {
+				*str += "A mage with Gate Lore skill 3 may carry 500 weight "
+					"units through a Gate. Also, a level 3 mage doing a random "
 					"gate jump may carry 1500 weight units through the Gate.";
 			} else if (level == 4) {
 				*str += "A mage with Gate Lore skill 4 may carry 1500 weight "
