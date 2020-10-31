@@ -66,7 +66,7 @@ class Battle : public AListElem
 		void FreeRound(Army *,Army *, int ass = 0);
 		void NormalRound(int,Army *,Army *);
 		void DoAttack(int round, Soldier *a, Army *attackers, Army *def,
-				int behind, int ass = 0, bool canattackback = false);
+				int behind, int ass = 0, bool canAttackBehind = false, bool canAttackFromBehind = false);
 
 		void GetSpoils(AList *,ItemList *, int);
 

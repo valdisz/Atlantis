@@ -77,8 +77,8 @@ void Battle::FreeRound(Army * att,Army * def, int ass)
 	//
 	att->round++;
 
-	bool overwhelmed = IsArmyOverwhelmedBy(def, att);
-	if (overwhelmed) {
+	bool attOverwhelm = IsArmyOverwhelmedBy(def, att);
+	if (attOverwhelm) {
 		AddLine(*(def->leader->name) + " is overwhelmed.");
 	}
 
@@ -88,7 +88,7 @@ void Battle::FreeRound(Army * att,Army * def, int ass)
 		int num = getrandom(att->CanAttack());
 		int behind;
 		Soldier * a = att->GetAttacker(num, behind);
-		DoAttack(att->round, a, att, def, behind, ass, overwhelmed);
+		DoAttack(att->round, a, att, def, behind, ass, attOverwhelm, false);
 	}
 
 	/* Write losses */
@@ -100,9 +100,9 @@ void Battle::FreeRound(Army * att,Army * def, int ass)
 }
 
 void Battle::DoAttack(int round, Soldier *a, Army *attackers, Army *def,
-		int behind, int ass, bool canattackback)
+		int behind, int ass, bool canAttackBehind, bool canAttackFromBehind)
 {
-	DoSpecialAttack(round, a, attackers, def, behind, canattackback);
+	DoSpecialAttack(round, a, attackers, def, behind, canAttackBehind);
 	if (!def->NumAlive()) return;
 
 	if (!behind && (a->riding != -1)) {
@@ -122,7 +122,7 @@ void Battle::DoAttack(int round, Soldier *a, Army *attackers, Army *def,
 						spd->damage[i].type, pMt->specialLev,
 						spd->damage[i].flags, spd->damage[i].dclass,
 						spd->damage[i].effect, 0, a, attackers,
-						canattackback, hitDamage);
+						canAttackBehind, hitDamage);
 				if (num != -1) {
 					if (tot == -1) tot = num;
 					else tot += num;
@@ -152,7 +152,7 @@ void Battle::DoAttack(int round, Soldier *a, Army *attackers, Army *def,
 		if (a->weapon != -1)
 			pWep = FindWeapon(ItemDefs[a->weapon].abr);
 
-		if (behind) {
+		if (behind && !canAttackFromBehind) {
 			if (!pWep) break;
 			if (!( pWep->flags & WeaponType::RANGED)) break;
 		}
@@ -172,7 +172,7 @@ void Battle::DoAttack(int round, Soldier *a, Army *attackers, Army *def,
 		}
 		//
 		def->DoAnAttack(this, NULL, 1, attackType, a->askill, flags, attackClass,
-				NULL, mountBonus, a, attackers, canattackback, hitDamage);
+				NULL, mountBonus, a, attackers, canAttackBehind, hitDamage);
 		if (!def->NumAlive()) break;
 	}
 
@@ -205,13 +205,13 @@ void Battle::NormalRound(int round,Army * a,Army * b)
 	int aatt = a->CanAttack();
 	int batt = b->CanAttack();
 
-	bool boverwhelmed = IsArmyOverwhelmedBy(b, a);
-	if (boverwhelmed) {
+	bool aOverwhelm = IsArmyOverwhelmedBy(b, a);
+	if (aOverwhelm) {
 		AddLine(*(b->leader->name) + " is overwhelmed.");
 	}
 
-	bool aoverwhelmed = IsArmyOverwhelmedBy(a, b);
-	if (aoverwhelmed) {
+	bool bOverwhelm = IsArmyOverwhelmedBy(a, b);
+	if (bOverwhelm) {
 		AddLine(*(a->leader->name) + " is overwhelmed.");
 	}
 
@@ -225,12 +225,12 @@ void Battle::NormalRound(int round,Army * a,Army * b)
 			num -= aatt;
 
 			Soldier * s = b->GetAttacker(num, behind);
-			DoAttack(b->round, s, b, a, behind, 0, aoverwhelmed);
+			DoAttack(b->round, s, b, a, behind, 0, bOverwhelm, aOverwhelm);
 		}
 		else
 		{
 			Soldier * s = a->GetAttacker(num, behind);
-			DoAttack(a->round, s, a, b, behind, 0, boverwhelmed);
+			DoAttack(a->round, s, a, b, behind, 0, aOverwhelm, bOverwhelm);
 			// ---
 		}
 		aalive = a->NumAlive();
