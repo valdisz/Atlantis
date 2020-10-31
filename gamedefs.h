@@ -727,6 +727,10 @@ public:
 	// This feature uses ARMY_ROUT setting to determine how size of the army is determined, by hits
 	// or by figure count.
 	int OVERWHELMING;
+
+	// Healing for both sides - win or lose
+	// This should reduce snowballing effect of winner getting stronger exponentially.
+	int HEAL_ALL;
 };
 
 extern GameDefs *Globals;

@@ -240,6 +240,7 @@ static GameDefs g = {
 	1,   // REGIONS_ECONOMY
 	1,   // ADVANCED_TACTICS
 	1,	// OVERWHELMING
+	1, // HEAL_ALL
 };
 
 GameDefs *Globals = &g;
