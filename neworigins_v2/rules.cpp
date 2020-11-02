@@ -239,7 +239,7 @@ static GameDefs g = {
 	40,	// UNDEATH_CONTAGION
 	1,   // REGIONS_ECONOMY
 	1,   // ADVANCED_TACTICS
-	1,	// OVERWHELMING
+	4,	// OVERWHELMING
 	1, // HEAL_ALL
 };
 
