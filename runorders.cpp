@@ -3044,6 +3044,14 @@ void Game::DoGuard1Orders()
 			Object *obj = (Object *) elem;
 			forlist((&obj->units)) {
 				Unit *u = (Unit *) elem;
+
+				// Only one faction and it's allies can be on guard at the same time
+				if (Globals->STRICT_GUARD && u->guard == GUARD_SET && !r->CanGuard(u)) {
+					u->guard = GUARD_NONE;
+					u->Error("Is prevented from guarding by another unit.");
+					continue;
+				}
+
 				if (u->guard == GUARD_SET || u->guard == GUARD_GUARD) {
 					if (!u->Taxers(1)) {
 						u->guard = GUARD_NONE;

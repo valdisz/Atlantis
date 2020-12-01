@@ -214,6 +214,7 @@ class ARegion : public AListElem
 		Unit *Forbidden(Unit *); /* Returns unit that is forbidding */
 		Unit *ForbiddenByAlly(Unit *); /* Returns unit that is forbidding */
 		int CanTax(Unit *);
+		int CanGuard(Unit *);
 		int CanPillage(Unit *);
 		void Pillage();
 		int ForbiddenShip(Object *);

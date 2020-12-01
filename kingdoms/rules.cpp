@@ -234,6 +234,7 @@ static GameDefs g = {
 	0, // ADVANCED_TACTICS
 	0,	// OVERWHELMING
 	0, // HEAL_ALL
+	0, // STRICT_GUARD
 };
 
 GameDefs *Globals = &g;
