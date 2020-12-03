@@ -242,6 +242,7 @@ static GameDefs g = {
 	4,	// OVERWHELMING
 	0, // HEAL_ALL
 	1, // STRICT_GUARD
+	0, // OCEAN_GUARD
 };
 
 GameDefs *Globals = &g;

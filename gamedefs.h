@@ -734,6 +734,9 @@ public:
 
 	// Prevents non-ally factions to set guard on guarded regions.
 	int STRICT_GUARD;
+
+	// Allows guarding in ocean
+	int OCEAN_GUARD;
 };
 
 extern GameDefs *Globals;

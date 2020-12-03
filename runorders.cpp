@@ -3045,6 +3045,14 @@ void Game::DoGuard1Orders()
 			forlist((&obj->units)) {
 				Unit *u = (Unit *) elem;
 
+				if (!Globals->OCEAN_GUARD &&
+					(u->guard == GUARD_SET || u->guard == GUARD_GUARD) &&
+					TerrainDefs[r->type].similar_type == R_OCEAN) {
+					u->guard = GUARD_NONE;
+					u->Error("Can not guard in oceans.");
+					continue;
+				}
+
 				// Only one faction and it's allies can be on guard at the same time
 				if (Globals->STRICT_GUARD && u->guard == GUARD_SET && !r->CanGuard(u)) {
 					u->guard = GUARD_NONE;
