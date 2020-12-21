@@ -1174,6 +1174,18 @@ void Game::WriteReport()
 
 	MakeFactionReportLists();
 	CountAllSpecialists();
+
+    int ** citems = new int* [factionseq];
+    for (int i = 0; i < factionseq; i++)
+    {
+      citems [i] = new int [NITEMS];
+      for (int j = 0; j < NITEMS; j++)
+      {
+        citems [i][j] = 0;
+      }
+    }
+    CountItems(citems);
+
 	forlist(&factions) {
 		Faction *fac = (Faction *) elem;
 		AString str = "report.";
@@ -1184,7 +1196,7 @@ void Game::WriteReport()
 			(fac->num == 1))) {
 			int i = f.OpenByName(str);
 			if (i != -1) {
-				fac->WriteReport(&f, this);
+				fac->WriteReport(&f, this, citems);
 				f.Close();
 			}
 		}
@@ -2089,3 +2101,40 @@ void Game::WriteTimesArticle(AString article)
         }
 }
 
+
+void Game::CountItems (int ** citems)
+{
+  int i = 0;
+  forlist (&factions)
+  {
+    Faction * fac = (Faction *) elem;
+    if (!fac->IsNPC())
+    {
+      for (int j = 0; j < NITEMS; j++)
+      {
+        citems[i][j] = CountItem (fac, j);
+      }
+      i++;
+    }
+  }
+}
+
+int Game::CountItem (Faction * fac, int item)
+{
+  int all = 0;
+      forlist (&(fac->present_regions))
+      {
+        ARegionPtr * r = (ARegionPtr *) elem;
+        forlist (&r->ptr->objects)
+        {
+          Object * obj = (Object *) elem;
+          forlist (&obj->units)
+          {
+            Unit * unit = (Unit *) elem;
+            if (unit->faction == fac)
+              all += unit->items.GetNum (item);
+          }
+        }
+      }
+   return all;
+}

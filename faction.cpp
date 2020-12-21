@@ -285,7 +285,60 @@ AString Faction::FactionTypeStr()
 	return temp;
 }
 
-void Faction::WriteReport(Areport *f, Game *pGame)
+void Faction::WriteFactionStats(Areport *f, Game *pGame, int ** citems) {
+    f->PutStr(";   Item                                Place  Max      Total");
+    f->PutStr(";");
+    for (int i = 0; i < NITEMS; i++)
+    {
+      int num = 0;
+      forlist (&present_regions)
+      {
+        ARegionPtr * r = (ARegionPtr *) elem;
+        forlist (&r->ptr->objects)
+        {
+          Object * obj = (Object *) elem;
+          forlist (&obj->units)
+          {
+            Unit * unit = (Unit *) elem;
+            if (unit->faction == this)
+              num += unit->items.GetNum (i);
+          }
+        }
+      }
+      if (num)
+      {
+        int place = 1;
+        int max = 0;
+        int total = 0;
+        for (int pl = 0; pl < pGame->factionseq; pl++)
+        {
+          if (citems [pl][i] > num) place++;
+          if (max < citems [pl][i]) max = citems [pl][i];
+          total += citems [pl][i];
+        }
+        AString str = AString ("; ") + ItemString (i,num);
+        if (ItemDefs[i].type & IT_MONSTER && ItemDefs[i].type == IT_ILLUSION)
+        {
+          str += AString (" (illusion)");
+        }
+        str += AString (" ");
+        int len = str.Len ();
+        for (int sp = 42; sp > len; sp--)
+          str += AString (" ");
+	str += AString (place);
+        len = str.Len ();
+        for (int sp = 47; sp > len; sp--) str += AString (" ");
+	str += AString (max);
+        len = str.Len ();
+        for (int sp = 57; sp > len; sp--) str += AString (" ");
+	str += AString (total);
+        f->PutStr (str);
+      }
+    }
+	f->EndLine();
+}
+
+void Faction::WriteReport(Areport *f, Game *pGame, int ** citems)
 {
 	if (IsNPC() && num == 1) {
 		if (Globals->GM_REPORT || (pGame->month == 0 && pGame->year == 1)) {
@@ -562,6 +615,7 @@ void Faction::WriteReport(Areport *f, Game *pGame)
 	//f->PutStr("#end");
 	f->EndLine();
 
+	this->WriteFactionStats(f, pGame, citems);
 }
 
 // LLS - write order template
