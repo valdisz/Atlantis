@@ -269,6 +269,10 @@ class WeaponType
 		int defenseBonus;
 		int mountBonus;
 
+		enum {
+			NUM_DAMAGE_HALF_SKILL = 500,
+			NUM_DAMAGE_SKILL = 1000,
+		};
 		int hitDamage;
 
 		WeaponBonusMalus bonusMalus[MAX_WEAPON_BM_TARGETS];

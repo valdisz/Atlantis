@@ -317,11 +317,28 @@ static AString EffectStr(char const *effect)
 }
 
 static AString AttackDamageDescription(const int damage) {
-	AString s;
-	
-	s = AString("attack deals ") + damage + " hitpoint damage";
+	AString temp;
 
-	return s;
+	if (damage <= 0) {
+		temp = "attack deals no damage";
+		return temp;
+	}
+
+	// Full skill level damage
+	if (damage >= WeaponType::NUM_DAMAGE_SKILL) {
+		temp = "attack deals the skill level points of damage";
+		return temp;
+	}
+
+	// Half skill damage
+	if (damage >= WeaponType::NUM_DAMAGE_HALF_SKILL) {
+		temp = "attack deals does half the skill level (rounded up) points of damage";
+		return temp;
+	}
+
+	// Just damage
+	temp = AString("attack deals ") + damage + " damage";
+	return temp;
 }
 
 AString ShowSpecial(char const *special, int level, int expandLevel, int fromItem)

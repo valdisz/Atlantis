@@ -791,9 +791,7 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_CLOTHARMOR);
 	EnableItem(I_BOOTS);
 	EnableItem(I_BAXE);
-	EnableItem(I_LANCE);
 	EnableItem(I_SPEAR);
-	EnableItem(I_PIKE);
 	EnableItem(I_JAVELIN);
 	EnableItem(I_MSHIELD);
 	EnableItem(I_ISHIELD);
