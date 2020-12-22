@@ -232,6 +232,7 @@ static GameDefs g = {
 	0,   // REGIONS_ECONOMY
 	0, // ADVANCED_TACTICS
 	0,	// OVERWHELMING
+	BattleLogLevel::NORMAL,	// BATTLE_LOG_LEVEL
 };
 
 GameDefs *Globals = &g;

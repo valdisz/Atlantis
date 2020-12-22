@@ -40,7 +40,7 @@ enum {
 	ATTACK_WEATHER,
 	ATTACK_RIDING,
 	ATTACK_RANGED,
-	NUM_ATTACK_TYPES
+	NUM_ATTACK_TYPES	// non resistable attack
 };
 
 enum {
@@ -244,8 +244,8 @@ class WeaponType
 		char const *baseSkill;
 		char const *orSkill;
 
-		int weapClass;
-		int attackType;
+		int weapClass;	// SLASHING, PIERCING, CRUSHING, CLEAVING, ARMORPIERCING, MAGIC_ENERGY, MAGIC_SPIRIT, MAGIC_WEATHER
+		int attackType;	// ATTACK_COMBAT, ATTACK_ENERGY, ATTACK_SPIRIT, ATTACK_WEATHER, ATTACK_RIDING, ATTACK_RANGED, NUM_ATTACK_TYPES (non resistable attack)
 		//
 		// For numAttacks:
 		// - A positive number is the number of attacks per round.
@@ -357,6 +357,7 @@ extern int ParseTransportableItem(AString *);
 extern int LookupItem(AString *);
 
 extern BattleItemType *FindBattleItem(char const *abbr);
+extern ItemType *FindItem(char const *abbr);
 extern ArmorType *FindArmor(char const *abbr);
 extern WeaponType *FindWeapon(char const *abbr);
 extern MountType *FindMount(char const *abbr);

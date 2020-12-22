@@ -32,6 +32,7 @@ class Battle;
 #include "fileio.h"
 #include "army.h"
 #include "items.h"
+#include <vector>
 
 enum {
 	ASS_NONE,
@@ -79,6 +80,8 @@ class Battle : public AListElem
 
 		void WriteSides(ARegion *,Unit *,Unit *,AList *,AList *,int,
 				ARegionList *pRegs );
+
+		// void WriteBattleStats(ArmyStats *);
 
 		int assassination;
 		Faction * attacker; /* Only matters in the case of an assassination */

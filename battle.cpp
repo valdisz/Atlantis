@@ -22,12 +22,103 @@
 // http://www.prankster.com/project
 //
 // END A3HEADER
+
+
 #include "game.h"
 #include "battle.h"
 #include "army.h"
 #include "gamedefs.h"
 #include "gamedata.h"
 #include "quests.h"
+#include "items.h"
+
+std::string WithPlural(int count, std::string single, std::string plural) {
+	return count > 1 ? plural : single;
+}
+
+enum StatsCategory {
+	ROUND,
+	BATTLE
+};
+
+void WriteStats(Battle &battle, Army &army, StatsCategory category) {
+	auto leaderName = std::string(army.leader->name->Str());
+	std::string header = std::string(army.leader->name->Str()) + " army:";
+	
+	battle.AddLine(AString(header.c_str()));
+
+	auto stats = category == StatsCategory::ROUND
+		? army.stats.roundStats
+		: army.stats.battleStats;
+	
+	for (auto &uskv : stats) {
+		UnitStat us = uskv.second;
+
+		std::string tmp = "- " + us.unitName;
+		if (us.attackStats.empty()) {
+			tmp += " made no attacks.";
+		}
+		else {
+			tmp += ":";
+		}
+		battle.AddLine(AString(tmp.c_str()));
+
+		for (auto &att : us.attackStats) {
+			std::string s = "  - ";
+
+			if (att.weaponIndex != -1) {
+				ItemType &weapon = ItemDefs[att.weaponIndex];
+				s += std::string(weapon.name) + " [" + weapon.abr + "]";
+			}
+			else if (att.effect != "") {
+				 s += att.effect;
+			}
+			else {
+				 s += "without weapon";
+			}
+
+			s += " (";
+
+			switch (att.weaponClass)  {
+				case SLASHING: s += "slashing"; break;
+				case PIERCING: s += "piercing"; break;
+				case CRUSHING: s += "cruhsing"; break;
+				case CLEAVING: s += "cleaving"; break;
+				case ARMORPIERCING: s += "armor piercing"; break;
+				case MAGIC_ENERGY: s += "magic"; break;
+				case MAGIC_SPIRIT: s += "magic"; break;
+				case MAGIC_WEATHER: s += "magic"; break;
+				
+				default: s += "unknown"; break;
+			}
+
+			switch (att.attackType) {
+				case ATTACK_COMBAT: s += " melee"; break;
+				case ATTACK_RIDING: s += " riding"; break;
+				case ATTACK_RANGED: s += " ranged"; break;
+				case ATTACK_ENERGY: s += " energy"; break;
+				case ATTACK_SPIRIT: s += " spirit"; break;
+				case ATTACK_WEATHER: s += " wather"; break;
+				
+				default: s += " unknown"; break;
+			}
+
+			s += " attack)";
+
+			int succeeded = att.attacks - att.failed;
+			int reachedTarget = succeeded - att.missed;
+
+			s += ", attacked " + to_string(succeeded) + " of " + to_string(att.attacks) + " " + WithPlural(att.attacks, "time", "times");
+			s += ", " + to_string(reachedTarget) + " successfull " + WithPlural(reachedTarget, "attack", "attacks");
+			s += ", " + to_string(att.blocked) + " blocked by armor";
+			s += ", " + to_string(att.hit) + " " + WithPlural(att.killed, "hit", "hits");
+			s += ", " + to_string(att.damage) + " total damage";
+			s += ", and killed " + to_string(att.killed)  + " " + WithPlural(att.killed, "enemy", "enemies") + ".";
+
+			battle.AddLine(AString(s.c_str()));
+		}
+	}
+}
 
 Battle::Battle()
 {
@@ -90,13 +181,28 @@ void Battle::FreeRound(Army * att,Army * def, int ass)
 		Soldier * a = att->GetAttacker(num, behind);
 		DoAttack(att->round, a, att, def, behind, ass, attOverwhelm, false);
 	}
+	AddLine("");
 
 	/* Write losses */
 	def->Regenerate(this);
 	alv -= def->NumAlive();
 	AddLine(*(def->leader->name) + " loses " + alv + ".");
 	AddLine("");
+
+	if (Globals->BATTLE_LOG_LEVEL == BattleLogLevel::VERBOSE) {
+		AddLine("Free round statistics:");
+		AddLine("");
+
+		WriteStats(*this, *att, StatsCategory::ROUND);
+		AddLine("");
+
+		WriteStats(*this, *def, StatsCategory::ROUND);
+		AddLine("");
+	}
+
 	att->Reset();
+	att->stats.ClearRound();
+	def->stats.ClearRound();
 }
 
 void Battle::DoAttack(int round, Soldier *a, Army *attackers, Army *def,
@@ -238,6 +344,7 @@ void Battle::NormalRound(int round,Army * a,Army * b)
 		aatt = a->CanAttack();
 		batt = b->CanAttack();
 	}
+	AddLine("");
 
 	/* Finish round */
 	a->Regenerate(this);
@@ -247,8 +354,23 @@ void Battle::NormalRound(int round,Army * a,Army * b)
 	bialive -= balive;
 	AddLine(*(b->leader->name) + " loses " + bialive + ".");
 	AddLine("");
+
+	if (Globals->BATTLE_LOG_LEVEL == BattleLogLevel::VERBOSE) {
+		AddLine(AString("Round ") + round + " statistics:");
+		AddLine("");
+
+		WriteStats(*this, *a, StatsCategory::ROUND);
+		AddLine("");
+
+		WriteStats(*this, *b, StatsCategory::ROUND);
+		AddLine("");
+	}
+
 	a->Reset();
+	a->stats.ClearRound();
+	
 	b->Reset();
+	b->stats.ClearRound();
 }
 
 void Battle::GetSpoils(AList *losers, ItemList *spoils, int ass)
@@ -343,6 +465,9 @@ int Battle::Run( ARegion * region,
 
 	int round = 1;
 	while (!armies[0]->Broken() && !armies[1]->Broken() && round < 101) {
+		armies[0]->stats.ClearRound();
+		armies[1]->stats.ClearRound();
+
 		NormalRound(round++,armies[0],armies[1]);
 	}
 
@@ -356,6 +481,19 @@ int Battle::Run( ARegion * region,
 		} else {
 			AddLine(*(armies[0]->leader->name) + " is destroyed!");
 		}
+		AddLine("");
+
+		if (Globals->BATTLE_LOG_LEVEL >= BattleLogLevel::DETAILED) {
+			AddLine("Battle statistics:");
+			AddLine("");
+
+			WriteStats(*this, *armies[0], StatsCategory::BATTLE);
+			AddLine("");
+
+			WriteStats(*this, *armies[1], StatsCategory::BATTLE);
+			AddLine("");
+		}
+
 		AddLine("Total Casualties:");
 		ItemList *spoils = new ItemList;
 		armies[0]->Lose(this, spoils);
@@ -390,6 +528,19 @@ int Battle::Run( ARegion * region,
 		} else {
 			AddLine(*(armies[1]->leader->name) + " is destroyed!");
 		}
+		AddLine("");
+
+		if (Globals->BATTLE_LOG_LEVEL >= BattleLogLevel::DETAILED) {
+			AddLine("Battle statistics:");
+			AddLine("");
+
+			WriteStats(*this, *armies[0], StatsCategory::BATTLE);
+			AddLine("");
+
+			WriteStats(*this, *armies[1], StatsCategory::BATTLE);
+			AddLine("");
+		}
+
 		AddLine("Total Casualties:");
 		ItemList *spoils = new ItemList;
 		armies[1]->Lose(this, spoils);
@@ -411,6 +562,18 @@ int Battle::Run( ARegion * region,
 
 	AddLine("The battle ends indecisively.");
 	AddLine("");
+
+	if (Globals->BATTLE_LOG_LEVEL >= BattleLogLevel::DETAILED) {
+		AddLine("Battle statistics:");
+		AddLine("");
+
+		WriteStats(*this, *armies[0], StatsCategory::BATTLE);
+		AddLine("");
+
+		WriteStats(*this, *armies[1], StatsCategory::BATTLE);
+		AddLine("");
+	}
+
 	AddLine("Total Casualties:");
 	armies[0]->Tie(this);
 	armies[1]->Tie(this);

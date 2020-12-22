@@ -236,6 +236,7 @@ static GameDefs g = {
 	0, // ADVANCED_TACTICS
 	0,	// OVERWHELMING
 	0, // HEAL_ALL
+	BattleLogLevel::NORMAL,	// BATTLE_LOG_LEVEL
 };
 
 GameDefs *Globals = &g;

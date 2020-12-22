@@ -26,6 +26,146 @@
 #include "gameio.h"
 #include "gamedata.h"
 
+#include <assert.h> 
+
+void unit_stat_control::Clear(UnitStat& us) {
+	us.attackStats.clear();
+}
+
+AttackStat* unit_stat_control::FindStat(UnitStat& us, int weaponIndex, SpecialType* effect) {
+	for (auto &stat : us.attackStats) {
+		if (stat.weaponIndex == weaponIndex
+			&& ((effect == NULL && stat.effect.empty()) || stat.effect == effect->specialname)) {
+			return &stat;
+		}
+	}
+
+	return NULL;
+}
+
+void unit_stat_control::TrackSoldier(UnitStat& us, int weaponIndex, SpecialType* effect, int attackType, int weaponClass) {
+	AttackStat* s = unit_stat_control::FindStat(us, weaponIndex, effect);
+	if (s == NULL) {
+		AttackStat stat;
+		if (effect != NULL) {
+			stat.effect = effect->specialname;
+		}
+		stat.weaponIndex = weaponIndex;
+		stat.attackType = attackType;
+		stat.weaponClass = weaponClass;
+		stat.soldiers = 1;
+		stat.attacks = 0;
+		stat.failed = 0;
+		stat.missed = 0;
+		stat.blocked = 0;
+		stat.hit = 0;
+		stat.damage = 0;
+		stat.killed = 0;
+
+		us.attackStats.push_back(stat);
+
+		return;
+	}
+
+	s->soldiers++;
+}
+
+void unit_stat_control::RecordAttack(UnitStat& us, int weaponIndex, SpecialType* effect) {
+	AttackStat* s = unit_stat_control::FindStat(us, weaponIndex, effect);
+	assert(s != NULL);
+
+	s->attacks++;
+}
+
+void unit_stat_control::RecordAttackFailed(UnitStat& us, int weaponIndex, SpecialType* effect) {
+	AttackStat* s = unit_stat_control::FindStat(us, weaponIndex, effect);
+	assert(s != NULL);
+
+	s->failed++;
+}
+
+void unit_stat_control::RecordAttackMissed(UnitStat& us, int weaponIndex, SpecialType* effect) {
+	AttackStat* s = unit_stat_control::FindStat(us, weaponIndex, effect);
+	assert(s != NULL);
+
+	s->missed++;
+}
+
+void unit_stat_control::RecordAttackBlocked(UnitStat& us, int weaponIndex, SpecialType* effect) {
+	AttackStat* s = unit_stat_control::FindStat(us, weaponIndex, effect);
+	assert(s != NULL);
+
+	s->blocked++;
+}
+
+void unit_stat_control::RecordHit(UnitStat& us, int weaponIndex, SpecialType* effect, int damage) {
+	AttackStat* s = unit_stat_control::FindStat(us, weaponIndex, effect);
+	assert(s != NULL);
+
+	s->hit++;
+	s->damage += damage;
+}
+
+void unit_stat_control::RecordKill(UnitStat& us, int weaponIndex, SpecialType* effect) {
+	AttackStat* s = unit_stat_control::FindStat(us, weaponIndex, effect);
+	assert(s != NULL);
+
+	s->killed++;
+}
+
+void ArmyStats::TrackUnit(Unit *unit) {
+	UnitStat roundStat;
+	roundStat.unitName = unit->name->Str();
+
+	UnitStat battleStat;
+	battleStat.unitName = unit->name->Str();
+
+	roundStats.insert(std::pair<int, UnitStat>(unit->num, roundStat));
+	battleStats.insert(std::pair<int, UnitStat>(unit->num, battleStat));
+}
+
+void ArmyStats::ClearRound() {
+	for (auto &kv : roundStats) {
+		unit_stat_control::Clear(kv.second);
+	}
+}
+
+void ArmyStats::TrackSoldier(int unitNumber, int weaponIndex, SpecialType* effect, int attackType, int weaponClass) {
+	unit_stat_control::TrackSoldier(roundStats[unitNumber],  weaponIndex, effect, attackType, weaponClass);
+	unit_stat_control::TrackSoldier(battleStats[unitNumber], weaponIndex, effect, attackType, weaponClass);
+}
+
+void ArmyStats::RecordAttack(int unitNumber, int weaponIndex, SpecialType* effect) {
+	unit_stat_control::RecordAttack(roundStats[unitNumber],  weaponIndex, effect);
+	unit_stat_control::RecordAttack(battleStats[unitNumber], weaponIndex, effect);
+}
+
+void ArmyStats::RecordAttackFailed(int unitNumber, int weaponIndex, SpecialType* effect) {
+	unit_stat_control::RecordAttackFailed(roundStats[unitNumber],  weaponIndex, effect);
+	unit_stat_control::RecordAttackFailed(battleStats[unitNumber], weaponIndex, effect);
+}
+
+void ArmyStats::RecordAttackMissed(int unitNumber, int weaponIndex, SpecialType* effect) {
+	unit_stat_control::RecordAttackMissed(roundStats[unitNumber],  weaponIndex, effect);
+	unit_stat_control::RecordAttackMissed(battleStats[unitNumber], weaponIndex, effect);
+}
+
+void ArmyStats::RecordAttackBlocked(int unitNumber, int weaponIndex, SpecialType* effect) {
+	unit_stat_control::RecordAttackBlocked(roundStats[unitNumber],  weaponIndex, effect);
+	unit_stat_control::RecordAttackBlocked(battleStats[unitNumber], weaponIndex, effect);
+}
+
+void ArmyStats::RecordHit(int unitNumber, int weaponIndex, SpecialType* effect, int damage) {
+	unit_stat_control::RecordHit(roundStats[unitNumber],  weaponIndex, effect, damage);
+	unit_stat_control::RecordHit(battleStats[unitNumber], weaponIndex, effect, damage);
+}
+
+void ArmyStats::RecordKill(int unitNumber, int weaponIndex, SpecialType* effect) {
+	unit_stat_control::RecordKill(roundStats[unitNumber],  weaponIndex, effect);
+	unit_stat_control::RecordKill(battleStats[unitNumber], weaponIndex, effect);
+}
+
+
 enum {
 	WIN_NO_DEAD,
 	WIN_DEAD,
@@ -520,6 +660,8 @@ void Soldier::Dead()
 
 Army::Army(Unit * ldr,AList * locs,int regtype,int ass)
 {
+	stats = ArmyStats();
+
 	int tacspell = 0;
 	Unit * tactician = ldr;
 
@@ -562,6 +704,8 @@ Army::Army(Unit * ldr,AList * locs,int regtype,int ass)
 
 	forlist(locs) {
 		Unit * u = ((Location *) elem)->unit;
+		stats.TrackUnit(u);
+
 		Object * obj = ((Location *) elem)->obj;
 		if (ass) {
 			forlist(&u->items) {
@@ -1183,6 +1327,12 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 		int attackLevel, int flags, int weaponClass, char const *effect,
 		int mountBonus, Soldier *attacker, Army *attackers, bool attackbehind, int attackDamage)
 {
+	SpecialType *sp = special != NULL
+		? FindSpecial(special)
+		: NULL;
+
+	attackers->stats.TrackSoldier(attacker->unit->num, attacker->weapon, sp, attackType, weaponClass);
+
 	/* 1. Check against Global effects (not sure how yet) */
 	/* 2. Attack shield */
 	Shield *hi;
@@ -1240,8 +1390,7 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 		int tlev = 0;
 		if (attackType != NUM_ATTACK_TYPES)
 			tlev = tar->dskill[ attackType ];
-		if (special != NULL) {
-			SpecialType *sp = FindSpecial(special);
+		if (sp != NULL) {
 			if ((sp->effectflags & SpecialType::FX_NOBUILDING) && tar->building)
 				tlev -= 2;
 		}
@@ -1285,12 +1434,16 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 
 		/* 5. Attack soldier */
 		if (attackType != NUM_ATTACK_TYPES) {
+			attackers->stats.RecordAttack(attacker->unit->num, attacker->weapon, sp);
+
 			if (!(flags & WeaponType::ALWAYSREADY)) {
 				int failchance = 2;
 				if (Globals->ADVANCED_FORTS) {
 					failchance += (tar->protection[attackType]+1)/2;
 				}
+
 				if (getrandom(failchance)) {
+					attackers->stats.RecordAttackFailed(attacker->unit->num, attacker->weapon, sp);
 					continue;
 				}
 			}
@@ -1298,10 +1451,12 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 			if (combat) {
 				/* 5.1 Add advanced tactics bonus */
 				if (!Hits(attackLevel + attackers->tactics_bonus, tlev + tactics_bonus)) {
+					attackers->stats.RecordAttackMissed(attacker->unit->num, attacker->weapon, sp);
 					continue;
 				}
 			} else {
 				if (!Hits(attackLevel, tlev)) {
+					attackers->stats.RecordAttackMissed(attacker->unit->num, attacker->weapon, sp);
 					continue;
 				}
 			}
@@ -1311,11 +1466,18 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 		if (effect == NULL) {
 			/* 7. Last chance... Check armor */
 			if (tar->ArmorProtect(weaponClass)) {
+				attackers->stats.RecordAttackBlocked(attacker->unit->num, attacker->weapon, sp);
 				continue;
 			}
 
+			attackers->stats.RecordHit(attacker->unit->num, attacker->weapon, sp, attackDamage);
+
 			/* 8. Seeya! */
 			Kill(tarnum, attackDamage);
+			if (tar->hits == 0) {
+				attackers->stats.RecordKill(attacker->unit->num, attacker->weapon, sp);
+			}
+
 			ret++;
 			if ((ItemDefs[tar->race].type & IT_MAN) &&
 				(ItemDefs[attacker->race].type & IT_UNDEAD)) {
@@ -1352,6 +1514,7 @@ void Army::Kill(int killed, int damage)
 	temp->hits = max(0, temp->hits - damage);
 	
 	if (temp->hits > 0) return;
+
 	temp->unit->losses++;
 	if (Globals->ARMY_ROUT == GameDefs::ARMY_ROUT_HITS_FIGURE) {
 		if (ItemDefs[temp->race].type & IT_MONSTER) {

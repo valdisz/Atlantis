@@ -66,6 +66,12 @@ extern int NUMMOUNTS;
 extern int NUMMONSTERS;
 extern int NUMMAN;
 
+enum BattleLogLevel {
+	NORMAL   = 0,	// Standard battle log
+	DETAILED = 1,	// Will include detailed statistics after the battle
+	VERBOSE  = 2	// Will include additionaly statistics for each battle round
+};
+
 class GameDefs {
 public:
 	char const *RULESET_NAME;
@@ -737,6 +743,9 @@ public:
 
 	// Allows guarding in ocean
 	int OCEAN_GUARD;
+
+	// Controls how detailed battle logs are, see BattleLogLevel for more details
+	BattleLogLevel BATTLE_LOG_LEVEL;
 };
 
 extern GameDefs *Globals;
