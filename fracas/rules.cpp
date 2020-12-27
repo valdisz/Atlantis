@@ -236,7 +236,10 @@ static GameDefs g = {
 	0, // ADVANCED_TACTICS
 	0,	// OVERWHELMING
 	0, // HEAL_ALL
+	0, // STRICT_GUARD
+	1, // OCEAN_GUARD
 	BattleLogLevel::NORMAL,	// BATTLE_LOG_LEVEL
+	false,	//FACTION_STATISTICS
 };
 
 GameDefs *Globals = &g;

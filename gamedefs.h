@@ -746,6 +746,9 @@ public:
 
 	// Controls how detailed battle logs are, see BattleLogLevel for more details
 	BattleLogLevel BATTLE_LOG_LEVEL;
+	
+	// Include faction statistics and ranking on items faction own into the report.
+	bool FACTION_STATISTICS;
 };
 
 extern GameDefs *Globals;

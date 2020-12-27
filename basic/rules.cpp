@@ -236,6 +236,7 @@ static GameDefs g = {
 	0, // STRICT_GUARD
 	1, // OCEAN_GUARD
 	BattleLogLevel::NORMAL,	// BATTLE_LOG_LEVEL
+	false,	//FACTION_STATISTICS
 };
 
 GameDefs *Globals = &g;
