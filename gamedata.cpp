@@ -1219,7 +1219,7 @@ ItemType id[] =
 	{"runesword","runeswords","RUNE",
 	 ItemType::NOMARKET | ItemType::NOTRANSPORT,
 	 NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
-	 "CRRU",1,20, {{I_SILVER,600},{I_MSWORD,1},{-1,0},{-1,0}},
+	 "CRRU",1,20, {{I_SILVER,1500},{I_MSWORD,1},{-1,0},{-1,0}},
 	 1, IT_MAGIC | IT_WEAPON | IT_BATTLE, 6000,1,
 	 0,0,0,0,0,
 	 -1,0,
@@ -2040,7 +2040,7 @@ ItemType id[] =
 	{"flaming sword","flaming swords","FSWO",
 	 ItemType::DISABLED | ItemType::NOMARKET,
 	 NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
-	 "CFSW",1,20, {{I_SILVER,600},{I_MSWORD,1},{-1,0},{-1,0}},
+	 "CFSW",1,20, {{I_SILVER,1500},{I_MSWORD,1},{-1,0},{-1,0}},
 	 1,IT_MAGIC | IT_WEAPON | IT_BATTLE, 6000,1,
 	 0,0,0,0,0,
 	 -1,0,
@@ -2789,7 +2789,7 @@ WeaponType wepd[] = {
 	{"DBOW",
 	 WeaponType::NEEDSKILL | WeaponType::RANGED | WeaponType::NOATTACKERSKILL,
 	 "LBOW", NULL,
-	 ARMORPIERCING, ATTACK_RANGED, WeaponType::NUM_ATTACKS_SKILL,
+	 ARMORPIERCING, ATTACK_RANGED, WeaponType::NUM_ATTACKS_HALF_SKILL,
 	 0, 0, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
@@ -2798,18 +2798,18 @@ WeaponType wepd[] = {
 	{"RUNE",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 SLASHING, ATTACK_COMBAT, 1,
-	 5, 5, 0,
-	 1,
+	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
+	 7, 7, 0,
+	 WeaponType::NUM_DAMAGE_SKILL,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
 	// WEAPON_MCROSSBOW
 	{"MXBO",
 	 WeaponType::NEEDSKILL | WeaponType::RANGED | WeaponType::NOATTACKERSKILL,
 	 "XBOW", NULL,
-	 ARMORPIERCING, ATTACK_RANGED, 1,
+	 ARMORPIERCING, ATTACK_RANGED, -2,
 	 0, 0, 0,
-	 1,
+	 2,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
 	// WEAPON_LONGBOW
@@ -2881,7 +2881,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, -2,
-	 6, 6, 0,
+	 6, 3, 0,
 	 WeaponType::NUM_DAMAGE_SKILL,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2898,9 +2898,9 @@ WeaponType wepd[] = {
 	{"FSWO",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 SLASHING, ATTACK_COMBAT, 1,
-	 4, 4, 0,
-	 1,
+	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
+	 6, 6, 0,
+	 WeaponType::NUM_DAMAGE_SKILL,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
 	// WEAPON_MBAXE
@@ -2908,7 +2908,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_HALF_SKILL,
-	 5, 5, 0,
+	 5, 2, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -3064,17 +3064,17 @@ ArmorType armd[] = {
 	// ARMOR_CLOAKOFI
 	{ "CLOA", 0, 100, {98, 98, 98, 98, 98, 98, 98, 98}},
 	// ARMOR_ADPLATE
-	{ "AARM", 0, 100, {95, 95, 95, 95, 90, 90, 90, 90}},
+	{ "AARM", 0, 100, {92, 92, 92, 92, 87, 87, 87, 87}},
 	// ARMOR_ADRING
-	{ "ARNG", 0, 100, {90, 90, 90, 90, 80, 80, 80, 80}},
+	{ "ARNG", 0, 100, {87, 87, 87, 87, 77, 77, 77, 77}},
 	// ARMOR_IMITHRIL
-	{ "IMTH", 0, 100, {90, 90, 90, 90, 75, 75, 75, 75}},
+	{ "IMTH", 0, 100, {87, 87, 87, 87, 72, 72, 72, 72}},
 	// ARMOR_MARMOR
-	{ "MARM", 0, 100, {90, 90, 90, 90, 67, 67, 67, 67}},
+	{ "MARM", 0, 100, {87, 87, 87, 87, 64, 64, 64, 64}},
 	// ARMOR_MCHAIN
 	{ "MCAR", 0, 300, {225, 200, 150, 225, 150, 150, 150, 150}},
 	// ARMOR_PLATEARMOR
-	{ "PARM", 0, 100, {67, 67, 67, 67, 33, 33, 33, 33}},
+	{ "PARM", 0, 100, {64, 64, 64, 64, 30, 30, 30, 30}},
 	// ARMOR_BPLATE
 	{ "BPLA", 0, 300, {100, 270, 200, 75, 100, 100, 100, 100}},
 	// ARMOR_CHAINARMOR
@@ -3589,10 +3589,6 @@ static SkillType sd[] = {
 	 SkillType::MAGIC | SkillType::CAST | SkillType::DISABLED,
 	 NULL, NULL,
 	 {{"ARTI",1},{NULL,0},{NULL,0}}},
-	{"magic armor","MAGA",100,
-	 SkillType::MAGIC | SkillType::DISABLED,
-	 NULL, NULL,
-	 {{"PATT",1},{"SPIR",1},{NULL,0}}},
 	{"blasphemous ritual","BRTL",100,
 	 SkillType::MAGIC | SkillType::CAST | SkillType::DISABLED,
 	 NULL, NULL,

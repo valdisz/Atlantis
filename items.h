@@ -269,6 +269,19 @@ class WeaponType
 		int defenseBonus;
 		int mountBonus;
 
+		//
+		// For hitDamage:
+		// - A positive number is the number of damage per attack.
+		// - A negative number is the number of rounds per attack.
+		// - NUM_DAMAGE_HALF_SKILL indicates that the weapon gives as many
+		//   damage as the skill of the user divided by 2, rounded up.
+		// - NUM_DAMAGE_HALF_SKILL+1 indicates that the weapon gives an extra
+		//   damage above that, etc.
+		// - NUM_DAMAGE_SKILL indicates the the weapon gives as many damage
+		//   as the skill of the user.
+		// - NUM_DAMAGE_SKILL+1 indicates the the weapon gives as many
+		//   damage as the skill of the user + 1, etc.
+		//
 		enum {
 			NUM_DAMAGE_HALF_SKILL = 500,
 			NUM_DAMAGE_SKILL = 1000,

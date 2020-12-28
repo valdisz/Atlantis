@@ -243,7 +243,7 @@ static GameDefs g = {
 	0, // HEAL_ALL
 	1, // STRICT_GUARD
 	0, // OCEAN_GUARD
-	BattleLogLevel::DETAILED,	// BATTLE_LOG_LEVEL
+	BattleLogLevel::VERBOSE,	// BATTLE_LOG_LEVEL
 };
 
 GameDefs *Globals = &g;

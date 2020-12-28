@@ -1384,13 +1384,6 @@ AString *ShowSkill::Report(Faction *f)
 				}
 			}
 			break;
-		case S_MAGIC_ARMOR:
-			if (level > 1) break;
-			*str += "Magic Armor gives the mage magical protection granting extra "
-					"hit point for every level in this skill. No order is necessary "
-					"to use this spell; it will be used automatically when the mage "
-					"is involved in a battle.";
-			break;
 		case S_BLASPHEMOUS_RITUAL:
 			if (level > 1) break;
 			if (OBJECT_DISABLED(O_BKEEP)) break;

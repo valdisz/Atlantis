@@ -779,15 +779,6 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_MWAGON);
 	EnableItem(I_GLIDER);
 	EnableItem(I_LEATHERARMOR);
-	ModifyArmorFlags("LARM", ArmorType::USEINASSASSINATE);
-	ModifyWeaponAttack("DBOW",
-			ARMORPIERCING,
-			ATTACK_RANGED,
-			WeaponType::NUM_ATTACKS_HALF_SKILL, 1);
-	ModifyWeaponAttack("RUNE",
-			SLASHING,
-			ATTACK_COMBAT,
-			WeaponType::NUM_ATTACKS_HALF_SKILL, 1);
 	EnableItem(I_CLOTHARMOR);
 	EnableItem(I_BOOTS);
 	EnableItem(I_BAXE);
@@ -796,6 +787,7 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_MSHIELD);
 	EnableItem(I_ISHIELD);
 	EnableItem(I_WSHIELD);
+	EnableItem(I_MBAXE);
 	EnableItem(I_AEGIS);
 	EnableItem(I_WINDCHIME);
 	EnableItem(I_GATE_CRYSTAL);
@@ -824,17 +816,17 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_BAG);
 	EnableItem(I_SPINNING);
 
-	ModifyItemProductionSkill(I_PIKE, "WEAP", 2);
-	ModifyItemProductionSkill(I_LANCE, "WEAP", 2);
 	//
 	// Change craft: adamantium
 	//
 	EnableItem(I_ADMANTIUM);
 	EnableItem(I_ADSWORD);
+	EnableItem(I_ADBAXE);
 	EnableItem(I_ADRING);
 	EnableItem(I_ADPLATE);
 	ModifyItemProductionSkill(I_ADMANTIUM, "MINI", 5);
 	ModifyItemProductionSkill(I_ADSWORD, "WEAP", 5);
+	ModifyItemProductionSkill(I_ADBAXE, "WEAP", 5);
 	ModifyItemProductionSkill(I_ADRING, "ARMO", 5);
 	ModifyItemProductionSkill(I_ADPLATE, "ARMO", 5);
 
@@ -872,7 +864,6 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableSkill(S_TRANSMUTATION);
 	EnableSkill(S_ENDURANCE);
 	EnableSkill(S_GEMCUTTING);
-	EnableSkill(S_MAGIC_ARMOR);
 	EnableSkill(S_BLASPHEMOUS_RITUAL);
 	DisableSkill(S_CAMELTRAINING);
 	DisableSkill(S_RANCHING);
@@ -961,8 +952,6 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyItemMagicInput(I_MCARPET, 1, I_SILVER, 400);
 	ModifyItemMagicInput(I_PORTAL, 0, I_ROOTSTONE, 1);
 	ModifyItemMagicInput(I_PORTAL, 1, I_SILVER, 500);
-	ModifyItemMagicInput(I_FSWORD, 0, I_MSWORD, 1);
-	ModifyItemMagicInput(I_FSWORD, 1, I_SILVER, 600);
 
 	EnableObject(O_ISLE);
 	EnableObject(O_DERELICT);
@@ -976,22 +965,19 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_KRAKEN);
 	EnableItem(I_MERFOLK);
 	EnableItem(I_ELEMENTAL);
-	
-	// New v2 Monsters
 	EnableItem(I_HYDRA);
 	EnableItem(O_BOG);
-
 	EnableItem(I_ICEDRAGON);
 	EnableItem(O_ICECAVE);
-
 	EnableItem(I_ILLYRTHID);
 	EnableItem(O_ILAIR);
-
+	
 	EnableItem(I_STORMGIANT);
 	EnableItem(I_CLOUDGIANT);
 	EnableItem(O_GIANTCASTLE);
-
+	
 	EnableItem(I_WARRIORS);
+
 	EnableItem(I_DARKMAGE);
 	EnableItem(O_DARKTOWER);
 

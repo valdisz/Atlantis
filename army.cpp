@@ -365,13 +365,15 @@ Soldier::Soldier(Unit * u,Object * o,int regtype,int r,int ass)
 	int attackBonus = 0;
 	int defenseBonus = 0;
 	int numAttacks = 1;
+	int numHitDamage = 1;
+	// hitDamage
 	for (i = 0; i < MAX_READY; i++) {
 		// Check the preferred weapon first.
 		item = unit->readyWeapon[i];
 		if (item == -1) break;
 		abbr = ItemDefs[item].abr;
 		item = unit->GetWeapon(abbr, riding, ridingBonus, attackBonus,
-				defenseBonus, numAttacks);
+				defenseBonus, numAttacks, numHitDamage);
 		if (item != -1) {
 			weapon = item;
 			break;
@@ -381,7 +383,7 @@ Soldier::Soldier(Unit * u,Object * o,int regtype,int r,int ass)
 		for (weaponType = 1; weaponType < NUMWEAPONS; weaponType++) {
 			abbr = WeaponDefs[weaponType].abbr;
 			item = unit->GetWeapon(abbr, riding, ridingBonus, attackBonus,
-					defenseBonus, numAttacks);
+					defenseBonus, numAttacks, numHitDamage);
 			if (item != -1) {
 				weapon = item;
 				break;
@@ -414,6 +416,7 @@ Soldier::Soldier(Unit * u,Object * o,int regtype,int r,int ass)
 	askill += attackBonus;
 	dskill[ATTACK_COMBAT] += defenseBonus;
 	attacks = numAttacks;
+	hitDamage = numHitDamage;
 }
 
 void Soldier::SetupSpell()
