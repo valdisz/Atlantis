@@ -1241,7 +1241,7 @@ ItemType id[] =
 	 NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
 	 "CRMA",1,100, {{I_SILVER,400},{-1,0},{-1,0},{-1,0}},
 	 0, IT_MAGIC, 2000,0,
-	 15,15,15,0,6,
+	 15,15,15,15,6,
 	 -1,0,
 	 -1,0, 0,
 	 0, NULL, 0,
@@ -2246,7 +2246,7 @@ ItemType id[] =
 	 -1,0,
 	 -1,0, 0,
 	 0, NULL, 0,
-	 "FARS", { "MANI", "PATT", "FORC", "SPIR" }, 1, 3},
+	 "FARS", { "MANI", "PATT", "FORC", "SPIR" }, 1, 2},
 	{"cornucopia","cornucopias","CORN",
 	 ItemType::DISABLED | ItemType::NOMARKET | ItemType::NOTRANSPORT,
 	 NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
@@ -2798,9 +2798,9 @@ WeaponType wepd[] = {
 	{"RUNE",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
-	 7, 7, 0,
-	 WeaponType::NUM_DAMAGE_SKILL,
+	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
+	 8, 8, 0,
+	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
 	// WEAPON_MCROSSBOW
@@ -2882,7 +2882,7 @@ WeaponType wepd[] = {
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, -2,
 	 6, 3, 0,
-	 WeaponType::NUM_DAMAGE_SKILL,
+	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
 	// WEAPON_ASWR
@@ -2890,24 +2890,24 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 SLASHING, ATTACK_COMBAT, 1,
-	 5, 5, 0,
-	 WeaponType::NUM_DAMAGE_HALF_SKILL,
+	 6, 6, 0,
+	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
 	// WEAPON_FSWORD
 	{"FSWO",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
-	 6, 6, 0,
-	 WeaponType::NUM_DAMAGE_SKILL,
+	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
+	 8, 8, 0,
+	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
 	// WEAPON_MBAXE
 	{"MBAX",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_HALF_SKILL,
+	 ARMORPIERCING, ATTACK_COMBAT, -2,
 	 5, 2, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
@@ -2916,7 +2916,7 @@ WeaponType wepd[] = {
 	{"MSWO",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
+	 SLASHING, ATTACK_COMBAT, 1,
 	 4, 4, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }

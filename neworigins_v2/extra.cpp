@@ -68,7 +68,6 @@ int Game::SetupFaction( Faction *pFac )
 
 	// Set up health
 	temp2->Study(S_COMBAT, 180);
-	temp2->Study(S_ENDURANCE, 180);
 
 	if (Globals->UPKEEP_MINIMUM_FOOD > 0)
 	{
@@ -780,7 +779,6 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_GLIDER);
 	EnableItem(I_LEATHERARMOR);
 	EnableItem(I_CLOTHARMOR);
-	EnableItem(I_BOOTS);
 	EnableItem(I_BAXE);
 	EnableItem(I_SPEAR);
 	EnableItem(I_JAVELIN);
@@ -845,6 +843,7 @@ void Game::ModifyTablesPerRuleset(void)
 
 	// Disable items
 	DisableItem(I_SUPERBOW);
+	DisableItem(I_BOOTS);
 
 	// No staff of lightning
 	DisableSkill(S_CREATE_STAFF_OF_LIGHTNING);
@@ -862,11 +861,13 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableSkill(S_CREATE_CENSER);
 	EnableSkill(S_CREATE_FLAMING_SWORD);
 	EnableSkill(S_TRANSMUTATION);
-	EnableSkill(S_ENDURANCE);
 	EnableSkill(S_GEMCUTTING);
 	EnableSkill(S_BLASPHEMOUS_RITUAL);
 	DisableSkill(S_CAMELTRAINING);
 	DisableSkill(S_RANCHING);
+
+	// No endurance
+	DisableSkill(S_ENDURANCE);
 
 	// Magic
 
