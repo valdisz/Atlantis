@@ -274,9 +274,7 @@ void Battle::DoAttack(int round, Soldier *a, Army *attackers, Army *def,
 			attackType = pWep->attackType;
 			mountBonus = pWep->mountBonus;
 			attackClass = pWep->weapClass;
-			hitDamage = pWep->hitDamage;
 		}
-		//
 		def->DoAnAttack(this, NULL, 1, attackType, a->askill, flags, attackClass,
 				NULL, mountBonus, a, attackers, canAttackBehind, hitDamage);
 		if (!def->NumAlive()) break;
