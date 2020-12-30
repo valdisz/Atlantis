@@ -70,8 +70,7 @@ public:
     int attackerMages;
     int attackersLost;
     int attackerMagesLost;
-    int attackerUndead;
-    int attackerDeamons;
+    int attackerFMI;
     int attackerMonsters;
 
     int defenderFactionNum;
@@ -82,8 +81,7 @@ public:
     int defenderMages;
     int defendersLost;
     int defenderMagesLost;
-    int defenderUndead;
-    int defenderDeamons;
+    int defenderFMI;
     int defenderMonsters;
 };
 
@@ -92,7 +90,7 @@ public:
     Events();
     ~Events();
 
-    std::string Write();
+    std::string& Write();
     void AddFact(FactBase &fact);
 
 private:
