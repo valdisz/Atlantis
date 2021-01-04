@@ -2799,7 +2799,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
-	 8, 8, 0,
+	 5, 5, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2809,7 +2809,7 @@ WeaponType wepd[] = {
 	 "XBOW", NULL,
 	 ARMORPIERCING, ATTACK_RANGED, -2,
 	 0, 0, 0,
-	 2,
+	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
 	// WEAPON_LONGBOW
@@ -2881,7 +2881,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, -2,
-	 6, 3, 0,
+	 5, 4, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2889,8 +2889,8 @@ WeaponType wepd[] = {
 	{"ASWR",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 SLASHING, ATTACK_COMBAT, 1,
-	 6, 6, 0,
+	 ARMORPIERCING, ATTACK_COMBAT, 1,
+	 4, 4, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2899,7 +2899,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
-	 8, 8, 0,
+	 5, 5, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2907,8 +2907,8 @@ WeaponType wepd[] = {
 	{"MBAX",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 ARMORPIERCING, ATTACK_COMBAT, -2,
-	 5, 2, 0,
+	 CLEAVING, ATTACK_COMBAT, 1,
+	 4, 3, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2916,8 +2916,8 @@ WeaponType wepd[] = {
 	{"MSWO",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 SLASHING, ATTACK_COMBAT, 1,
-	 4, 4, 0,
+	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_HALF_SKILL,
+	 3, 3, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2935,7 +2935,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 CLEAVING, ATTACK_COMBAT, -2,
-	 3, 3, 0,
+	 3, 2, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -3495,11 +3495,11 @@ static SkillType sd[] = {
 	{"enchant swords","ESWO",100,
 	 SkillType::MAGIC | SkillType::CAST,
 	 NULL, NULL,
-	 {{"ARTI",1},{NULL,0},{NULL,0}}},
+	 {{"ARTI",2},{NULL,0},{NULL,0}}},
 	{"enchant armor","EARM",100,
 	 SkillType::MAGIC | SkillType::CAST,
 	 NULL, NULL,
-	 {{"ARTI",1},{NULL,0},{NULL,0}}},
+	 {{"ARTI",2},{NULL,0},{NULL,0}}},
 	{"enchant shields","ESHD",100,
 	 SkillType::MAGIC | SkillType::CAST | SkillType::DISABLED,
 	 NULL, NULL,
