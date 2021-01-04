@@ -2880,8 +2880,8 @@ WeaponType wepd[] = {
 	{"ABAX",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 ARMORPIERCING, ATTACK_COMBAT, -2,
-	 5, 4, 0,
+	 ARMORPIERCING, ATTACK_COMBAT, 1,
+	 8, 6, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2889,8 +2889,8 @@ WeaponType wepd[] = {
 	{"ASWR",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 ARMORPIERCING, ATTACK_COMBAT, 1,
-	 4, 4, 0,
+	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_HALF_SKILL,
+	 6, 6, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2899,7 +2899,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
-	 5, 5, 0,
+	 8, 8, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2907,8 +2907,8 @@ WeaponType wepd[] = {
 	{"MBAX",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 CLEAVING, ATTACK_COMBAT, 1,
-	 4, 3, 0,
+	 ARMORPIERCING, ATTACK_COMBAT, 1,
+	 6, 4, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2917,7 +2917,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_HALF_SKILL,
-	 3, 3, 0,
+	 4, 4, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
