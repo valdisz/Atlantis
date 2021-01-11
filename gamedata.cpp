@@ -2935,7 +2935,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 CLEAVING, ATTACK_COMBAT, -2,
-	 3, 2, 0,
+	 4, 2, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2970,7 +2970,7 @@ WeaponType wepd[] = {
 	{"SWOR",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 SLASHING, ATTACK_COMBAT, 1,
+	 SLASHING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_HALF_SKILL,
 	 2, 2, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
