@@ -1219,7 +1219,7 @@ ItemType id[] =
 	{"runesword","runeswords","RUNE",
 	 ItemType::NOMARKET | ItemType::NOTRANSPORT,
 	 NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
-	 "CRRU",1,20, {{I_SILVER,1500},{I_MSWORD,1},{-1,0},{-1,0}},
+	 "CRRU",1,20, {{I_SILVER,2000},{I_MSWORD,1},{-1,0},{-1,0}},
 	 1, IT_MAGIC | IT_WEAPON | IT_BATTLE, 6000,1,
 	 0,0,0,0,0,
 	 -1,0,
@@ -2798,8 +2798,8 @@ WeaponType wepd[] = {
 	{"RUNE",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
-	 5, 5, 0,
+	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL,
+	 8, 8, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2807,7 +2807,7 @@ WeaponType wepd[] = {
 	{"MXBO",
 	 WeaponType::NEEDSKILL | WeaponType::RANGED | WeaponType::NOATTACKERSKILL,
 	 "XBOW", NULL,
-	 ARMORPIERCING, ATTACK_RANGED, -2,
+	 ARMORPIERCING, ATTACK_RANGED, 1,
 	 0, 0, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
@@ -2825,7 +2825,7 @@ WeaponType wepd[] = {
 	{"HXBO",
 	 WeaponType::NEEDSKILL | WeaponType::RANGED | WeaponType::NOATTACKERSKILL,
 	 "XBOW", NULL,
-	 ARMORPIERCING, ATTACK_RANGED, -3,
+	 ARMORPIERCING, ATTACK_RANGED, -4,
 	 3, 0, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
@@ -2852,7 +2852,7 @@ WeaponType wepd[] = {
 	{"XBOW",
 	 WeaponType::NEEDSKILL | WeaponType::RANGED | WeaponType::NOATTACKERSKILL,
 	 "XBOW", NULL,
-	 ARMORPIERCING, ATTACK_RANGED, -2,
+	 ARMORPIERCING, ATTACK_RANGED, -3,
 	 0, 0, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
@@ -2881,7 +2881,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, 1,
-	 8, 6, 0,
+	 7, 5, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -2898,7 +2898,7 @@ WeaponType wepd[] = {
 	{"FSWO",
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
-	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL+1,
+	 ARMORPIERCING, ATTACK_COMBAT, WeaponType::NUM_ATTACKS_SKILL,
 	 8, 8, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
@@ -2908,7 +2908,7 @@ WeaponType wepd[] = {
 	 WeaponType::RIDINGBONUS,
 	 "COMB", NULL,
 	 ARMORPIERCING, ATTACK_COMBAT, 1,
-	 6, 4, 0,
+	 5, 4, 0,
 	 1,
 	 { { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 }, { NULL, 0, 0 } }
 	},
@@ -3064,17 +3064,17 @@ ArmorType armd[] = {
 	// ARMOR_CLOAKOFI
 	{ "CLOA", 0, 100, {98, 98, 98, 98, 98, 98, 98, 98}},
 	// ARMOR_ADPLATE
-	{ "AARM", 0, 100, {92, 92, 92, 92, 87, 87, 87, 87}},
+	{ "AARM", 0, 100, {95, 95, 95, 95, 85, 85, 85, 85}},
 	// ARMOR_ADRING
-	{ "ARNG", 0, 100, {87, 87, 87, 87, 77, 77, 77, 77}},
+	{ "ARNG", 0, 100, {90, 90, 90, 90, 75, 75, 75, 75}},
 	// ARMOR_IMITHRIL
-	{ "IMTH", 0, 100, {87, 87, 87, 87, 72, 72, 72, 72}},
+	{ "IMTH", 0, 100, {90, 90, 90, 90, 75, 75, 75, 75}},
 	// ARMOR_MARMOR
-	{ "MARM", 0, 100, {87, 87, 87, 87, 64, 64, 64, 64}},
+	{ "MARM", 0, 100, {80, 80, 80, 80, 65, 65, 65, 65}},
 	// ARMOR_MCHAIN
 	{ "MCAR", 0, 300, {225, 200, 150, 225, 150, 150, 150, 150}},
 	// ARMOR_PLATEARMOR
-	{ "PARM", 0, 100, {64, 64, 64, 64, 30, 30, 30, 30}},
+	{ "PARM", 0, 100, {67, 67, 67, 67, 33, 33, 33, 33}},
 	// ARMOR_BPLATE
 	{ "BPLA", 0, 300, {100, 270, 200, 75, 100, 100, 100, 100}},
 	// ARMOR_CHAINARMOR
