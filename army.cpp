@@ -34,8 +34,11 @@ void unit_stat_control::Clear(UnitStat& us) {
 
 AttackStat* unit_stat_control::FindStat(UnitStat& us, int weaponIndex, SpecialType* effect) {
 	for (auto &stat : us.attackStats) {
-		if (stat.weaponIndex == weaponIndex
-			&& ((effect == NULL && stat.effect.empty()) || stat.effect == effect->specialname)) {
+		std::string effectName = effect == NULL
+			? ""
+			: effect->specialname;
+
+		if (stat.weaponIndex == weaponIndex && stat.effect == effectName) {
 			return &stat;
 		}
 	}
