@@ -244,6 +244,7 @@ static GameDefs g = {
 	0, // STRICT_GUARD
 	1, // OCEAN_GUARD
 	BattleLogLevel::NORMAL,	// BATTLE_LOG_LEVEL
+	0, // EXTENDED_FORT_DEFENCE
 };
 
 GameDefs *Globals = &g;

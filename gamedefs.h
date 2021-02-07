@@ -746,6 +746,9 @@ public:
 
 	// Controls how detailed battle logs are, see BattleLogLevel for more details
 	BattleLogLevel BATTLE_LOG_LEVEL;
+
+	// Extends fortifications defenses into adjacent regions
+	int EXTENDED_FORT_DEFENCE;
 };
 
 extern GameDefs *Globals;

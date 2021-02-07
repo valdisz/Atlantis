@@ -237,6 +237,7 @@ static GameDefs g = {
 	0,	// OVERWHELMING
 	0, // HEAL_ALL
 	BattleLogLevel::NORMAL,	// BATTLE_LOG_LEVEL
+	0, // EXTENDED_FORT_DEFENCE
 };
 
 GameDefs *Globals = &g;
