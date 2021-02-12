@@ -814,6 +814,11 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_BAG);
 	EnableItem(I_SPINNING);
 
+	// FMI
+	EnableItem(I_ADMANTIUM_DRAGON);
+	EnableItem(I_CATAPULT);
+	EnableItem(I_STEEL_DEFENDER);
+
 	//
 	// Change craft: adamantium
 	//
