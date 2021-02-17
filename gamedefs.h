@@ -749,6 +749,9 @@ public:
 
 	// Extends fortifications defenses into adjacent regions
 	int EXTENDED_FORT_DEFENCE;
+
+	// Remove trade items from spoils
+	int SPOILS_NO_TRADE;
 };
 
 extern GameDefs *Globals;

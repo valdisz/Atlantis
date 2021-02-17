@@ -837,7 +837,7 @@ void Army::GetMonSpoils(ItemList *spoils,int monitem, int free)
 	int thespoil = mp->spoiltype;
 
 	if (thespoil == -1) return;
-	if (thespoil == IT_NORMAL && getrandom(2)) thespoil = IT_TRADE;
+	if (thespoil == IT_NORMAL && getrandom(2) && !Globals->SPOILS_NO_TRADE) thespoil = IT_TRADE;
 
 	int count = 0;
 	int i;

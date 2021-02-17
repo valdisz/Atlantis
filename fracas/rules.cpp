@@ -238,6 +238,7 @@ static GameDefs g = {
 	0, // HEAL_ALL
 	BattleLogLevel::NORMAL,	// BATTLE_LOG_LEVEL
 	0, // EXTENDED_FORT_DEFENCE
+	0, // SPOILS_NO_TRADE
 };
 
 GameDefs *Globals = &g;
