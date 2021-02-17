@@ -1032,18 +1032,9 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyRaceSkillLevels("IDWA", 5, 2);
 	ModifyRaceSkills("IDWA", 0, "COMB");
 	ModifyRaceSkills("IDWA", 1, "WEAP");
-	ModifyRaceSkills("IDWA", 2, "GCUT");
+	ModifyRaceSkills("IDWA", 2, "MINI");
 	ModifyRaceSkills("IDWA", 3, "FARM");
 	ModifyRaceSkills("IDWA", 4, "ARMO");
-
-	EnableItem(I_UNDERDWARF);
-	ModifyItemBasePrice(I_UNDERDWARF, 40);
-	ModifyRaceSkillLevels("UDWA", 5, 2);
-	ModifyRaceSkills("UDWA", 0, "ARMO");
-	ModifyRaceSkills("UDWA", 1, "WEAP");
-	ModifyRaceSkills("UDWA", 2, "COMB");
-	ModifyRaceSkills("UDWA", 3, "MINI");
-	ModifyRaceSkills("UDWA", 4, "GCUT");
 	
 	EnableItem(I_HIGHELF);
 	ModifyItemBasePrice(I_HIGHELF, 40);
@@ -1063,15 +1054,6 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyRaceSkills("WELF", 3, "CARP");
 	ModifyRaceSkills("WELF", 4, "FISH");
 
-	EnableItem(I_DROWMAN);
-	ModifyItemBasePrice(I_DROWMAN, 40);
-	ModifyRaceSkillLevels("DRLF", 5, 2);
-	ModifyRaceSkills("DRLF", 0, "HERB");
-	ModifyRaceSkills("DRLF", 1, "LBOW");
-	ModifyRaceSkills("DRLF", 2, "COMB");
-	ModifyRaceSkills("DRLF", 3, "WEAP");
-	ModifyRaceSkills("DRLF", 4, "HEAL");
-
 	EnableItem(I_GNOME);
 	ModifyItemBasePrice(I_GNOME, 30);
 	ModifyRaceSkillLevels("GNOM", 5, 2);
@@ -1079,7 +1061,7 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyRaceSkills("GNOM", 1, "QUAR");
 	ModifyRaceSkills("GNOM", 2, "ENTE");
 	ModifyRaceSkills("GNOM", 3, "XBOW");
-	ModifyRaceSkills("GNOM", 4, "GCUT");
+	ModifyRaceSkills("GNOM", 4, "HEAL");
 	ModifyItemCapacities(I_GNOME,7,0,0,0);
 	ModifyItemWeight(I_GNOME, 5);
 
@@ -1204,38 +1186,15 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyTerrainCoastRace(R_TUNDRA, 2, I_GNOLL);
 	ModifyTerrainEconomy(R_TUNDRA, 400, 11, 10, 2);
 
-	// Underworld
-
-	ClearTerrainRaces(R_CAVERN);
-	ModifyTerrainRace(R_CAVERN, 0, I_DROWMAN);
-	ModifyTerrainRace(R_CAVERN, 1, I_UNDERDWARF);
-	ModifyTerrainRace(R_CAVERN, 2, I_MAN);
-	ModifyTerrainRace(R_CAVERN, 3, I_GNOME);
-	ModifyTerrainCoastRace(R_CAVERN, 0, I_MAN);
-	ModifyTerrainCoastRace(R_CAVERN, 1, I_UNDERDWARF);
-	ModifyTerrainCoastRace(R_CAVERN, 2, I_DROWMAN);
-	ModifyTerrainEconomy(R_CAVERN, 300, 12, 10, 1);
-
-	ClearTerrainRaces(R_UFOREST);
-	ModifyTerrainRace(R_UFOREST, 0, I_DROWMAN);
-	ModifyTerrainRace(R_UFOREST, 1, I_UNDERDWARF);
-	ModifyTerrainRace(R_UFOREST, 2, I_GOBLINMAN);
-	ModifyTerrainRace(R_UFOREST, 3, I_MAN);
-	ModifyTerrainCoastRace(R_UFOREST, 0, I_DROWMAN);
-	ModifyTerrainCoastRace(R_UFOREST, 1, I_UNDERDWARF);
-	ModifyTerrainCoastRace(R_UFOREST, 2, I_GOBLINMAN);
-	ModifyTerrainEconomy(R_UFOREST, 500, 12, 10, 2);
-
-	ClearTerrainRaces(R_CHASM);
-	ModifyTerrainRace(R_CHASM, 0, I_UNDERDWARF);
-	ModifyTerrainRace(R_CHASM, 1, I_DROWMAN);
-	ModifyTerrainRace(R_CHASM, 2, I_GOBLINMAN);
-	ModifyTerrainRace(R_CHASM, 3, I_ORC);
-	ModifyTerrainCoastRace(R_CHASM, 0, I_UNDERDWARF);
-	ModifyTerrainCoastRace(R_CHASM, 1, I_DROWMAN);
-	ModifyTerrainCoastRace(R_CHASM, 2, I_GOBLINMAN);
-	ModifyTerrainEconomy(R_CHASM, 0, 0, 0, 3);
-	// ModifyTerrainWMons(R_CHASM, 20, I_DEMON, I_BALROG, I_ETTIN);
+	ClearTerrainRaces(R_CERAN_HILL);
+	ModifyTerrainRace(R_CERAN_HILL, 0, I_GNOME);
+	ModifyTerrainRace(R_CERAN_HILL, 1, I_GOBLINMAN);
+	ModifyTerrainRace(R_CERAN_HILL, 2, I_ORC);
+	ModifyTerrainRace(R_CERAN_HILL, 3, I_HILLDWARF);
+	ModifyTerrainCoastRace(R_CERAN_HILL, 0, I_GNOME);
+	ModifyTerrainCoastRace(R_CERAN_HILL, 1, I_GOBLINMAN);
+	ModifyTerrainCoastRace(R_CERAN_HILL, 2, I_ORC);
+	ModifyTerrainEconomy(R_CERAN_HILL, 700, 12, 30, 2);
 
 	// Modify the various spells which are allowed to cross levels
 	if (Globals->EASIER_UNDERWORLD) {
