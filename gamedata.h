@@ -265,6 +265,7 @@ enum {
 	I_TURT,
 	I_CATAPULT,
 	I_STEEL_DEFENDER,
+	I_DEVIL,
 	NITEMS
 };
 

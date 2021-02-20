@@ -213,9 +213,9 @@ void Game::MakeLMon(Object *pObj)
 					(ItemDefs[I_DEMON].type & IT_ILLUSION));
 			u->items.SetNum(I_DEMON, getrandom(mp->number + 1));
 
-			mp = FindMonster(ItemDefs[I_BALROG].abr,
-					(ItemDefs[I_BALROG].type & IT_ILLUSION));
-			u->items.SetNum(I_BALROG, getrandom(mp->number + 1));
+			mp = FindMonster(ItemDefs[I_DEVIL].abr,
+					(ItemDefs[I_DEVIL].type & IT_ILLUSION));
+			u->items.SetNum(I_DEVIL, getrandom(mp->number + 1));
 			break;
 		case I_SKELETON:
 			u->MakeWMon("Undead", I_SKELETON, getrandom(mp->number + 1));

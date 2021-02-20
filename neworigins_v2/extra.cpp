@@ -59,15 +59,21 @@ int Game::SetupFaction( Faction *pFac )
 	// Set up magic
 	//
 	temp2->type = U_MAGE;
-	temp2->Study(S_OBSERVATION, 180);
-	temp2->Study(S_FORCE, 90);
-	temp2->Study(S_PATTERN, 90);
-	temp2->Study(S_SPIRIT, 90);
+	temp2->Study(S_OBSERVATION, 30);
+	temp2->Study(S_FORCE, 30);
+	temp2->Study(S_PATTERN, 30);
+	temp2->Study(S_SPIRIT, 30);
 	temp2->Study(S_GATE_LORE, 30);
 	temp2->Study(S_FIRE, 30);
 
 	// Set up health
 	temp2->Study(S_COMBAT, 180);
+
+	// Set up flags
+	temp2->SetFlag(FLAG_BEHIND, 1);
+	temp2->SetFlag(FLAG_NOCROSS_WATER, 0);
+	temp2->SetFlag(FLAG_HOLDING, 0);
+	temp2->SetFlag(FLAG_NOAID, 0);
 
 	if (Globals->UPKEEP_MINIMUM_FOOD > 0)
 	{
@@ -976,6 +982,7 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(O_ICECAVE);
 	EnableItem(I_ILLYRTHID);
 	EnableItem(O_ILAIR);
+	EnableItem(I_DEVIL);
 	
 	EnableItem(I_STORMGIANT);
 	EnableItem(I_CLOUDGIANT);
