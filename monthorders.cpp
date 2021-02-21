@@ -1943,13 +1943,28 @@ Location *Game::DoAMoveOrder(Unit *unit, ARegion *region, Object *obj)
 
 	forbid = newreg->Forbidden(unit);
 	if (forbid && !startmove && unit->guard != GUARD_ADVANCE) {
+		// Event for incomming unit
 		int obs = unit->GetAttribute("observation");
-		unit->Event(AString("Is forbidden entry to ") +
-					newreg->ShortPrint(&regions) + " by " +
-					forbid->GetName(obs) + ".");
+		AString forbiddenText = AString("Is forbidden entry to ")
+			+ newreg->ShortPrint(&regions)
+			+ " by "
+			+ forbid->GetName(obs);
+
+		if (forbid->describe != NULL) {
+			forbiddenText = forbiddenText + "; " + forbid->describe->Str();
+		}
+		forbiddenText = forbiddenText + ".";
+		unit->Event(forbiddenText);
+		
+		// Event for region guard
 		obs = forbid->GetAttribute("observation");
-		forbid->Event(AString("Forbids entry to ") +
-					unit->GetName(obs) + ".");
+		AString forbidText = AString("Forbids entry to ") + unit->GetName(obs);
+		if (unit->describe != NULL) {
+			forbidText = forbidText + "; " + unit->describe->Str();
+		}
+		forbidText = forbidText + ".";
+		forbid->Event(forbidText);
+
 		goto done_moving;
 	}
 
