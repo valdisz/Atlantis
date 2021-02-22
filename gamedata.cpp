@@ -2310,7 +2310,7 @@ ItemType id[] =
 
 	{"catapult","catapults","CATP",
 	ItemType::DISABLED | ItemType::MANPRODUCE,
-	"CARP",4,4,1,{{I_WOOD,200},{I_STONE,50},{I_LASSO,50},{-1,0}},
+	"CARP",4,4,1,{{I_WOOD,200},{I_STONE,50},{I_FUR,50},{-1,0}},
 	NULL,0,0,{{-1,0},{-1,0},{-1,0},{-1,0}},
 	400,IT_MONSTER,2000,1,
 	400,0,0,0,2,
@@ -2321,7 +2321,7 @@ ItemType id[] =
 
 	{"steel defender","steel defenders","STED",
 	ItemType::DISABLED | ItemType::MANPRODUCE,
-	"CARP",4,4,1, {{I_ROOTSTONE,1},{I_IRON,200},{-1,0},{-1,0}},
+	"CARP",4,4,1, {{I_ROOTSTONE,1},{I_IRON,200},{I_FUR,20},{-1,0}},
 	NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
 	300,IT_MONSTER,500,1,
 	300,0,0,0,2,
@@ -2528,7 +2528,7 @@ MonType md[] = {
 	 NULL,0,
 	 4000,IT_ADVANCED,25,8,"Ice Wurms", "ICEW", 1},
 	{6,{6,6,6,6,5,0},
-	 50,70,0,
+	 50,60,0,
 	 4,1,3,
 	 "firebreath", 6,
 	 8000,IT_MAGIC,50,1,"Dragon", "DRAG", 1},
@@ -3078,13 +3078,13 @@ ArmorType armd[] = {
 	// ARMOR_CLOAKOFI
 	{ "CLOA", 0, 100, {98, 98, 98, 98, 98, 98, 98, 98}},
 	// ARMOR_ADPLATE
-	{ "AARM", 0, 100, {95, 95, 95, 95, 85, 85, 85, 85}},
+	{ "AARM", 0, 100, {95, 95, 95, 95, 90, 90, 90, 90}},
 	// ARMOR_ADRING
-	{ "ARNG", 0, 100, {90, 90, 90, 90, 75, 75, 75, 75}},
+	{ "ARNG", 0, 100, {90, 90, 90, 90, 80, 80, 80, 80}},
 	// ARMOR_IMITHRIL
 	{ "IMTH", 0, 100, {90, 90, 90, 90, 75, 75, 75, 75}},
 	// ARMOR_MARMOR
-	{ "MARM", 0, 100, {80, 80, 80, 80, 65, 65, 65, 65}},
+	{ "MARM", 0, 100, {85, 85, 85, 85, 67, 67, 67, 67}},
 	// ARMOR_MCHAIN
 	{ "MCAR", 0, 300, {225, 200, 150, 225, 150, 150, 150, 150}},
 	// ARMOR_PLATEARMOR
@@ -3094,7 +3094,7 @@ ArmorType armd[] = {
 	// ARMOR_CHAINARMOR
 	{ "CARM", 0, 100, {33, 33, 33, 33, 16, 16, 16, 16}},
 	// ARMOR_LEATHERARMOR
-	{ "LARM", ArmorType::USEINASSASSINATE, 100, {25, 25, 25, 25, 5, 5, 5, 5}},
+	{ "LARM", ArmorType::USEINASSASSINATE, 100, {30, 30, 30, 30, 13, 13, 13, 13}},
 	// ARMOR_CLOTHARMOR
 	{ "CLAR", ArmorType::USEINASSASSINATE, 100, {16, 16, 16, 16, 5, 5, 5, 5}},
 };
@@ -4243,7 +4243,7 @@ static TerrainType td[] = {
 	 TerrainType::FLYINGMOUNTS | TerrainType::SHOW_RULES,
 	 200,11,20,2,
 	 {{I_WOOD,100,10},{I_HERBS,100,20},{I_MUSHROOM,35,5},{I_IRONWOOD,35,5},
-	  {-1,0,0},{-1,0,0},{-1,0,0}},
+	  {I_FUR,80,10},{-1,0,0},{-1,0,0}},
 	 {I_TRIBESMAN,I_TRIBALELF,I_WOODELF,-1},
 	 {I_SEAELF,-1,-1},
 	 1,I_ANACONDA,I_KONG,I_WMEN,
@@ -4260,7 +4260,7 @@ static TerrainType td[] = {
 	{"tundra", "tundra", 't', R_TUNDRA,
 	 TerrainType::RIDINGMOUNTS | TerrainType::FLYINGMOUNTS | TerrainType::SHOW_RULES,
 	 100,11,10,2,
-	 {{I_FUR,100,10},{I_HERBS,100,10},{I_MUSHROOM,25,5},{I_ROUGHGEM,35,5},
+	 {{I_FUR,100,10},{I_HERBS,100,10},{I_MUSHROOM,35,5},{I_ROUGHGEM,35,5},
 	  {-1,0,0},{-1,0,0},{-1,0,0}},
 	 {I_ESKIMO,I_ICEDWARF,-1,-1},
 	 {I_SEAELF,I_VIKING,-1},

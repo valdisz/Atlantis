@@ -784,14 +784,12 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_MWAGON);
 	EnableItem(I_GLIDER);
 	EnableItem(I_LEATHERARMOR);
-	EnableItem(I_CLOTHARMOR);
 	EnableItem(I_BAXE);
 	EnableItem(I_SPEAR);
 	EnableItem(I_JAVELIN);
 	EnableItem(I_MSHIELD);
 	EnableItem(I_ISHIELD);
 	EnableItem(I_WSHIELD);
-	EnableItem(I_MBAXE);
 	EnableItem(I_AEGIS);
 	EnableItem(I_WINDCHIME);
 	EnableItem(I_GATE_CRYSTAL);
@@ -808,8 +806,7 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_GEMS);
 
 	// Artifacts of power
-	EnableItem(I_RELICOFGRACE);
-	ModifyItemName(I_RELICOFGRACE, "artifact of power", "artifacts of power");
+	DisableItem(I_RELICOFGRACE);
 
 	// Tools
 	EnableItem(I_PICK);
@@ -829,7 +826,6 @@ void Game::ModifyTablesPerRuleset(void)
 	//
 	EnableItem(I_ADMANTIUM);
 	EnableItem(I_ADSWORD);
-	EnableItem(I_ADBAXE);
 	EnableItem(I_ADRING);
 	EnableItem(I_ADPLATE);
 	ModifyItemProductionSkill(I_ADMANTIUM, "MINI", 5);
@@ -854,6 +850,9 @@ void Game::ModifyTablesPerRuleset(void)
 	// Disable items
 	DisableItem(I_SUPERBOW);
 	DisableItem(I_BOOTS);
+	DisableItem(I_CLOTHARMOR);
+	DisableItem(I_MBAXE);
+	DisableItem(I_ADBAXE);
 
 	// No staff of lightning
 	DisableSkill(S_CREATE_STAFF_OF_LIGHTNING);
