@@ -5109,7 +5109,7 @@ static SpecialType spd[] = {
 
   // SPECIAL_CATAPULT_STRIKE,
   {"catapult strike", "a catapult strike",
-	SpecialType::HIT_BUILDINGIF,
+	SpecialType::HIT_BUILDINGEXCEPT,
    	{-1, -1, -1, -1, -1},
    	{-1, -1, -1, -1, -1, -1, -1},
    	{NULL, NULL, NULL},
