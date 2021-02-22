@@ -257,7 +257,7 @@ ItemType id[] =
 	 0, NULL, 0,
 	 "", { "", "", "", "" }, 0, 0},
 	{"livestock","livestock","LIVE",
-	 0,
+	 ItemType::NOTRANSPORT,
 	 "FARM",1,1,1, {{-1,0}, {-1,0},{-1,0},{-1,0}},
 	 NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
 	 50, IT_NORMAL | IT_FOOD, 15,0,
@@ -2200,7 +2200,7 @@ ItemType id[] =
 	{"aegis","aegeis","AEGS",
 	 ItemType::DISABLED | ItemType::NOMARKET | ItemType::NOTRANSPORT,
 	 NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
-	 "CRAG",1,20, {{I_MITHRIL,1},{I_SILVER,600},{-1,0},{-1,0}},
+	 "CRAG",1,20, {{I_MITHRIL,1},{I_SILVER,5000},{-1,0},{-1,0}},
 	 1, IT_MAGIC | IT_MAGEONLY, 25000,1,
 	 0,0,0,0,0,
 	 -1,0,
@@ -3110,7 +3110,7 @@ MountType mountd[] = {
 	// MOUNT_NONE
 	{ NULL, NULL, 0, 0, 0, NULL, 0},
 	// MOUNT_WHORSE
-	{ "WING", "RIDI", 3, 3, 3, NULL, 0},
+	{ "WING", "RIDI", 3, 5, 3, NULL, 0},
 	// MOUNT_HORSE
 	{ "HORS", "RIDI", 1, 3, 3, NULL, 0},
 	// MOUNT_TURT
