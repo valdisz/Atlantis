@@ -35,7 +35,7 @@
 #define MAXIMUM_ACTIVE_QUESTS		20
 #define QUEST_EXPLORATION_PERCENT	30
 #define QUEST_SPAWN_RATE		7
-#define QUEST_MAX_REWARD		6000
+#define QUEST_MAX_REWARD		3000
 #define QUEST_SPAWN_CHANCE		70
 #define MAX_DESTINATIONS		5
 
@@ -179,16 +179,6 @@ static void CreateQuest(ARegionList *regions, int monfaction)
 				break;
 			}
 		}
-	}
-
-	// 25% chance to drop I_RELICOFGRACE from quest in addition to regular reward
-	d = getrandom(100);
-	if (d < 25) {
-		item = new Item;
-		item->type = I_RELICOFGRACE;
-		item->num = 1;
-		q->rewards.Add(item);	
-		printf("\nQuest reward: Relic.\n");
 	}
 
 	d = getrandom(100);
@@ -802,7 +792,6 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableItem(I_FSWORD);
 	EnableItem(I_MUSHROOM);
 	EnableItem(I_HEALPOTION);
-	EnableItem(I_ROUGHGEM);
 	EnableItem(I_GEMS);
 
 	// Artifacts of power
@@ -834,25 +823,13 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyItemProductionSkill(I_ADRING, "ARMO", 5);
 	ModifyItemProductionSkill(I_ADPLATE, "ARMO", 5);
 
-	// Cut down the number of trade items to improve
-	// chances of good trade routes
-	DisableItem(I_FIGURINES);
-	DisableItem(I_TAROTCARDS);
-	DisableItem(I_CAVIAR);
-	DisableItem(I_CHOCOLATE);
-	DisableItem(I_ROSES);
-	DisableItem(I_VELVET);
-	DisableItem(I_CASHMERE);
-	DisableItem(I_WOOL);
-	DisableItem(I_MINK);
-	DisableItem(I_DYES);
-
 	// Disable items
 	DisableItem(I_SUPERBOW);
 	DisableItem(I_BOOTS);
 	DisableItem(I_CLOTHARMOR);
 	DisableItem(I_MBAXE);
 	DisableItem(I_ADBAXE);
+	DisableItem(I_ROUGHGEM);
 
 	// No staff of lightning
 	DisableSkill(S_CREATE_STAFF_OF_LIGHTNING);
@@ -870,13 +847,14 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableSkill(S_CREATE_CENSER);
 	EnableSkill(S_CREATE_FLAMING_SWORD);
 	EnableSkill(S_TRANSMUTATION);
-	EnableSkill(S_GEMCUTTING);
 	EnableSkill(S_BLASPHEMOUS_RITUAL);
 	DisableSkill(S_CAMELTRAINING);
 	DisableSkill(S_RANCHING);
 
 	// No endurance
 	DisableSkill(S_ENDURANCE);
+
+	DisableSkill(S_GEMCUTTING);
 
 	// Magic
 
@@ -937,8 +915,8 @@ void Game::ModifyTablesPerRuleset(void)
 	EnableObject(O_ALCHEMISTLAB);
 	EnableObject(O_OASIS);
 	EnableObject(O_TRAPPINGHUT);
-	EnableObject(O_GEMAPPRAISER);
 
+	DisableObject(O_GEMAPPRAISER);
 	DisableObject(O_PALACE);
 
 	ModifyObjectName(O_MFORTRESS, "Magical Fortress");
