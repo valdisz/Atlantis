@@ -1017,7 +1017,7 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyRaceSkills("IDWA", 0, "COMB");
 	ModifyRaceSkills("IDWA", 1, "WEAP");
 	ModifyRaceSkills("IDWA", 2, "MINI");
-	ModifyRaceSkills("IDWA", 3, "FARM");
+	ModifyRaceSkills("IDWA", 3, "FISH");
 	ModifyRaceSkills("IDWA", 4, "ARMO");
 	
 	EnableItem(I_HIGHELF);
@@ -1085,7 +1085,7 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyRaceSkills("GNOL", 1, "HUNT");
 	ModifyRaceSkills("GNOL", 2, "COMB");
 	ModifyRaceSkills("GNOL", 3, "ARMO");
-	ModifyRaceSkills("GNOL", 4, "FISH");
+	ModifyRaceSkills("GNOL", 4, "CARP");
 
 	EnableItem(I_ORC);
 	ModifyItemBasePrice(I_ORC, 40);

@@ -223,7 +223,7 @@ static GameDefs g = {
 	0,  // START_GATES_OPEN
 	1,  // SHOW_CLOSED_GATES
 	0,	// TRANSPORT               - zero with Arcadia
-	1,	// LOCAL_TRANSPORT
+	2,	// LOCAL_TRANSPORT
 	3,	// NONLOCAL_TRANSPORT
 	5,	// SHIPPING_COST
 	0,	// FRACTIONAL_WEIGHT
