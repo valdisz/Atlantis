@@ -461,7 +461,14 @@ class ARegionList : public AList
 		void CreateAbyssLevel(int level, char const *name);
 		void CreateNexusLevel(int level, int xSize, int ySize, char const *name);
 		void CreateSurfaceLevel(int level, int xSize, int ySize, char const *name);
-		void CreateConstrainedSurfaceLevel(int level, int xSize, int ySize, char const *name, int contients, int landMass, int maxContinentSize);
+		void CreateConstrainedSurfaceLevel(int level, int xSize, int ySize, char const *name, int contients, int landMass, int maxContinentSize,
+			int gapMin,
+			int gapMax,
+			int volcanoesMin,
+			int volcanoesMax,
+			int lakesMin,
+			int lakesMax
+		);
 		void CreateIslandLevel(int level, int nPlayers, char const *name);
 		void CreateUnderworldLevel(int level, int xSize, int ySize, char const *name);
 		void CreateUnderdeepLevel(int level, int xSize, int ySize, char const *name);
