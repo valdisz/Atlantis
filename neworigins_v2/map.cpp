@@ -515,10 +515,18 @@ bool Zone::AtBorderWith(Zone* zone) {
 	return false;
 }
 
-class MapConstraints {
+class MapBuilder {
 public:
-	MapConstraints(ARegionArray* aregs);
-	~MapConstraints();
+	MapBuilder(ARegionArray* aregs);
+	~MapBuilder();
+
+	int maxZones;
+	int gapMin;
+	int gapMax;
+	int volcanoesMin;
+	int volcanoesMax;
+	int lakesMin;
+	int lakesMax;
 
 	int w;
 	int h;
@@ -528,7 +536,7 @@ public:
 
 	ZoneRegion* GetRegion(int x, int y);
 	ZoneRegion* GetRegion(Coords location);
-	void CreateZones(int count, int minDistance, int maxAtempts);
+	void CreateZones(int minDistance, int maxAtempts);
 	void GrowZones();
 	void SpecializeZones(int continents, int continentAreaFraction);
 	void GrowTerrain();
@@ -569,7 +577,7 @@ int GetRegionIndex(const int x, const int y, const int w, const int h) {
 	return i;
 }
 
-Zone* MapConstraints::GetNotIsland() {
+Zone* MapBuilder::GetNotIsland() {
 	for (auto &kv : this->zones) {
 		auto zone = kv.second;
 		if (zone->type != ZoneType::CONTINENT) continue;
@@ -582,7 +590,7 @@ Zone* MapConstraints::GetNotIsland() {
 	return NULL;
 }
 
-Zone* MapConstraints::GetZoneOfMaxSize(ZoneType type, int maxSize) {
+Zone* MapBuilder::GetZoneOfMaxSize(ZoneType type, int maxSize) {
 	for (auto &kv : this->zones) {
 		auto zone = kv.second;
 		if (zone->type != type) continue;
@@ -595,7 +603,7 @@ Zone* MapConstraints::GetZoneOfMaxSize(ZoneType type, int maxSize) {
 	return NULL;
 }
 
-MapConstraints::MapConstraints(ARegionArray* aregs) {
+MapBuilder::MapBuilder(ARegionArray* aregs) {
 	this->w = aregs->x;
 	this->h = aregs->y;
 	this->lastZoneId = 0;
@@ -634,7 +642,7 @@ MapConstraints::MapConstraints(ARegionArray* aregs) {
 	}
 }
 
-Zone* MapConstraints::CreateZone(ZoneType type) {
+Zone* MapBuilder::CreateZone(ZoneType type) {
 	Zone* zone = new Zone;
 	zone->id = this->lastZoneId++;
 	zone->type = type;
@@ -644,7 +652,7 @@ Zone* MapConstraints::CreateZone(ZoneType type) {
 	return zone;
 }
 
-void MapConstraints::Clear() {
+void MapBuilder::Clear() {
 	for (auto &region : this->regions) {
 		delete region;
 	}
@@ -657,25 +665,25 @@ void MapConstraints::Clear() {
 	this->zones.clear();
 }
 
-MapConstraints::~MapConstraints() {
+MapBuilder::~MapBuilder() {
 	Clear();
 }
 
-void MapConstraints::ConnectZones() {
+void MapBuilder::ConnectZones() {
 	for (auto &zone : this->zones) {
 		zone.second->SetConnections();
 	}
 }
 
-ZoneRegion* MapConstraints::GetRegion(const int x, const int y) {
+ZoneRegion* MapBuilder::GetRegion(const int x, const int y) {
 	return this->regions[GetRegionIndex(x, y, this->w, this->h)];
 }
 
-ZoneRegion* MapConstraints::GetRegion(Coords location) {
+ZoneRegion* MapBuilder::GetRegion(Coords location) {
 	return this->GetRegion(location.x, location.y);
 }
 
-void MapConstraints::ClearEmptyZones() {
+void MapBuilder::ClearEmptyZones() {
 	int count = 0;
 	std::vector<int> keys;
 	for (auto &z : this->zones) {
@@ -694,11 +702,11 @@ void MapConstraints::ClearEmptyZones() {
 	Awrite(AString("Removed ") + count + " empty zones");
 }
 
-void MapConstraints::CreateZones(int count, int minDistance, int maxAtempts) {
+void MapBuilder::CreateZones(int minDistance, int maxAtempts) {
 	Awrite("Create zones");
 
 	int attempts = 0;
-	while (this->zones.size() < count && attempts++ < maxAtempts) {
+	while (this->zones.size() < this->maxZones && attempts++ < maxAtempts) {
 		Coords location = {
 			x: getrandom(this->w),
 			y: getrandom(this->h)
@@ -723,7 +731,7 @@ void MapConstraints::CreateZones(int count, int minDistance, int maxAtempts) {
 	}
 }
 
-void MapConstraints::GrowZones() {
+void MapBuilder::GrowZones() {
 	Awrite("Grow zones");
 
 	std::unordered_set<Zone *> v;
@@ -784,7 +792,7 @@ void MapConstraints::GrowZones() {
 	ConnectZones();
 } 
 
-void MapConstraints::MergeZoneInto(Zone* src, Zone* dest) {
+void MapBuilder::MergeZoneInto(Zone* src, Zone* dest) {
 	if (src == NULL) {
 		Awrite("src cannot be null");
 		exit(1);
@@ -821,7 +829,7 @@ void MapConstraints::MergeZoneInto(Zone* src, Zone* dest) {
 	}
 }
 
-void MapConstraints::SplitZone(Zone* zone) {
+void MapBuilder::SplitZone(Zone* zone) {
 	if (zone == NULL) {
 		Awrite("Cannot split NULL zone");
 		exit(1);
@@ -862,7 +870,7 @@ Zone* FindConnectedContinent(Zone* zone) {
 std::vector<ZoneRegion *> FindBorderRegions(Zone* zone, Zone* borderZone, const int depth, const bool useRandom = false) {
 	std::unordered_set<ZoneRegion *> visited;
 
-	const int diff = 10;
+	const int diff = 3;
 
 	std::vector<ZoneRegion *> v;
 	for (int i = 0; i < depth; i++) {
@@ -872,8 +880,8 @@ std::vector<ZoneRegion *> FindBorderRegions(Zone* zone, Zone* borderZone, const 
 				if (!region->HaveBorderWith(borderZone)) continue;
 
 				if (useRandom && depth == 1) {
-					int roll = makeRoll(2, 6);
-					if (diff > roll) continue;
+					int roll = makeRoll(1, 5);
+					if (roll < diff) continue;
 				}
 				
 				visited.insert(region);
@@ -890,8 +898,8 @@ std::vector<ZoneRegion *> FindBorderRegions(Zone* zone, Zone* borderZone, const 
 				if (visited.find(next) != visited.end()) continue;
 
 				if (i == depth - 1) {
-					int roll = makeRoll(2, 6);
-					if (diff > roll) continue;
+					int roll = makeRoll(1, 5);
+					if (roll < diff) continue;
 				}
 				
 				v.push_back(region);
@@ -912,7 +920,7 @@ std::vector<ZoneRegion *> FindBorderRegions(Zone* zone, Zone* borderZone, const 
 	return list;
 }
 
-void MapConstraints::SpecializeZones(int continents, int continentAreaFraction) {
+void MapBuilder::SpecializeZones(int continents, int continentAreaFraction) {
 	Awrite("Specialize zones");
 
 	int maxArea = (this->w * this->h * continentAreaFraction) / 200;
@@ -994,8 +1002,8 @@ void MapConstraints::SpecializeZones(int continents, int continentAreaFraction) 
 		bool removeFromA;
 		bool removeFromB;
 
-		int depthRoll = makeRoll(2, 4) / 2;
-		int randomRoll = makeRoll(1, 6);
+		int depthRoll = makeRoll(1, this->gapMax - this->gapMin) + this->gapMin;
+		int randomRoll = makeRoll(1, 2);
 		int sideRoll = makeRoll(1, 2);
 
 		int sideADepth;
@@ -1022,8 +1030,8 @@ void MapConstraints::SpecializeZones(int continents, int continentAreaFraction) 
 			}
 		}
 		else if (depthRoll == 2) {
-			sideBRandom = depthRoll == 2 && randomRoll >= 4;
-			sideARandom = depthRoll == 2 && randomRoll < 4;
+			sideBRandom = depthRoll == 2 && randomRoll == 1;
+			sideARandom = depthRoll == 2 && randomRoll == 2;
 		}
 
 		// find regions that are on border
@@ -1210,11 +1218,11 @@ const int BIOMES[BIOME_ZONES][MAX_BIOMES] = {
 	{ 5, R_MOUNTAIN, R_PLAIN, R_SWAMP, R_JUNGLE, R_DESERT, -1, -1 }
 };
 
-void MapConstraints::AddVolcanoes() {
+void MapBuilder::AddVolcanoes() {
 	Awrite("Adding volcanoes");
 	// volcanos will be added anywhere
 
-	int count = 12 + makeRoll(2, 6) - 3 ;
+	int count = makeRoll(1, this->volcanoesMax - this->volcanoesMin) + this->volcanoesMin;
 	int distance = (std::min(this->w, this->h / 2) * 2) / count + 2;
 
 	int cols = count / makeRoll(1, 4) + 1;
@@ -1323,12 +1331,12 @@ void MapConstraints::AddVolcanoes() {
 	this->ConnectZones();
 }
 
-void MapConstraints::AddLakes() {
+void MapBuilder::AddLakes() {
 	Awrite("Adding lakes");
 	// lakes can appear only on the land, not near water and not on the mountains
 
 	int attempts = 1000;
-	int count = makeRoll(4, 4) + 4;
+	int count = makeRoll(1, this->lakesMax - this->lakesMin) + this->lakesMin;
 	int distance = (std::min(this->w, this->h / 2) * 2) / count;
 
 	std::vector<Coords> lakes;
@@ -1364,7 +1372,7 @@ void MapConstraints::AddLakes() {
 	}
 }
 
-void MapConstraints::GrowTerrain() {
+void MapBuilder::GrowTerrain() {
 	for (auto &kv : this->zones) {
 		auto zone = kv.second;
 		if (zone->type == ZoneType::OCEAN || zone->type == ZoneType::STRAIT || zone->type == ZoneType::UNDECIDED) {
@@ -1388,7 +1396,7 @@ void MapConstraints::GrowTerrain() {
 	this->AddLakes();
 }
 
-void MapConstraints::GrowLandInZone(Zone* zone) {
+void MapBuilder::GrowLandInZone(Zone* zone) {
 	Awrite("Growing land in zone");
 
 	if (!zone->CheckZoneIntegerity()) {
@@ -1602,7 +1610,7 @@ void MapConstraints::GrowLandInZone(Zone* zone) {
 	}
 }
 
-void MapConstraints::SetOceanNames() {
+void MapBuilder::SetOceanNames() {
 	for (auto &kv : this->zones) {
 		auto ocean = kv.second;
 		if (ocean->type == ZoneType::OCEAN || ocean->type == ZoneType::STRAIT) {
@@ -1753,7 +1761,15 @@ void ARegionList::CreateSurfaceLevel(int level, int xSize, int ySize, char const
 	FinalSetup(pRegionArrays[level]);
 }
 
-void ARegionList::CreateConstrainedSurfaceLevel(int level, int xSize, int ySize, char const *name, int contients, int landMass, int maxContinentSize) {
+void ARegionList::CreateConstrainedSurfaceLevel(int level, int xSize, int ySize, char const *name, int contients,
+	int landMass, int maxContinentSize,
+		int gapMin,
+		int gapMax,
+		int volcanoesMin,
+		int volcanoesMax,
+		int lakesMin,
+		int lakesMax
+	) {
 	if (Globals->ICOSAHEDRAL_WORLD) {
 		// this is not supported
 		throw "Icosahedral maps are not supported";
@@ -1765,15 +1781,21 @@ void ARegionList::CreateConstrainedSurfaceLevel(int level, int xSize, int ySize,
 
 	int area = xSize * ySize / 2;
 	const int radius = 1;
-	int maxZones = EstimateMaxZones(area, radius);
 
-	MapConstraints* constraints = new MapConstraints(pRegionArrays[level]);
-	constraints->maxContinentArea = maxContinentSize;
+	MapBuilder* builder = new MapBuilder(pRegionArrays[level]);
+	builder->maxContinentArea = maxContinentSize;
+	builder->maxZones = EstimateMaxZones(area, radius);
+	builder->gapMin = gapMin;
+	builder->gapMax = gapMax;
+	builder->volcanoesMin = volcanoesMin;
+	builder->volcanoesMax = volcanoesMax;
+	builder->lakesMin = lakesMin;
+	builder->lakesMax = lakesMax;;
 
-	constraints->CreateZones(maxZones, radius + 2, 1000);
-	constraints->GrowZones();
-	constraints->SpecializeZones(contients, landMass);
-	constraints->GrowTerrain();
+	builder->CreateZones(radius + 2, 1000);
+	builder->GrowZones();
+	builder->SpecializeZones(contients, landMass);
+	builder->GrowTerrain();
 
 	// SeverLandBridges(pRegionArrays[level]);
 
@@ -1782,14 +1804,14 @@ void ARegionList::CreateConstrainedSurfaceLevel(int level, int xSize, int ySize,
 
 	FinalSetup(pRegionArrays[level]);
 
-	constraints->SetOceanNames();
+	builder->SetOceanNames();
 
 	/////
 
 	int continents = 0;
 	int continentArea = 0;
 	int waterArea = 0;
-	for (auto &kv : constraints->zones) {
+	for (auto &kv : builder->zones) {
 		auto zone = kv.second;
 		if (zone->type == ZoneType::CONTINENT) {
 			continentArea += zone->regions.size();
@@ -1800,12 +1822,12 @@ void ARegionList::CreateConstrainedSurfaceLevel(int level, int xSize, int ySize,
 		}
 	}
 
-	Awrite(AString("Zones: ") + (int) constraints->zones.size());
+	Awrite(AString("Zones: ") + (int) builder->zones.size());
 	Awrite(AString("Continents: ") + continents);
 	Awrite(AString("Contient area: ") + continentArea);
 	Awrite(AString("Water area: ") + waterArea);
 
-	delete constraints;
+	delete builder;
 }
 
 void ARegionList::CreateIslandLevel(int level, int nPlayers, char const *name)

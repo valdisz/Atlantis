@@ -453,7 +453,53 @@ void Game::CreateWorld()
 		}
 		maxContinentSize = answer;
 
-		regions.CreateConstrainedSurfaceLevel(1, xx, yy, 0, continents, landMass, maxContinentSize);
+		int gapMin = -1;
+		while (gapMin < 1 || gapMin > 8) {
+			Awrite("Min continent gap? [1..8]");
+			gapMin = Agetint();
+		}
+
+		int gapMax = -1;
+		while (gapMax < gapMin || gapMax > 8) {
+			Awrite(AString("Max continent gap? [") + gapMin + "..8]");
+			gapMax = Agetint();
+		}
+		
+		int volcanoesMin = -1;
+		while (volcanoesMin < 0 || volcanoesMin > 12) {
+			Awrite("Min number of volcano sites? [0..24]");
+			volcanoesMin = Agetint();
+		}
+		
+		int volcanoesMax = -1;
+		while (volcanoesMax < volcanoesMin || volcanoesMax > 48) {
+			Awrite(AString("Max number of volcano sites? [") + volcanoesMin + "..48]");
+			volcanoesMax = Agetint();
+		}
+		
+		int lakesMin = -1;
+		while (lakesMin < 0 || lakesMin > 24) {
+			Awrite("Min number of lakes? [0..24]");
+			lakesMin = Agetint();
+		}
+		
+		int lakesMax = -1;
+		while (lakesMax < lakesMin || lakesMax > 100) {
+			Awrite(AString("Max number of lakes? [") + lakesMin + "..48]");
+			lakesMax = Agetint();
+		}
+
+		regions.CreateConstrainedSurfaceLevel(1, xx, yy, 0,
+			continents,
+			landMass,
+			maxContinentSize,
+			gapMin,
+			gapMax,
+			volcanoesMin,
+			volcanoesMax,
+			lakesMin,
+			lakesMax
+		);
 	}
 
 	// Create underworld levels
