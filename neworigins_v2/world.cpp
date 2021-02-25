@@ -489,7 +489,7 @@ void Game::CreateWorld()
 			lakesMax = Agetint();
 		}
 
-		regions.CreateConstrainedSurfaceLevel(1, xx, yy, 0,
+		auto builder = regions.CreateConstrainedSurfaceLevel(1, xx, yy, 0,
 			continents,
 			landMass,
 			maxContinentSize,
@@ -500,6 +500,7 @@ void Game::CreateWorld()
 			lakesMin,
 			lakesMax
 		);
+		delete builder;
 	}
 
 	// Create underworld levels
@@ -578,6 +579,18 @@ void Game::CreateWorld()
 		regions.InitSetupGates( i );
 	}
 	// Underdeep has no gates, only the possible shafts above.
+
+	// fix gate index back from -2 to 0
+	auto arr = regions.pRegionArrays[1];
+	for (int x = 0; x < arr->x; x++) {
+		for (int y = 0; y < arr->y; y++) {
+			if ((x + y) % 2) continue;
+			auto tmp = arr->GetRegion(x, y);
+			if (tmp->gate == -2) {
+				tmp->gate = 0;
+			}
+		}
+	}
 
 	regions.FixUnconnectedRegions();
 

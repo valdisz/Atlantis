@@ -44,6 +44,134 @@ class ARegionArray;
 #include "market.h"
 #include "object.h"
 #include <map>
+#include <list>
+#include <unordered_set>
+#include <vector>
+
+enum ZoneType {
+	UNDECIDED,	// zone type not yet determined
+	OCEAN,		// no land will be generated in this zone
+	CONTINENT,	// normal land will grow
+	STRAIT,		// ocean, but formed at two contient border area
+	VOLCANO		// volcano
+};
+
+struct Coords {
+	int x;
+	int y;
+
+	int Distance(const Coords& other);
+};
+
+struct Zone;
+struct Province;
+
+struct ZoneRegion {
+	int id;
+	Coords location;
+	bool exclude;
+	int biome;
+	Zone *zone;
+	Province *province;
+	ARegion* region;
+	ZoneRegion *neighbors[NDIRS];
+
+	bool HaveBorderWith(Zone* zone);
+	bool HaveBorderWith(ZoneRegion* other);
+	bool IsInner();
+	bool IsOuter();
+	bool AtBorderWith(ZoneType type);
+	std::vector<Zone *> GetNeihborZones();
+	int CountNeighbors(Zone* zone);
+	int CountNeighbors(Province* province);
+	std::map<int, int> CountNeighborBiomes();
+};
+
+struct Province {
+	int id;
+	int h;
+	int biome;
+	Zone* zone;
+	std::map<int, ZoneRegion *> regions;
+
+	Coords GetLocation();
+	void AddRegion(ZoneRegion* region);
+	void RemoveRegion(ZoneRegion* region);
+	bool Grow();
+	int GetLatitude();
+	int GetSize();
+	std::unordered_set<Province *> GetNeighbors();
+	std::unordered_set<int> GetNeighborBiomes();
+};
+
+struct Zone {
+	~Zone();
+
+	int id;
+	Coords location;
+	ZoneType type;
+	std::map<int, Zone *> neighbors;
+	std::map<int, ZoneRegion *> regions;
+	std::map<int, Province *> provinces;
+
+	void RemoveRegion(ZoneRegion* region);
+	void AddRegion(ZoneRegion* region);
+	void SetConnections();
+	std::unordered_set<ZoneRegion *> TraverseRegions();
+	bool CheckZoneIntegerity();
+	bool AtBorderWith(Zone* zone);
+	void RemoveNeighbor(Zone* zone);
+	void AddNeighbor(Zone* zone);
+
+	bool IsIsland();
+
+	Province* CreateProvince(ZoneRegion* region, int h);
+	void RemoveProvince(Province* province);
+};
+
+class MapBuilder {
+public:
+	MapBuilder(ARegionArray* aregs);
+	~MapBuilder();
+
+	int maxZones;
+	int gapMin;
+	int gapMax;
+	int volcanoesMin;
+	int volcanoesMax;
+	int lakesMin;
+	int lakesMax;
+
+	int w;
+	int h;
+	std::map<int, Zone *> zones;
+	std::vector<ZoneRegion *> regions;
+	int maxContinentArea;
+
+	ZoneRegion* GetRegion(int x, int y);
+	ZoneRegion* GetRegion(Coords location);
+	void CreateZones(int minDistance, int maxAtempts);
+	void GrowZones();
+	void SpecializeZones(int continents, int continentAreaFraction);
+	void GrowTerrain();
+	void GrowLandInZone(Zone* zone);
+	void SetOceanNames();
+	void ClearEmptyZones();
+	void MergeZoneInto(Zone* src, Zone* dest);
+	void SplitZone(Zone* zone);
+	void Clear();
+	void ConnectZones();
+	Zone* CreateZone(ZoneType type);
+	Zone* GetNotIsland();
+	Zone* GetZoneOfMaxSize(ZoneType type, int maxSize);
+	void AddVolcanoes();
+	void AddLakes();
+
+	Zone* GetZone(int x, int y);
+
+private:
+	int lastZoneId;
+};
 
 /* Weather Types */
 enum {
@@ -461,7 +589,7 @@ class ARegionList : public AList
 		void CreateAbyssLevel(int level, char const *name);
 		void CreateNexusLevel(int level, int xSize, int ySize, char const *name);
 		void CreateSurfaceLevel(int level, int xSize, int ySize, char const *name);
-		void CreateConstrainedSurfaceLevel(int level, int xSize, int ySize, char const *name, int contients, int landMass, int maxContinentSize,
+		MapBuilder* CreateConstrainedSurfaceLevel(int level, int xSize, int ySize, char const *name, int contients, int landMass, int maxContinentSize,
 			int gapMin,
 			int gapMax,
 			int volcanoesMin,
