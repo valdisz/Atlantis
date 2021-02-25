@@ -613,7 +613,8 @@ MapBuilder::MapBuilder(ARegionArray* aregs) {
 			if (!((x + y) % 2)) {
 				ZoneRegion *reg = new ZoneRegion;
 				reg->id = GetRegionIndex(x, y, this->w, this->h);
-				reg->location = { x: x, y: y };
+				reg->location.x = x;
+				reg->location.y = y;
 				reg->zone = NULL;
 				reg->exclude = false;
 				reg->province = NULL;
