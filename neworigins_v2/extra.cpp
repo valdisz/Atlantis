@@ -1130,7 +1130,7 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyTerrainCoastRace(R_MOUNTAIN, 0, I_HILLDWARF);
 	ModifyTerrainCoastRace(R_MOUNTAIN, 1, I_ORC);
 	ModifyTerrainCoastRace(R_MOUNTAIN, 2, I_MAN);
-	ModifyTerrainEconomy(R_MOUNTAIN, 400, 12, 20, 2);
+	ModifyTerrainEconomy(R_MOUNTAIN, 400, 11, 20, 2);
 
 	ClearTerrainRaces(R_SWAMP);
 	ModifyTerrainRace(R_SWAMP, 0, I_LIZARDMAN);

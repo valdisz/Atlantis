@@ -237,6 +237,7 @@ void Game::MakeLMon(Object *pObj)
 			u->items.SetNum(I_SORCERERS,
 					getrandom(mp->number + 1));
 			u->SetFlag(FLAG_BEHIND, 1);
+			u->guard = GUARD_NONE;
 			u->MoveUnit(pObj);
 
 			u = GetNewUnit(monfac, 0);
@@ -245,6 +246,7 @@ void Game::MakeLMon(Object *pObj)
 					(ItemDefs[I_WARRIORS].type & IT_ILLUSION));
 			u->MakeWMon(mp->name, I_WARRIORS,
 					(mp->number + getrandom(mp->number) + 1) / 2);
+			u->guard = GUARD_NONE;
 
 			break;
 		case I_DARKMAGE:
@@ -263,6 +265,7 @@ void Game::MakeLMon(Object *pObj)
 					(ItemDefs[I_DARKMAGE].type & IT_ILLUSION));
 			u->items.SetNum(I_DARKMAGE, getrandom(mp->number + 1));
 			u->SetFlag(FLAG_BEHIND, 1);
+			u->guard = GUARD_NONE;
 			u->MoveUnit(pObj);
 
 			u = GetNewUnit(monfac, 0);
@@ -271,12 +274,14 @@ void Game::MakeLMon(Object *pObj)
 					(ItemDefs[I_DROW].type & IT_ILLUSION));
 			u->MakeWMon(mp->name, I_DROW,
 					(mp->number + getrandom(mp->number) + 1) / 2);
+			u->guard = GUARD_NONE;
 
 			break;
 		case I_ILLYRTHID:
 			u->MakeWMon(mp->name, I_ILLYRTHID,
 					(mp->number + getrandom(mp->number) + 1) / 2);
 			u->SetFlag(FLAG_BEHIND, 1);
+			u->guard = GUARD_NONE;
 			u->MoveUnit(pObj);
 
 			u = GetNewUnit(monfac, 0);
@@ -288,6 +293,7 @@ void Game::MakeLMon(Object *pObj)
 			mp = FindMonster(ItemDefs[I_UNDEAD].abr,
 					(ItemDefs[I_UNDEAD].type & IT_ILLUSION));
 			u->items.SetNum(I_UNDEAD, getrandom(mp->number + 1));
+			u->guard = GUARD_NONE;
 			break;
 		case I_STORMGIANT:
 			if (getrandom(3) < 1) {
