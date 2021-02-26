@@ -110,7 +110,9 @@ struct ZoneRegion {
 
 ZoneRegion::ZoneRegion(int id, int x, int y, ARegion* region) {
 	this->id = id;
-	location = Coords({ x, y });
+	location = Coords();
+	location.x = x;
+	location.y = y;
 	this->region = region;
 	zone = NULL;
 	exclude = false;
