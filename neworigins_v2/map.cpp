@@ -1559,14 +1559,12 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 	for (auto &kv : zone->provinces) {
 		auto p = kv.second;
 
-		auto coords = p->GetLocation();
-		Awrite(AString("Province x: ") + coords.x + ", y: " + coords.y);
-
 		int lat = p->GetLatitude();
-
 		auto latBiomes = GetBiomes(lat);
 		int biomeCount = (int) latBiomes.size();
-		Awrite(AString("Province biome count: ") + biomeCount);
+		
+		auto coords = p->GetLocation();
+		Awrite(AString("[Province] x: ") +  + coords.x + ", y: " + coords.y + ", lat: " + lat + ", biomes: " + biomeCount);
 
 		std::vector<int> weights;
 		weights.resize(biomeCount);
