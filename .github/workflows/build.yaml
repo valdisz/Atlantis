@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  workflow_dispatch: {}
+  push: {}
+
+jobs:
+  # build_linux:
+  #   name: Linux build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - run: make neworigins_v2
+  #   - uses: actions/upload-artifact@v2
+  #     with:
+  #       name: neworigins_v2_linux
+  #       path: neworigins_v2/neworigins_v2
+  # build_windows:
+  #   name: Windows build
+  #   runs-on: windows-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - run: make neworigins_v2
+  #   - uses: actions/upload-artifact@v2
+  #     with:
+  #       name: neworigins_v2_windows
+  #       path: neworigins_v2/neworigins_v2.exe
+  build_mac:
+    name: Mac build
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: make neworigins_v2
+    - uses: actions/upload-artifact@v2
+      with:
+        name: neworigins_v2_mac
+        path: neworigins_v2/neworigins_v2
