@@ -391,7 +391,7 @@ Zone::~Zone() {
 }
 
 Province* Zone::CreateProvince(ZoneRegion* region, int h) {
-	Province* province = new Province;
+	Province* province = new Province();
 	province->id = this->provinces.size();
 	province->zone = this;
 	province->h = h;
@@ -635,6 +635,11 @@ MapBuilder::MapBuilder(ARegionArray* aregs) {
 				);
 				reg->biome = -1;
 
+				if (reg->location.x != x || reg->location.y != y) {
+					Awrite("Reg location is wrong");
+					exit(1);
+				}
+
 				if (reg->location.x != reg->region->xloc || reg->location.y != reg->region->yloc) {
 					Awrite("Region location do not match");
 					exit(1);
@@ -658,7 +663,7 @@ MapBuilder::MapBuilder(ARegionArray* aregs) {
 }
 
 Zone* MapBuilder::CreateZone(ZoneType type) {
-	Zone* zone = new Zone;
+	Zone* zone = new Zone();
 	zone->id = this->lastZoneId++;
 	zone->type = type;
 
