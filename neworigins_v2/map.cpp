@@ -308,6 +308,8 @@ int Province::GetLatitude() {
 	}
 
 	Awrite(AString("[getloc] lat: ") + lat);
+
+	return lat;
 }
 
 int Province::GetSize() {
