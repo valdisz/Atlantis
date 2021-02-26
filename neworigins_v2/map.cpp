@@ -1541,7 +1541,7 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 			// biomes = 0, all weights are equal
 			case 0:
 				for (int i = 0; i < biomeCount; i++) {
-					weights.at(i) = ++w;
+					weights[i] = ++w;
 				}
 				break;
 
@@ -1549,7 +1549,7 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 			case 1:
 				for (int i = 0; i < biomeCount; i++) {
 					int biome = latBiomes[i + 1];
-					weights.at(i) = biomes.find(biome) == biomes.end()
+					weights[i] = biomes.find(biome) == biomes.end()
 						? ++w
 						: 0;
 				}
@@ -1564,14 +1564,14 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 				for (int i = 0; i < biomeCount; i++) {
 					int biome = latBiomes[i + 1];
 					if (nb.find(biome) != nb.end()) {
-						weights.at(i) = ++w;
+						weights[i] = ++w;
 					}
 					else if (biomes.find(biome) != biomes.end()) {
-						weights.at(i) = ++w;
+						weights[i] = ++w;
 						w += 1;
 					}
 					else {
-						weights.at(i) = ++w;
+						weights[i] = ++w;
 						w += 3;
 					}
 				}
@@ -1580,7 +1580,7 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 
 		int roll = makeRoll(1, w);
 		for (int i = biomeCount - 1; i >= 0; i--) {
-			int diff = weights.at(i);
+			int diff = weights[i];
 			if (diff == 0) continue;
 			if (roll >= diff) {
 				int biome = latBiomes[i + 1];
