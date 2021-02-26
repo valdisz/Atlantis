@@ -35,3 +35,4 @@ jobs:
       with:
         name: neworigins_v2_mac
         path: neworigins_v2/neworigins_v2
+    - run: ./neworigins_v2/neworigins_v2 new
