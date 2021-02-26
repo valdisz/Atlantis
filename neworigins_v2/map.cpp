@@ -2837,6 +2837,7 @@ void ARegionList::InitSetupGates(int level)
 				int tempy = j*16 + getrandom(8)*2 + tempx%2;
 				ARegion *temp = pArr->GetRegion(tempx, tempy);
 				if (temp && TerrainDefs[temp->type].similar_type != R_OCEAN &&
+						temp->type != R_VOLCANO &&
 						temp->gate != -1) {
 					numberofgates++;
 					temp->gate = -1;

@@ -1130,7 +1130,7 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyTerrainCoastRace(R_MOUNTAIN, 0, I_HILLDWARF);
 	ModifyTerrainCoastRace(R_MOUNTAIN, 1, I_ORC);
 	ModifyTerrainCoastRace(R_MOUNTAIN, 2, I_MAN);
-	ModifyTerrainEconomy(R_MOUNTAIN, 600, 12, 20, 2);
+	ModifyTerrainEconomy(R_MOUNTAIN, 400, 12, 20, 2);
 
 	ClearTerrainRaces(R_SWAMP);
 	ModifyTerrainRace(R_SWAMP, 0, I_LIZARDMAN);
@@ -1169,16 +1169,6 @@ void Game::ModifyTablesPerRuleset(void)
 	ModifyTerrainCoastRace(R_TUNDRA, 1, I_GNOME);
 	ModifyTerrainCoastRace(R_TUNDRA, 2, I_GNOLL);
 	ModifyTerrainEconomy(R_TUNDRA, 400, 11, 10, 2);
-
-	ClearTerrainRaces(R_CERAN_HILL);
-	ModifyTerrainRace(R_CERAN_HILL, 0, I_GNOME);
-	ModifyTerrainRace(R_CERAN_HILL, 1, I_GOBLINMAN);
-	ModifyTerrainRace(R_CERAN_HILL, 2, I_ORC);
-	ModifyTerrainRace(R_CERAN_HILL, 3, I_HILLDWARF);
-	ModifyTerrainCoastRace(R_CERAN_HILL, 0, I_GNOME);
-	ModifyTerrainCoastRace(R_CERAN_HILL, 1, I_GOBLINMAN);
-	ModifyTerrainCoastRace(R_CERAN_HILL, 2, I_ORC);
-	ModifyTerrainEconomy(R_CERAN_HILL, 700, 12, 30, 2);
 
 	// Modify the various spells which are allowed to cross levels
 	if (Globals->EASIER_UNDERWORLD) {
