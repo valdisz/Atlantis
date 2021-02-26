@@ -289,10 +289,10 @@ Coords Province::GetLocation() {
 		yMax = std::max(yMax, reg->location.y);
 	}
 
-	return {
-		x: xMin + (xMax - xMin + 1) / 2,
-		y: yMin + (yMax - yMin + 1) / 2
-	};
+	Coords c = Coords();
+	c.x = xMin + (xMax - xMin + 1) / 2;
+	c.y = yMin + (yMax - yMin + 1) / 2;
+	return c;
 }
 
 int Province::GetLatitude() {
@@ -1575,12 +1575,13 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 	for (auto &kv : zone->provinces) {
 		auto p = kv.second;
 
+		auto coords = p->GetLocation();
 		int lat = p->GetLatitude();
+		Awrite(AString("[Province] x: ") + coords.x + ", y: " + coords.y + ", lat: " + lat);
+
 		auto latBiomes = GetBiomes(lat);
 		int biomeCount = (int) latBiomes.size();
-		
-		auto coords = p->GetLocation();
-		Awrite(AString("[Province] x: ") +  + coords.x + ", y: " + coords.y + ", lat: " + lat + ", biomes: " + biomeCount);
+		Awrite(AString("[Province] biomes: ") + biomeCount);
 
 		std::vector<int> weights;
 		weights.resize(biomeCount);
