@@ -297,10 +297,17 @@ Coords Province::GetLocation() {
 
 int Province::GetLatitude() {
 	auto loc = GetLocation();
+	Awrite(AString("[getloc] x: ") + loc.x + ", y: " + loc.y);
+	
 	int lat = ( loc.y * 8 ) / this->h;
+	Awrite(AString("[getloc] lat: ") + lat + ", h: " + this->h);
+
 	if (lat > 3) {
 		lat = std::max(0, 7 - lat);
+		Awrite(AString("[getloc] lat > 3: ") + lat);
 	}
+
+	Awrite(AString("[getloc] lat: ") + lat);
 }
 
 int Province::GetSize() {
