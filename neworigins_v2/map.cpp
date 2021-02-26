@@ -249,19 +249,22 @@ std::unordered_set<int> Province::GetNeighborBiomes() {
 }
 
 Coords Province::GetLocation() {
-	int xMin = -1;
-	int yMin;
-	int xMax;
-	int yMax;
+	int xMin = 0;
+	int yMin = 0;
+	int xMax = 0;
+	int yMax = 0;
 
+	bool first = true;
 	for (auto &kv : regions) {
 		auto reg = kv.second;
 
-		if (xMin == -1) {
+		if (first) {
 			xMin = reg->location.x;
 			yMin = reg->location.y;
 			xMax = xMin;
 			yMax = yMin;
+
+			first = false;
 
 			continue;
 		}
@@ -857,7 +860,6 @@ void MapBuilder::SplitZone(Zone* zone) {
 }
 
 Zone* FindConnectedContinent(Zone* zone) {
-	Awrite("Searching for continent");
 	for (auto &kv : zone->neighbors) {
 		auto n = kv.second;
 		if (n->type == ZoneType::CONTINENT) {
@@ -998,10 +1000,7 @@ void MapBuilder::SpecializeZones(int continents, int continentAreaFraction) {
 	Awrite("Add gaps between continents");
 	Zone* nonIsland = GetNotIsland();
 	while (nonIsland != NULL) {
-		Awrite("Starting border cleanup ");
 		Zone* otherZone = FindConnectedContinent(nonIsland);
-		bool removeFromA;
-		bool removeFromB;
 
 		int depthRoll = makeRoll(1, this->gapMax - this->gapMin) + this->gapMin;
 		int randomRoll = makeRoll(1, 2);
@@ -1036,7 +1035,7 @@ void MapBuilder::SpecializeZones(int continents, int continentAreaFraction) {
 		}
 
 		// find regions that are on border
-		Zone* strait = CreateZone(ZoneType::STRAIT);
+		Zone* strait = CreateZone(ZoneType::STRAIT); 	
 		std::list<ZoneRegion *> list;
 		if (sideADepth) {
 			auto tmp = FindBorderRegions(nonIsland, otherZone, sideADepth, sideARandom);
@@ -1560,9 +1559,14 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 	for (auto &kv : zone->provinces) {
 		auto p = kv.second;
 
+		auto coords = p->GetLocation();
+		Awrite(AString("Province x: ") + coords.x + ", y: " + coords.y);
+
 		int lat = p->GetLatitude();
+
 		auto latBiomes = GetBiomes(lat);
 		int biomeCount = (int) latBiomes.size();
+		Awrite(AString("Province biome count: ") + biomeCount);
 
 		std::vector<int> weights;
 		weights.resize(biomeCount);
