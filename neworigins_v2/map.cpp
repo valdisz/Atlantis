@@ -1203,22 +1203,6 @@ void MapBuilder::SpecializeZones(int continents, int continentAreaFraction) {
 	}
 }
 
-const int BIOME_ZONES = 4;
-const int MAX_BIOMES = 8;
-const int BIOMES[BIOME_ZONES][MAX_BIOMES] = {
-	// 0: Arctic regions
-	{ 4, R_TUNDRA, R_MOUNTAIN, R_FOREST, R_PLAIN, -1, -1, -1 },
-
-	// 1: Colder regions
-	{ 5, R_TUNDRA, R_MOUNTAIN, R_FOREST, R_PLAIN, R_SWAMP, -1, -1 },
-
-	// 2: Warmer regions
-	{ 7, R_TUNDRA, R_MOUNTAIN, R_FOREST, R_PLAIN, R_SWAMP, R_JUNGLE, R_DESERT },
-
-	// 3: Tropical regions
-	{ 5, R_MOUNTAIN, R_PLAIN, R_SWAMP, R_JUNGLE, R_DESERT, -1, -1 }
-};
-
 void MapBuilder::AddVolcanoes() {
 	Awrite("Adding volcanoes");
 	// volcanos will be added anywhere
@@ -1397,6 +1381,52 @@ void MapBuilder::GrowTerrain() {
 	this->AddLakes();
 }
 
+std::vector<int> GetBiomes(int lat) {
+	std::vector<int> list;
+
+	switch (lat) {
+		case 0:
+			list.push_back(R_TUNDRA);
+			list.push_back(R_MOUNTAIN);
+			list.push_back(R_FOREST);
+			list.push_back(R_PLAIN);
+			break;
+
+		case 1:
+			list.push_back(R_TUNDRA);
+			list.push_back(R_MOUNTAIN);
+			list.push_back(R_FOREST);
+			list.push_back(R_PLAIN);
+			list.push_back(R_SWAMP);
+			break;
+			
+		case 2:
+			list.push_back(R_TUNDRA);
+			list.push_back(R_MOUNTAIN);
+			list.push_back(R_FOREST);
+			list.push_back(R_PLAIN);
+			list.push_back(R_SWAMP);
+			list.push_back(R_JUNGLE);
+			list.push_back(R_DESERT);
+			break;
+			
+		case 3:
+			list.push_back(R_MOUNTAIN);
+			list.push_back(R_PLAIN);
+			list.push_back(R_SWAMP);
+			list.push_back(R_JUNGLE);
+			list.push_back(R_DESERT);
+			break;
+			
+		default:
+			Awrite(AString("Unsupported latitude: ") + lat);
+			exit(1);
+			break;
+	}
+
+	return list;
+}
+
 void MapBuilder::GrowLandInZone(Zone* zone) {
 	Awrite("Growing land in zone");
 
@@ -1531,8 +1561,8 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 		auto p = kv.second;
 
 		int lat = p->GetLatitude();
-		auto latBiomes = BIOMES[lat];
-		int biomeCount = latBiomes[0];
+		auto latBiomes = GetBiomes(lat);
+		int biomeCount = (int) latBiomes.size();
 
 		std::vector<int> weights;
 		weights.resize(biomeCount);
@@ -1548,7 +1578,7 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 			// biomes = 1, all weights are equal except already present biome where weight will be 0
 			case 1:
 				for (int i = 0; i < biomeCount; i++) {
-					int biome = latBiomes[i + 1];
+					int biome = latBiomes[i];
 					weights[i] = biomes.find(biome) == biomes.end()
 						? ++w
 						: 0;
@@ -1562,7 +1592,7 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 			default:
 				auto nb = p->GetNeighborBiomes();
 				for (int i = 0; i < biomeCount; i++) {
-					int biome = latBiomes[i + 1];
+					int biome = latBiomes[i];
 					if (nb.find(biome) != nb.end()) {
 						weights[i] = ++w;
 					}
@@ -1583,7 +1613,7 @@ void MapBuilder::GrowLandInZone(Zone* zone) {
 			int diff = weights[i];
 			if (diff == 0) continue;
 			if (roll >= diff) {
-				int biome = latBiomes[i + 1];
+				int biome = latBiomes[i];
 				p->biome = biome;
 				biomes.insert(biome);
 				break;
