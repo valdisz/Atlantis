@@ -284,6 +284,8 @@ int Province::GetLatitude() {
 	if (lat > 3) {
 		lat = std::max(0, 7 - lat);
 	}
+
+	return lat;
 }
 
 int Province::GetSize() {
