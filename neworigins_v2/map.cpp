@@ -86,6 +86,8 @@ struct Zone;
 struct Province;
 
 struct ZoneRegion {
+	ZoneRegion(int id, int x, int y, ARegion* region);
+
 	int id;
 	Coords location;
 	bool exclude;
@@ -105,6 +107,16 @@ struct ZoneRegion {
 	int CountNeighbors(Province* province);
 	std::map<int, int> CountNeighborBiomes();
 };
+
+ZoneRegion::ZoneRegion(int id, int x, int y, ARegion* region) {
+	this->id = id;
+	location = Coords({ x, y });
+	this->region = region;
+	zone = NULL;
+	exclude = false;
+	province = NULL;
+	biome = -1;
+}
 
 std::map<int, int> ZoneRegion::CountNeighborBiomes() {
 	std::map<int, int> stats;
@@ -614,13 +626,11 @@ MapBuilder::MapBuilder(ARegionArray* aregs) {
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			if (!((x + y) % 2)) {
-				ZoneRegion *reg = new ZoneRegion;
-				reg->id = GetRegionIndex(x, y, this->w, this->h);
-				reg->location = { x, y };
-				reg->zone = NULL;
-				reg->exclude = false;
-				reg->province = NULL;
-				reg->region = aregs->GetRegion(x, y);
+				ZoneRegion *reg = new ZoneRegion(
+					GetRegionIndex(x, y, this->w, this->h),
+					x, y,
+					aregs->GetRegion(x, y)
+				);
 				reg->biome = -1;
 
 				if (reg->location.x != reg->region->xloc || reg->location.y != reg->region->yloc) {
