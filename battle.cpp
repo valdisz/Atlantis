@@ -424,6 +424,30 @@ void Battle::GetSpoils(AList *losers, ItemList *spoils, int ass)
 	}
 }
 
+void AddBattleFact(
+	Events* events, 
+	ARegion* region,
+	Unit* attacker,
+	Unit* defender,
+	Army* attackerArmy,
+	Army* defenderArmy,
+	int outcome
+) {
+	auto battleFact = new BattleFact();
+
+	battleFact->location.Assign(region);
+	
+	battleFact->attacker.AssignUnit(attacker);
+	battleFact->attacker.AssignArmy(attackerArmy);
+	
+	battleFact->defender.AssignUnit(defender);
+	battleFact->defender.AssignArmy(defenderArmy);
+	
+	battleFact->outcome = outcome;
+
+	events->AddFact(battleFact);
+}
+
 int Battle::Run(Events* events, 
 		ARegion * region,
 		Unit * att,
@@ -438,19 +462,8 @@ int Battle::Run(Events* events,
 	assassination = ASS_NONE;
 	attacker = att->faction;
 
-	auto battleFact = new BattleFact();
-
 	armies[0] = new Army(att,atts,region->type,ass);
 	armies[1] = new Army(tar,defs,region->type,ass);
-
-	battleFact->x = region->xloc;
-	battleFact->y = region->yloc;
-	battleFact->z = region->zloc;
-	battleFact->terrain = TerrainDefs[region->type].name;
-	battleFact->province = region->name->Str();
-
-	battleFact->attacker.AssignUnit(att);
-	battleFact->defender.AssignUnit(tar);
 
 	if (ass) {
 		FreeRound(armies[0],armies[1], ass);
@@ -518,13 +531,8 @@ int Battle::Run(Events* events,
 		AddLine(temp);
 		AddLine("");
 
-		battleFact->attacker.AssignArmy(armies[0]);
-		battleFact->defender.AssignArmy(armies[1]);
 		if (!ass) {
-			events->AddFact(battleFact);
-		}
-		else {
-			delete battleFact;
+			AddBattleFact(events, region, att, tar, armies[0], armies[1], BATTLE_LOST);
 		}
 
 		delete spoils;
@@ -575,13 +583,8 @@ int Battle::Run(Events* events,
 		AddLine(temp);
 		AddLine("");
 
-		battleFact->attacker.AssignArmy(armies[0]);
-		battleFact->defender.AssignArmy(armies[1]);
 		if (!ass) {
-			events->AddFact(battleFact);
-		}
-		else {
-			delete battleFact;
+			AddBattleFact(events, region, att, tar, armies[0], armies[1], BATTLE_WON);
 		}
 
 		delete spoils;
@@ -612,13 +615,8 @@ int Battle::Run(Events* events,
 	AddLine(temp);
 	AddLine("");
 
-	battleFact->attacker.AssignArmy(armies[0]);
-	battleFact->defender.AssignArmy(armies[1]);
 	if (!ass) {
-		events->AddFact(battleFact);
-	}
-	else {
-		delete battleFact;
+		AddBattleFact(events, region, att, tar, armies[0], armies[1], BATTLE_DRAW);
 	}
 
 	delete armies[0];

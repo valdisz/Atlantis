@@ -26,18 +26,21 @@
 #ifndef EVENTS_CLASS
 #define EVENTS_CLASS
 
-#include "unit.h"
-#include <string>
-#include <list>
-
 class Events;
 
 class FactBase;
 class BattleFact;
 
+#include "unit.h"
+#include <string>
+#include <list>
 
 enum EventCategory {
-    EVENT_BATTLE
+    EVENT_BATTLE,
+    EVENT_CITY_CAPTURED,
+    EVENT_CITY_HELD,
+    EVENT_MONSTERS_SLAIN,
+    EVENT_MONSTERS_WIN
 };
 
 struct Event {
@@ -54,8 +57,6 @@ public:
 };
 
 struct BattleSide {
-    BattleSide();
-
     int factionNum;
     std::string factionName;
 
@@ -63,32 +64,47 @@ struct BattleSide {
     std::string unitName;
 
     int total;
+
     int mages;
     int monsters;
+    int undead;
     int fmi;
+    
     int lost;
+    
     int magesLost;
     int fmiLost;
+    int undeadLost;
     int monstersLost;
 
     void AssignUnit(Unit* unit);
     void AssignArmy(Army* army);
 };
 
-class BattleFact : public FactBase {
-public:
-    ~BattleFact();
-
-    void GetEvents(std::list<Event> &events);
-
+struct EventLocation {
     int x;
     int y;
     int z;
+    int terrainType;
     std::string province;
-    std::string terrain;
+    std::string settlement;
 
+    std::string getTerrain();
+    void Assign(ARegion* region);
+};
+
+class BattleFact : public FactBase {
+public:
+    BattleFact();
+    ~BattleFact();
+    
+    void GetEvents(std::list<Event> &events);
+
+    EventLocation location;
     BattleSide attacker;
     BattleSide defender;
+
+    int outcome;    // BATTLE_LOST, BATTLE_WON, BATTLE_DRAW
 };
 
 class Events {
@@ -96,7 +112,8 @@ public:
     Events();
     ~Events();
 
-    std::string& Write();
+    std::string Write();
+
     void AddFact(FactBase *fact);
 
 private:

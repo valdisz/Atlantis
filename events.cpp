@@ -26,17 +26,8 @@
 #include "gameio.h"
 #include "events.h"
 
-BattleSide::BattleSide() {
-    this->factionNum = 0;
-    this->unitNum = 0;
-    this->total = 0;
-    this->mages = 0;
-    this->monsters = 0;
-    this->lost = 0;
-    this->fmi = 0;
-    this->fmiLost = 0;
-    this->magesLost = 0;
-    this->monstersLost = 0;
+FactBase::~FactBase() {
+
 }
 
 void BattleSide::AssignUnit(Unit* unit) {
@@ -48,21 +39,30 @@ void BattleSide::AssignUnit(Unit* unit) {
 
 void BattleSide::AssignArmy(Army* army) {
 	this->total = army->count;
+
 	for (int i = 0; i < army->count; i++) {
 		auto soldier = army->soldiers[i];
         bool lost = soldier->hits == 0;
 
         if (lost) this->lost++;
 
-        if (ItemDefs[soldier->race].flags & ItemType::MANPRODUCE) {
+        ItemType& item = ItemDefs[soldier->race];
+
+        if (item.flags & ItemType::MANPRODUCE) {
             this->fmi++;
             if (lost) this->fmiLost++;
             continue;
         }
 
-        if (ItemDefs[soldier->race].type & IT_MONSTER) {
+        if (item.type & IT_MONSTER) {
             this->monsters++;
             if (lost) this->monstersLost++;
+
+            if (item.type & IT_UNDEAD) {
+                this->undead++;
+                if (lost) this->undeadLost++;
+            }
+
             continue;
         }
 
@@ -72,6 +72,26 @@ void BattleSide::AssignArmy(Army* army) {
             continue;
         }
 	}
+}
+
+std::string EventLocation::getTerrain() {
+    return TerrainDefs[this->terrainType].name;
+}
+
+void EventLocation::Assign(ARegion* region) {
+	this->x = region->xloc;
+	this->y = region->yloc;
+	this->z = region->zloc;
+	this->terrainType = region->type;
+	this->province = region->name->Str();
+    
+    if (region->town) this->settlement = region->town->name->Str();
+}
+
+BattleFact::BattleFact() {
+    this->attacker = BattleSide();
+    this->defender = BattleSide();
+    this->location = EventLocation();
 }
 
 BattleFact::~BattleFact() {
@@ -87,6 +107,22 @@ const char* ENCOUNTER[N_MESSAGES] = {
 };
 
 void BattleFact::GetEvents(std::list<Event> &events) {
+    if (this->defender.factionNum == 1) {
+        // city capture
+        return;
+    }
+
+    if (this->defender.factionNum == 2) {
+        // monster hunt
+        return;
+    }
+
+    if (this->attacker.factionNum == 2) {
+        // monster aggression
+        return;
+    }
+
+    // PvP
     int total = this->attacker.total + this->defender.total;
     int totalLost = this->attacker.lost + this->defender.lost;
     int totalMages = this->attacker.mages + this->defender.mages;
@@ -105,8 +141,8 @@ void BattleFact::GetEvents(std::list<Event> &events) {
             : " big loses";
 
         text = std::string(ENCOUNTER[getrandom(N_MESSAGES)])
-        + " in the " + this->terrain
-        + " of " + this->province
+        + " in the " + this->location.getTerrain()
+        + " of " + this->location.province
         + " resulted in " + loses
         + ".";
 
@@ -121,17 +157,35 @@ void BattleFact::GetEvents(std::list<Event> &events) {
 
 
         text = std::string("A small encounter between hostile forces") +
-        " in the " + this->terrain + " of " + this->province +
+        " in the " + this->location.getTerrain() + " of " + this->location.province +
         " resulted in " + loses + ".";
 
         score = 2;
     }
     else if (total <= 2500) {
         // regional conflict
+
+        std::string loses = totalLost > total / 2
+            ? " small loses"
+            : " big loses";
+
+        text = std::string("A sregional conflict between hostile forces") +
+        " in the " + this->location.getTerrain() + " of " + this->location.province +
+        " resulted in " + loses + ".";
+
         score = 3;
     }
     else {
-        // continental conflict
+        // continental conflict / epic conflict
+
+        std::string loses = totalLost > total / 2
+            ? " small loses"
+            : " big loses";
+
+        text = std::string("An epicl battle between hostile forces") +
+        " in the " + this->location.getTerrain() + " of " + this->location.province +
+        " resulted in " + loses + ".";
+
         score = 5;
     }
 
@@ -162,7 +216,7 @@ void Events::AddFact(FactBase *fact) {
     this->facts.push_back(fact);
 }
 
-std::string& Events::Write() {
+std::string Events::Write() {
     std::list<Event> events;
     for (auto &fact : this->facts) {
         fact->GetEvents(events);
