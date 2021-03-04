@@ -244,6 +244,7 @@ static GameDefs g = {
 	BattleLogLevel::VERBOSE,	// BATTLE_LOG_LEVEL
 	1, // EXTENDED_FORT_DEFENCE
 	1, // SPOILS_NO_TRADE
+	true,	// WORLD_EVENTS
 };
 
 GameDefs *Globals = &g;

@@ -1052,6 +1052,11 @@ int Game::RunGame()
 	Awrite("Running the Turn...");
 	RunOrders();
 
+	if (Globals->WORLD_EVENTS) {
+		Awrite("Writing world events...");
+		WriteWorldEvents();
+	}
+
 	Awrite("Writing the Report File...");
 	WriteReport();
 	Awrite("");
@@ -1072,6 +1077,13 @@ int Game::RunGame()
 	Awrite("done");
 
 	return(1);
+}
+
+void Game::WriteWorldEvents() {
+	std::string text = this->events.Write();
+	if (text.empty() || text.length() == 0) return;
+
+	this->WriteTimesArticle(text.c_str());
 }
 
 void Game::PreProcessTurn()

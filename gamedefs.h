@@ -748,6 +748,9 @@ public:
 
 	// Remove trade items from spoils
 	int SPOILS_NO_TRADE;
+
+	// Write into time world events like battles, city captures, etc.
+	bool WORLD_EVENTS;
 };
 
 extern GameDefs *Globals;
