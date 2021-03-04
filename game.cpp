@@ -44,11 +44,13 @@ Game::Game()
 	gameStatus = GAME_STATUS_UNINIT;
 	ppUnits = 0;
 	maxppunits = 0;
+	events = new Events();
 }
 
 Game::~Game()
 {
 	delete ppUnits;
+	delete events;
 	ppUnits = 0;
 	maxppunits = 0;
 }
@@ -1079,8 +1081,12 @@ int Game::RunGame()
 	return(1);
 }
 
+void Game::RecordFact(FactBase* fact) {
+	this->events->AddFact(fact);
+}
+
 void Game::WriteWorldEvents() {
-	std::string text = this->events.Write();
+	std::string text = this->events->Write();
 	if (text.empty() || text.length() == 0) return;
 
 	this->WriteTimesArticle(text.c_str());

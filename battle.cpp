@@ -424,7 +424,8 @@ void Battle::GetSpoils(AList *losers, ItemList *spoils, int ass)
 	}
 }
 
-int Battle::Run( ARegion * region,
+int Battle::Run(Events* events, 
+		ARegion * region,
 		Unit * att,
 		AList * atts,
 		Unit * tar,
@@ -437,8 +438,19 @@ int Battle::Run( ARegion * region,
 	assassination = ASS_NONE;
 	attacker = att->faction;
 
+	auto battleFact = new BattleFact();
+
 	armies[0] = new Army(att,atts,region->type,ass);
 	armies[1] = new Army(tar,defs,region->type,ass);
+
+	battleFact->x = region->xloc;
+	battleFact->y = region->yloc;
+	battleFact->z = region->zloc;
+	battleFact->terrain = TerrainDefs[region->type].name;
+	battleFact->province = region->name->Str();
+
+	battleFact->attacker.AssignUnit(att);
+	battleFact->defender.AssignUnit(tar);
 
 	if (ass) {
 		FreeRound(armies[0],armies[1], ass);
@@ -505,6 +517,16 @@ int Battle::Run( ARegion * region,
 		AddLine("");
 		AddLine(temp);
 		AddLine("");
+
+		battleFact->attacker.AssignArmy(armies[0]);
+		battleFact->defender.AssignArmy(armies[1]);
+		if (!ass) {
+			events->AddFact(battleFact);
+		}
+		else {
+			delete battleFact;
+		}
+
 		delete spoils;
 		delete armies[0];
 		delete armies[1];
@@ -552,6 +574,16 @@ int Battle::Run( ARegion * region,
 		AddLine("");
 		AddLine(temp);
 		AddLine("");
+
+		battleFact->attacker.AssignArmy(armies[0]);
+		battleFact->defender.AssignArmy(armies[1]);
+		if (!ass) {
+			events->AddFact(battleFact);
+		}
+		else {
+			delete battleFact;
+		}
+
 		delete spoils;
 		delete armies[0];
 		delete armies[1];
@@ -579,6 +611,16 @@ int Battle::Run( ARegion * region,
 	AddLine("");
 	AddLine(temp);
 	AddLine("");
+
+	battleFact->attacker.AssignArmy(armies[0]);
+	battleFact->defender.AssignArmy(armies[1]);
+	if (!ass) {
+		events->AddFact(battleFact);
+	}
+	else {
+		delete battleFact;
+	}
+
 	delete armies[0];
 	delete armies[1];
 	return BATTLE_DRAW;
@@ -1050,7 +1092,7 @@ int Game::RunBattle(ARegion * r,Unit * attacker,Unit * target,int ass,
 			}
 		}
 	}
-	result = b->Run(r,attacker,&atts,target,&defs,ass, &regions );
+	result = b->Run(events, r,attacker,&atts,target,&defs,ass, &regions );
 
 	/* Remove all dead units */
 	int uncontrolled = 0;

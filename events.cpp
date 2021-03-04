@@ -26,6 +26,54 @@
 #include "gameio.h"
 #include "events.h"
 
+BattleSide::BattleSide() {
+    this->factionNum = 0;
+    this->unitNum = 0;
+    this->total = 0;
+    this->mages = 0;
+    this->monsters = 0;
+    this->lost = 0;
+    this->fmi = 0;
+    this->fmiLost = 0;
+    this->magesLost = 0;
+    this->monstersLost = 0;
+}
+
+void BattleSide::AssignUnit(Unit* unit) {
+	this->factionName = unit->faction->name->Str();
+	this->factionNum = unit->faction->num;
+	this->unitName = unit->name->Str();
+	this->unitNum = unit->num;
+}
+
+void BattleSide::AssignArmy(Army* army) {
+	this->total = army->count;
+	for (int i = 0; i < army->count; i++) {
+		auto soldier = army->soldiers[i];
+        bool lost = soldier->hits == 0;
+
+        if (lost) this->lost++;
+
+        if (ItemDefs[soldier->race].flags & ItemType::MANPRODUCE) {
+            this->fmi++;
+            if (lost) this->fmiLost++;
+            continue;
+        }
+
+        if (ItemDefs[soldier->race].type & IT_MONSTER) {
+            this->monsters++;
+            if (lost) this->monstersLost++;
+            continue;
+        }
+
+        if (soldier->unit->type == U_MAGE || soldier->unit->type == U_GUARDMAGE) {
+            this->mages++;
+            if (lost) this->magesLost++;
+            continue;
+        }
+	}
+}
+
 BattleFact::~BattleFact() {
 
 }
@@ -39,12 +87,12 @@ const char* ENCOUNTER[N_MESSAGES] = {
 };
 
 void BattleFact::GetEvents(std::list<Event> &events) {
-    int total = this->attackers + this->defenders;
-    int totalLost = this->attackersLost + this->defendersLost;
-    int totalMages = this->attackerMages + this->defenderMages;
-    int totalMagesLost = this->attackerMagesLost + this->defenderMagesLost;
-    int totalMonsters = this->attackerMonsters + this->defenderMonsters;
-    int totalFMI = this->attackerFMI + this->defenderFMI;
+    int total = this->attacker.total + this->defender.total;
+    int totalLost = this->attacker.lost + this->defender.lost;
+    int totalMages = this->attacker.mages + this->defender.mages;
+    int totalMagesLost = this->attacker.magesLost + this->defender.magesLost;
+    int totalMonsters = this->attacker.monsters + this->defender.monsters;
+    int totalFMI = this->attacker.fmi + this->defender.fmi;
 
     int score = 0;
     std::string text;
@@ -91,7 +139,7 @@ void BattleFact::GetEvents(std::list<Event> &events) {
     if (totalMonsters > 0) score += 1;
     if (totalFMI > 0) score += 1;
 
-    events.push_back({ EventCategory::BATTLE, score, text });
+    events.push_back({ EventCategory::EVENT_BATTLE, score, text });
 }
 
 
@@ -103,17 +151,21 @@ Events::Events() {
 }
 
 Events::~Events() {
+    for (auto &fact : this->facts) {
+        delete fact;
+    }
+
     this->facts.clear();
 }
 
-void Events::AddFact(FactBase &fact) {
+void Events::AddFact(FactBase *fact) {
     this->facts.push_back(fact);
 }
 
 std::string& Events::Write() {
     std::list<Event> events;
     for (auto &fact : this->facts) {
-        fact.GetEvents(events);
+        fact->GetEvents(events);
     }
 
     std::string text;

@@ -119,6 +119,7 @@ public:
 	// Functions to allow enabling/disabling parts of the data tables
 	void ModifyTablesPerRuleset(void);
 
+	void RecordFact(FactBase* fact);
 	void WriteWorldEvents();
 private:
 	//
@@ -309,7 +310,7 @@ private:
 	int monfaction;
 	int doExtraInit;
 
-	Events events;
+	Events* events;
 	
 	//
 	// Parsing functions

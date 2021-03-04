@@ -26,16 +26,18 @@
 #ifndef EVENTS_CLASS
 #define EVENTS_CLASS
 
-class Events;
-class FactBase;
-
-class BattleFact;
-
+#include "unit.h"
 #include <string>
 #include <list>
 
+class Events;
+
+class FactBase;
+class BattleFact;
+
+
 enum EventCategory {
-    BATTLE
+    EVENT_BATTLE
 };
 
 struct Event {
@@ -51,38 +53,42 @@ public:
     virtual void GetEvents(std::list<Event> &events) = 0;
 };
 
+struct BattleSide {
+    BattleSide();
+
+    int factionNum;
+    std::string factionName;
+
+    int unitNum;
+    std::string unitName;
+
+    int total;
+    int mages;
+    int monsters;
+    int fmi;
+    int lost;
+    int magesLost;
+    int fmiLost;
+    int monstersLost;
+
+    void AssignUnit(Unit* unit);
+    void AssignArmy(Army* army);
+};
+
 class BattleFact : public FactBase {
 public:
     ~BattleFact();
+
     void GetEvents(std::list<Event> &events);
 
-    std::string province;
-    std::string terrain;
     int x;
     int y;
     int z;
+    std::string province;
+    std::string terrain;
 
-    int attackerFactionNum;
-    std::string attackerFactionName;
-    int attackerUnitNum;
-    std::string attackerUnitName;
-    int attackers;
-    int attackerMages;
-    int attackersLost;
-    int attackerMagesLost;
-    int attackerFMI;
-    int attackerMonsters;
-
-    int defenderFactionNum;
-    std::string defenderFactionName;
-    int defenderUnitNum;
-    std::string defenderUnitName;
-    int defenders;
-    int defenderMages;
-    int defendersLost;
-    int defenderMagesLost;
-    int defenderFMI;
-    int defenderMonsters;
+    BattleSide attacker;
+    BattleSide defender;
 };
 
 class Events {
@@ -91,10 +97,10 @@ public:
     ~Events();
 
     std::string& Write();
-    void AddFact(FactBase &fact);
+    void AddFact(FactBase *fact);
 
 private:
-    std::list<FactBase> facts;
+    std::list<FactBase *> facts;
 };
 
 #endif
