@@ -53,55 +53,90 @@ BattleFact::~BattleFact() {
 
 }
 
-const int N_MESSAGES = 4;
+const int N_VARIANTS = 4;
 
-const char* ADJECTIVE[N_MESSAGES] = {
+const char* ADJECTIVE[N_VARIANTS] = {
     "Some",
     "Many",
     "Several",
     "Dozen"
 };
 
-const char* REPORTING[N_MESSAGES] = {
+const char* REPORTING[N_VARIANTS] = {
     "traders",
     "pilgrims",
     "travelers",
     "adventurers"
 };
 
-const char* CHANNEL[N_MESSAGES] = {
+const char* CHANNEL[N_VARIANTS] = {
     "they have heard about",
     "refugees are teeling about",
     "locals are afraid of",
     "in some distant land"
 };
 
-const char* SMALL_BATTLE[N_MESSAGES] = {
+const char* SMALL_BATTLE[N_VARIANTS] = {
     "encounter",
     "fight",
     "skrimish",
     "battle"
 };
 
-const char* BATTLE[N_MESSAGES] = {
+const char* BATTLE[N_VARIANTS] = {
     "clash",
     "fight",
     "assault",
     "battle"
 };
 
-const char* SIDES[N_MESSAGES] = {
+const char* ONE_SIDE[N_VARIANTS] = {
+    "a faction",
+    "a rebels",
+    "a villans",
+    "an opposition"
+};
+
+const char* TWO_SIDES[N_VARIANTS] = {
     "hostile forces",
     "enemies",
     "two armies",
     "combatants"
 };
 
-const char* SIZES[N_MESSAGES] = {
+const char* HUNTERS[N_VARIANTS] = {
+    "an andventurers",
+    "a hunters",
+    "a witchers",
+    "a rangers"
+};
+
+const char* SIZES[N_VARIANTS] = {
     "couple",
     "few",
     "several",
     "many"
+};
+
+const char* ACTION_SUCCESS[N_VARIANTS] = {
+    "slain",
+    "murdered",
+    "put to the sword",
+    "expeled"
+};
+
+const char* ACTION_ATTEMPT[N_VARIANTS] = {
+    "attacked",
+    "ambushed",
+    "tryed to cast out",
+    "tryed to expel"
+};
+
+const char* NOUN[N_VARIANTS] = {
+    "terror",
+    "fear",
+    "horror",
+    "dread"
 };
 
 std::string relativeSize(int size) {
@@ -112,29 +147,107 @@ std::string relativeSize(int size) {
     return SIZES[3];
 }
 
+std::string townType(int type) {
+    switch (type)
+    {
+        case TOWN_VILLAGE: return "village";
+        case TOWN_TOWN:    return "town";
+        case TOWN_CITY:    return "city";
+        default:           return "unknown";
+    }
+}
+
 void BattleFact::GetEvents(std::list<Event> &events) {
     // Some traders are telling that in some distant land
     std::string text = string_format("%s %s are telling that %s ",
-        ADJECTIVE[getrandom(N_MESSAGES)],
-        REPORTING[getrandom(N_MESSAGES)],
-        CHANNEL[getrandom(N_MESSAGES)]
+        ADJECTIVE[getrandom(N_VARIANTS)],
+        REPORTING[getrandom(N_VARIANTS)],
+        CHANNEL[getrandom(N_VARIANTS)]
     );
 
     if (this->defender.factionNum == 1) {
         // city capture
-        events.push_back({ EventCategory::EVENT_CITY_CAPTURED, 1, text });
+        if (this->outcome == BATTLE_WON) {
+            // in the plains of Cefelat the Toadfield city guards were slain by a faction
+            text += string_format("in the %ss of %s the %s %s guards were %s by %s.",
+                this->location.getTerrain(),
+                this->location.province,
+                this->location.settlement,
+                townType(this->location.settlementType),
+                ACTION_SUCCESS[getrandom(N_VARIANTS)],
+                ONE_SIDE[getrandom(N_VARIANTS)]
+            );
+        }
+        else {
+            // in the plains of Cefelat the Toadfield a villans attacked city guards but were unsuccessful.
+            text += string_format("in the %ss of %s the %s %s %s city guards but were unsuccessful.",
+                this->location.getTerrain(),
+                this->location.province,
+                this->location.settlement,
+                townType(this->location.settlementType),
+                ONE_SIDE[getrandom(N_VARIANTS)],
+                ACTION_ATTEMPT[getrandom(N_VARIANTS)]
+            );
+        }
+
+        events.push_back({ EventCategory::EVENT_CITY_CAPTURE, this->location.settlementType + 1, text });
+
         return;
     }
 
     if (this->defender.factionNum == 2) {
         // monster hunt
-        events.push_back({ EventCategory::EVENT_MONSTERS_SLAIN, 1, text });
+        if (this->outcome == BATTLE_WON) {
+            // a witchers have slain Demons freeing the plains of Cefelat from their terror.
+            text += string_format("%s have %s %s freeing the %ss of %s from their %s.",
+                HUNTERS[getrandom(N_VARIANTS)],
+                ACTION_SUCCESS[getrandom(N_VARIANTS)],
+                this->defender.unitName,
+                this->location.getTerrain(),
+                this->location.province,
+                NOUN[getrandom(N_VARIANTS)]
+            );
+        }
+        else {
+            // a witchers tried to slain Demons in the plains of Cefelat but were all slain.
+            text += string_format("%s tried to %s %s in the %ss of %s but were all %s.",
+                HUNTERS[getrandom(N_VARIANTS)],
+                ACTION_SUCCESS[getrandom(N_VARIANTS)],
+                this->defender.unitName,
+                this->location.getTerrain(),
+                this->location.province,
+                ACTION_SUCCESS[getrandom(N_VARIANTS)]
+            );
+        }
+
+        events.push_back({ EventCategory::EVENT_MONSTER_HUNT, 1, text });
         return;
     }
 
     if (this->attacker.factionNum == 2) {
         // monster aggression
-        events.push_back({ EventCategory::EVENT_MONSTERS_WIN, 1, text });
+        if (this->outcome == BATTLE_WON) {
+            // Demons in the plains of Cefelat continue to cause %s on local inhabitants.
+            text += string_format("%s in the %ss of %s continue to cause %s on local inhabitants.",
+                this->defender.unitName,
+                this->location.getTerrain(),
+                this->location.province,
+                NOUN[getrandom(N_VARIANTS)]
+            );
+        }
+        else {
+            // Demons tried to cause fear in the plains of Cefelat bet were slain by a witchers.
+            text += string_format("5s tried to cause %s in the %ss of %s bet were %s by %s.",
+                this->defender.unitName,
+                NOUN[getrandom(N_VARIANTS)],
+                this->location.getTerrain(),
+                this->location.province,
+                ACTION_SUCCESS[getrandom(N_VARIANTS)],
+                HUNTERS[getrandom(N_VARIANTS)]
+            );
+        }
+
+        events.push_back({ EventCategory::EVENT_MONSTER_AGGRESSION, 1, text });
         return;
     }
 
@@ -171,8 +284,8 @@ void BattleFact::GetEvents(std::list<Event> &events) {
 
         // a small encounter between hostile forces in the woods of Sansaor took place some men died.
         text += string_format("a small %s between %s in the %ss of %s took place %s.",
-            SMALL_BATTLE[getrandom(N_MESSAGES)],
-            SIDES[getrandom(N_MESSAGES)],
+            SMALL_BATTLE[getrandom(N_VARIANTS)],
+            TWO_SIDES[getrandom(N_VARIANTS)],
             this->location.getTerrain(),
             this->location.province,
             result
@@ -201,8 +314,8 @@ void BattleFact::GetEvents(std::list<Event> &events) {
 
         // a battle between two armies in the woods of Sansaor took place with .
         text += string_format("a %s between %s in the %ss of %s took place with %i killed from both sides %s.",
-            SMALL_BATTLE[getrandom(N_MESSAGES)],
-            SIDES[getrandom(N_MESSAGES)],
+            SMALL_BATTLE[getrandom(N_VARIANTS)],
+            TWO_SIDES[getrandom(N_VARIANTS)],
             this->location.getTerrain(),
             this->location.province,
             lost,
@@ -262,9 +375,9 @@ void BattleFact::GetEvents(std::list<Event> &events) {
 
         // a battle with use of magic between two armies in the woods of Sansaor took place with .
         text += string_format("a %s%s between %s in the %ss of %s took place with %i killed from both sides %s.",
-            BATTLE[getrandom(N_MESSAGES)],
+            BATTLE[getrandom(N_VARIANTS)],
             specials,
-            SIDES[getrandom(N_MESSAGES)],
+            TWO_SIDES[getrandom(N_VARIANTS)],
             this->location.getTerrain(),
             this->location.province,
             lost,
@@ -324,9 +437,9 @@ void BattleFact::GetEvents(std::list<Event> &events) {
 
         // a battle with use of magic between two armies in the woods of Sansaor took place with .
         text += string_format("a epic %s%s between %s in the %ss of %s took place with %i killed from both sides %s.",
-            BATTLE[getrandom(N_MESSAGES)],
+            BATTLE[getrandom(N_VARIANTS)],
             specials,
-            SIDES[getrandom(N_MESSAGES)],
+            TWO_SIDES[getrandom(N_VARIANTS)],
             this->location.getTerrain(),
             this->location.province,
             lost,

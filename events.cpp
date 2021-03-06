@@ -85,7 +85,10 @@ void EventLocation::Assign(ARegion* region) {
 	this->terrainType = region->type;
 	this->province = region->name->Str();
     
-    if (region->town) this->settlement = region->town->name->Str();
+    if (region->town) {
+        this->settlement = region->town->name->Str();
+        this->settlementType = region->town->TownType();
+    }
 }
 
 

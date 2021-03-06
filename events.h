@@ -37,10 +37,9 @@ class BattleFact;
 
 enum EventCategory {
     EVENT_BATTLE,
-    EVENT_CITY_CAPTURED,
-    EVENT_CITY_HELD,
-    EVENT_MONSTERS_SLAIN,
-    EVENT_MONSTERS_WIN
+    EVENT_CITY_CAPTURE,
+    EVENT_MONSTER_HUNT,
+    EVENT_MONSTER_AGGRESSION
 };
 
 struct Event {
@@ -88,6 +87,7 @@ struct EventLocation {
     int terrainType;
     std::string province;
     std::string settlement;
+    int settlementType;
 
     std::string getTerrain();
     void Assign(ARegion* region);
