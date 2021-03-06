@@ -25,6 +25,8 @@
 
 #include "gameio.h"
 #include "events.h"
+#include <map>
+#include <algorithm>
 
 FactBase::~FactBase() {
 
@@ -111,15 +113,53 @@ void Events::AddFact(FactBase *fact) {
     this->facts.push_back(fact);
 }
 
+bool compareEvents(const Event &first, const Event &second) {
+    return first.score < second.score;
+}
+
+
 std::string Events::Write() {
     std::list<Event> events;
+
+    // test start
+
+    auto f = new BattleFact();
+    f->defender.factionNum = 1;
+    f->outcome = BATTLE_WON;
+    this->AddFact(f);
+
+    // test end
+
     for (auto &fact : this->facts) {
         fact->GetEvents(events);
     }
 
-    std::string text;
+    std::map<EventCategory, std::vector<Event>> categories;
     for (auto &event : events) {
-        text = text + "\n" + event.text;
+        if (categories.find(event.category) == categories.end()) {
+            std::vector<Event> list = {};
+            categories.insert(std::pair<EventCategory, std::vector<Event>>(event.category, list));
+        }
+
+        categories[event.category].push_back(event);
+    }
+
+    std::string text;
+    for (auto &cat : categories) {
+        auto list = cat.second;
+
+        std::sort(list.begin(), list.end(), compareEvents);
+        list.resize(std::min((int) list.size(), 10));
+
+        int n = std::min((int) list.size(), getrandom(5) + 1);
+        while (n-- > 0) {
+            int i = getrandom(list.size());
+
+            if (!text.empty()) text += "\n";
+            text += list[i].text;
+            
+            list.erase(list.begin() + i);
+        }
     }
 
     return text;
