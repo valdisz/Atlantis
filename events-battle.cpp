@@ -71,9 +71,9 @@ const char* REPORTING[N_VARIANTS] = {
 
 const char* CHANNEL[N_VARIANTS] = {
     "they have heard about",
-    "refugees are teeling about",
+    "refugees are worried about",
     "locals are rumoring about",
-    "they have heard about"
+    "have heard a tell about"
 };
 
 const char* SMALL_BATTLE[N_VARIANTS] = {
@@ -158,7 +158,10 @@ std::string townType(int type) {
 }
 
 void BattleFact::GetEvents(std::list<Event> &events) {
-    // Some traders are telling that refugees are teeling about"
+    // Some traders are telling that they have heard about
+    // Some traders are telling that refugees are worried about
+    // Some traders are telling that locals are rumoring about
+    // Some traders are telling that have heard a tell about
     std::string text = string_format("%s %s are telling that %s ",
         ADJECTIVE[getrandom(N_VARIANTS)],
         REPORTING[getrandom(N_VARIANTS)],
