@@ -376,11 +376,32 @@ void BattleFact::GetEvents(std::list<Event> &events) {
             result = "and many soldiers will never fight again";
         }
 
+        std::string sides;
+        int roll = getrandom(10);
+        if (roll >= 8) {
+            // 20 %
+            sides = string_format("%s and %s",
+                this->attacker.factionName.c_str(),
+                this->defender.factionName.c_str()
+            );
+        }
+        else if (roll >= 6) {
+            // 20%
+            sides = string_format("%s and %s",
+                (getrandom(2) >= 1 ? this->attacker.factionName.c_str() : this->defender.factionName.c_str()),
+                ONE_SIDE[getrandom(N_VARIANTS)]
+            );
+        }
+        else {
+            // 60%
+            sides = TWO_SIDES[getrandom(N_VARIANTS)];
+        }
+
         // a battle with use of magic between two armies in the woods of Sansaor with .
         text += string_format("a %s%s between %s in the %ss of %s with %i killed from both sides %s.",
             BATTLE[getrandom(N_VARIANTS)],
             specials.c_str(),
-            TWO_SIDES[getrandom(N_VARIANTS)],
+            sides.c_str(),
             this->location.getTerrain().c_str(),
             this->location.province.c_str(),
             lost,
@@ -438,11 +459,16 @@ void BattleFact::GetEvents(std::list<Event> &events) {
             result = "and many soldiers will never fight again";
         }
 
+        std::string sides = string_format("%s and %s",
+            this->attacker.factionName.c_str(),
+            this->defender.factionName.c_str()
+        );
+
         // a battle with use of magic between two armies in the woods of Sansaor with .
         text += string_format("a epic %s%s between %s in the %ss of %s with %i killed from both sides %s.",
             BATTLE[getrandom(N_VARIANTS)],
             specials.c_str(),
-            TWO_SIDES[getrandom(N_VARIANTS)],
+            sides.c_str(),
             this->location.getTerrain().c_str(),
             this->location.province.c_str(),
             lost,
