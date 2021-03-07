@@ -112,7 +112,7 @@ public:
     Events();
     ~Events();
 
-    std::string Write();
+    std::string Write(std::string worldName, std::string month, int year);
 
     void AddFact(FactBase *fact);
 

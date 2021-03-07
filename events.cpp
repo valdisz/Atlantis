@@ -98,7 +98,6 @@ void EventLocation::Assign(ARegion* region) {
 
 
 Events::Events() {
-
 }
 
 Events::~Events() {
@@ -153,7 +152,7 @@ std::string makeLine(std::size_t width, bool odd, std::string text)  {
     return line;
 }
 
-std::string Events::Write() {
+std::string Events::Write(std::string worldName, std::string month, int year) {
     std::list<Event> events;
 
     // // test start
@@ -212,8 +211,6 @@ std::string Events::Write() {
     std::string text =  "   _.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._\n";
                 text += ".----      - ---     --     ---   -----   - --       ----  ----   -     ----.\n";
                 text += " )                                                                         (\n";
-                text += "(                               WORLD EVENTS                                )\n";
-                text += " )                                                                         (\n";
 
     std::list<std::string> lines;
     for (auto &cat : categories) {
@@ -239,6 +236,16 @@ std::string Events::Write() {
 
             list.erase(list.begin() + i);
         }
+    }
+
+    bool noNews = lines.size() == 0;
+
+    lines.push_front("");
+    lines.push_front(month + ", Year " + std::to_string(year));
+    lines.push_front(worldName + " Events");
+
+    if (noNews) {
+        lines.push_back("--== Nothing mentionable happened in the world this month ==--");
     }
 
     if (lines.size() % 2) {

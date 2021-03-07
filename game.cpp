@@ -1086,7 +1086,7 @@ void Game::RecordFact(FactBase* fact) {
 }
 
 void Game::WriteWorldEvents() {
-	std::string text = this->events->Write();
+	std::string text = this->events->Write(Globals->RULESET_NAME, MonthNames[this->month], this->year);
 	if (text.empty() || text.length() == 0) return;
 
 	this->WriteTimesArticle(text.c_str());
