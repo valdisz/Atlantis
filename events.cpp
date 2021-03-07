@@ -117,18 +117,83 @@ bool compareEvents(const Event &first, const Event &second) {
     return first.score < second.score;
 }
 
+std::list<string> wrapText(std::string input, std::size_t width) {
+    std::size_t curpos = 0;
+    std::size_t nextpos = 0;
+
+    std::list<std::string> lines;
+    std::string substr = input.substr(curpos, width + 1);
+
+    while (substr.length() == width + 1 && (nextpos = substr.rfind(' ')) != input.npos) {
+        lines.push_back(input.substr(curpos, nextpos));
+        
+        curpos += nextpos + 1;
+        substr = input.substr(curpos, width + 1);
+    }
+
+    if (curpos != input.length()) {
+        lines.push_back(input.substr(curpos, input.npos));
+    }
+
+    return lines;
+}
+
+std::string makeLine(std::size_t width, bool odd, std::string text)  {
+    std::string line = (odd ? "( " : " )");
+
+    std::size_t left = (width - text.size()) / 2;
+
+    while (line.size() < left) line += ' ';
+    line += text;
+    while (line.size() < (width - 2)) line += ' ';
+
+    line += (odd ? " )" : "(");
+    line += "\n";
+
+    return line;
+}
 
 std::string Events::Write() {
     std::list<Event> events;
 
-    // test start
+    // // test start
 
-    auto f = new BattleFact();
-    f->defender.factionNum = 1;
-    f->outcome = BATTLE_WON;
-    this->AddFact(f);
+    // auto f = new BattleFact();
+    // f->defender.factionNum = 1;
+    // f->outcome = BATTLE_WON;
+    // f->location.terrainType = 3;
+    // f->location.province = "Deeckmarcar";
+    // this->AddFact(f);
 
-    // test end
+    // f = new BattleFact();
+    // f->defender.factionNum = 2;
+    // f->defender.unitName = "Demons";
+    // f->outcome = BATTLE_WON;
+    // f->location.terrainType = 4;
+    // f->location.province = "Derenha";
+    // this->AddFact(f);
+
+    // f = new BattleFact();
+    // f->attacker.factionNum = 2;
+    // f->attacker.unitName = "Undead";
+    // f->outcome = BATTLE_WON;
+    // f->location.terrainType = 5;
+    // f->location.province = "Perhont";
+    // this->AddFact(f);
+
+    // auto f2 = new BattleFact();
+    // f2->attacker.factionNum = 12;
+    // f2->attacker.total = 600;
+    // f2->attacker.lost = 100;
+    // f2->defender.factionNum = 11;
+    // f2->defender.total = 300;
+    // f2->defender.lost = 200;
+    // f2->outcome = BATTLE_WON;
+    // f2->location.terrainType = 3;
+    // f2->location.province = "Deeckmarcar";
+    // this->AddFact(f2);
+
+    // // test end
 
     for (auto &fact : this->facts) {
         fact->GetEvents(events);
@@ -144,23 +209,52 @@ std::string Events::Write() {
         categories[event.category].push_back(event);
     }
 
-    std::string text;
+    std::string text =  "   _.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._\n";
+                text += ".----      - ---     --     ---   -----   - --       ----  ----   -     ----.\n";
+                text += " )                                                                         (\n";
+                text += "(                               WORLD EVENTS                                )\n";
+                text += " )                                                                         (\n";
+
+    std::list<std::string> lines;
     for (auto &cat : categories) {
         auto list = cat.second;
 
         std::sort(list.begin(), list.end(), compareEvents);
         list.resize(std::min((int) list.size(), 10));
 
-        int n = std::min((int) list.size(), getrandom(5) + 1);
+        int n = std::min((int) list.size(), getrandom(3) + 1);
         while (n-- > 0) {
             int i = getrandom(list.size());
 
-            if (!text.empty()) text += "\n";
-            text += list[i].text;
-            
+            if (lines.size() > 0) {
+                lines.push_back("");
+                lines.push_back(".:*~*:._.:*~*:._.:*~*:.");
+                lines.push_back("");
+            }
+
+            auto tmp = wrapText(list[i].text, 65);
+            for (auto &line : tmp) {
+                lines.push_back(line);
+            }
+
             list.erase(list.begin() + i);
         }
     }
+
+    if (lines.size() % 2) {
+        lines.push_back("");
+    }
+
+    int n = 3;
+    for (auto &line : lines) {
+        text += makeLine(77, (n++) % 2, line);
+    }
+
+    text += "(__       _       _       _       _       _       _       _       _       __)\n";
+    text += "    `-._.-' (___ _) `-._.-' `-._.-' )     ( `-._.-' `-._.-' (__ _ ) `-._.-'\n";
+    text += "            ( _ __)                (_     _)                (_ ___)\n";
+    text += "            (__  _)                 `-._.-'                 (___ _)\n";
+    text += "            `-._.-'                                         `-._.-'\n";
 
     return text;
 }

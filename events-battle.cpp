@@ -229,7 +229,7 @@ void BattleFact::GetEvents(std::list<Event> &events) {
         if (this->outcome == BATTLE_WON) {
             // Demons in the plains of Cefelat continue to cause %s on local inhabitants.
             text += string_format("%s in the %ss of %s continue to cause %s on local inhabitants.",
-                this->defender.unitName.c_str(),
+                this->attacker.unitName.c_str(),
                 this->location.getTerrain().c_str(),
                 this->location.province.c_str(),
                 NOUN[getrandom(N_VARIANTS)]
@@ -237,8 +237,8 @@ void BattleFact::GetEvents(std::list<Event> &events) {
         }
         else {
             // Demons tried to cause fear in the plains of Cefelat bet were slain by a witchers.
-            text += string_format("5s tried to cause %s in the %ss of %s bet were %s by %s.",
-                this->defender.unitName.c_str(),
+            text += string_format("%s tried to cause %s in the %ss of %s bet were %s by %s.",
+                this->attacker.unitName.c_str(),
                 NOUN[getrandom(N_VARIANTS)],
                 this->location.getTerrain().c_str(),
                 this->location.province.c_str(),
@@ -282,8 +282,8 @@ void BattleFact::GetEvents(std::list<Event> &events) {
                 : "and many soldiers will never fight again";
         }
 
-        // a small encounter between hostile forces in the woods of Sansaor took place some men died.
-        text += string_format("a small %s between %s in the %ss of %s took place %s.",
+        // a small encounter between hostile forces in the woods of Sansaor where some men died.
+        text += string_format("a small %s between %s in the %ss of %s where %s.",
             SMALL_BATTLE[getrandom(N_VARIANTS)],
             TWO_SIDES[getrandom(N_VARIANTS)],
             this->location.getTerrain().c_str(),
@@ -312,8 +312,8 @@ void BattleFact::GetEvents(std::list<Event> &events) {
             result = "and many soldiers will never fight again";
         }
 
-        // a battle between two armies in the woods of Sansaor took place with .
-        text += string_format("a %s between %s in the %ss of %s took place with %i killed from both sides %s.",
+        // a battle between two armies in the woods of Sansaor with .
+        text += string_format("a %s between %s in the %ss of %s with %i killed from both sides %s.",
             SMALL_BATTLE[getrandom(N_VARIANTS)],
             TWO_SIDES[getrandom(N_VARIANTS)],
             this->location.getTerrain().c_str(),
@@ -373,8 +373,8 @@ void BattleFact::GetEvents(std::list<Event> &events) {
             result = "and many soldiers will never fight again";
         }
 
-        // a battle with use of magic between two armies in the woods of Sansaor took place with .
-        text += string_format("a %s%s between %s in the %ss of %s took place with %i killed from both sides %s.",
+        // a battle with use of magic between two armies in the woods of Sansaor with .
+        text += string_format("a %s%s between %s in the %ss of %s with %i killed from both sides %s.",
             BATTLE[getrandom(N_VARIANTS)],
             specials.c_str(),
             TWO_SIDES[getrandom(N_VARIANTS)],
@@ -435,8 +435,8 @@ void BattleFact::GetEvents(std::list<Event> &events) {
             result = "and many soldiers will never fight again";
         }
 
-        // a battle with use of magic between two armies in the woods of Sansaor took place with .
-        text += string_format("a epic %s%s between %s in the %ss of %s took place with %i killed from both sides %s.",
+        // a battle with use of magic between two armies in the woods of Sansaor with .
+        text += string_format("a epic %s%s between %s in the %ss of %s with %i killed from both sides %s.",
             BATTLE[getrandom(N_VARIANTS)],
             specials.c_str(),
             TWO_SIDES[getrandom(N_VARIANTS)],
