@@ -26,6 +26,8 @@
 #include "unit.h"
 #include "gamedata.h"
 
+#include "stack"
+
 UnitId::UnitId()
 {
 }
@@ -2674,4 +2676,117 @@ int Unit::CanUseWeapon(WeaponType *pWep)
 	if (pWep->flags & WeaponType::NEEDSKILL && !baseSkillLevel) return -1;
 
 	return baseSkillLevel;
+}
+
+int Unit::GetStackWeight() {
+	int weight = this->items.Weight();
+	for (auto &s : this->stackMembers) {
+		weight += s->GetStackWeight();
+	}
+
+	return weight;
+}
+
+bool Unit::StackCanWalk() {
+	int weight = this->items.Weight();
+	if (!this->CanWalk(weight)) {
+		return false;
+	}
+
+	for (auto &s : this->stackMembers) {
+		if (!s->StackCanWalk()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool Unit::StackCanRide() {
+	int weight = this->items.Weight();
+	if (!this->CanRide(weight)) {
+		return false;
+	}
+
+	for (auto &s : this->stackMembers) {
+		if (!s->StackCanRide()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool Unit::StackCanFly() {
+	int weight = this->items.Weight();
+	if (!this->CanFly(weight)) {
+		return false;
+	}
+
+	for (auto &s : this->stackMembers) {
+		if (!s->StackCanFly()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool Unit::StackCanSwim() {
+	if (!this->CanSwim()) {
+		return false;
+	}
+
+	for (auto &s : this->stackMembers) {
+		if (!s->StackCanSwim()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+std::list<Unit *> Unit::GetAllStackMembers() {
+	std::list<Unit *> members;
+
+	std::stack<Unit *> s;
+	s.push(this);
+
+	while (!s.empty()) {
+		Unit *current = s.top();
+		s.pop();
+
+		members.push_back(current);
+
+		for (auto &m : current->stackMembers) {
+			s.push(m);
+		}
+	}
+
+	return members;
+}
+
+void Unit::LeaveStack() {
+	if (this->stackLeader == NULL) {
+		return;
+	}
+
+	this->stackLeader->stackMembers.remove(this);
+	this->stackLeader = NULL;
+}
+
+void Unit::JoinStack(Unit *leader) {
+	this->LeaveStack();
+
+	this->stackLeader = leader;
+	this->stackLeader->stackMembers.push_back(this);
+}
+
+
+void Unit::DismissStack() {
+	for (auto &m : this->stackMembers) {
+		m->stackLeader = NULL;
+	}
+
+	this->stackMembers.clear();
 }

@@ -1923,6 +1923,15 @@ int ARegion::ForbiddenShip(Object *ship)
 	return 0;
 }
 
+bool ARegion::ForbiddenStack(Unit *unit) {
+	auto stackMembers = unit->GetAllStackMembers();
+	for (auto &m : stackMembers) {
+		if (Forbidden(m)) return true;
+	}
+
+	return false;
+}
+
 void ARegion::DefaultOrders()
 {
 	forlist((&objects)) {

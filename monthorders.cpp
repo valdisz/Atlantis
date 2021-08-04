@@ -48,6 +48,21 @@ void Game::RunMovementOrders()
 	MoveDir *d;
 	AString order, *tOrder;
 
+	// stacks must be broken if some units want to move separately
+	forlist(&regions) {
+		r = (ARegion *) elem;
+		forlist(&r->objects) {
+			o = (Object *) elem;
+			forlist(&o->units) {
+				u = (Unit *) elem;
+
+				if (u->monthorders && (u->monthorders->type == O_MOVE || u->monthorders->type == O_ADVANCE || u->monthorders->type == O_ENTER || u->monthorders->type == O_SAIL)) {
+					u->LeaveStack();
+				}
+			}
+		}
+	}
+
 	for (phase = 0; phase < Globals->MAX_SPEED; phase++) {
 		forlist(&regions) {
 			r = (ARegion *) elem;
@@ -1650,8 +1665,36 @@ void Game::DoMoveEnter(Unit *unit,ARegion *region,Object **obj)
 				continue;
 			}
 
-			if (!to->CanEnter(region,unit)) {
-				unit->Error("ENTER: Can't enter that.");
+			auto stackMembers = unit->GetAllStackMembers();
+			bool error = false;
+
+			// enter
+			for (auto &member : stackMembers) {
+				if (!to->CanEnter(region, member)) {
+					error = true;
+					break;
+				}
+			}
+			if (error) {
+				for (auto &member : stackMembers) {
+					member->Error("ENTER: Can't enter that.");
+				}
+				continue;
+			}
+			////
+
+			// forbidden enter
+			for (auto &member : stackMembers) {
+				Unit *forbid = to->ForbiddenBy(region, member);
+				if (forbid && !o->advancing) {
+					unit->Error("ENTER: Is refused entry.");
+					continue;
+				}
+			}
+			if (error) {
+				for (auto &member : stackMembers) {
+					member->Error("ENTER: Can't enter that.");
+				}
 				continue;
 			}
 

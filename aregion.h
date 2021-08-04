@@ -218,6 +218,7 @@ class ARegion : public AListElem
 		int CanPillage(Unit *);
 		void Pillage();
 		int ForbiddenShip(Object *);
+		bool ForbiddenStack(Unit *);
 		int HasCityGuard();
 		int NotifySpell(Unit *, char const *, ARegionList *pRegs);
 		void NotifyCity(Unit *, AString& oldname, AString& newname);

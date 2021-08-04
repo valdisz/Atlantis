@@ -299,6 +299,19 @@ class Unit : public AListElem
 		// Used for tracking VISIT quests
 		set<string> visited;
 		int raised;
+
+		// Stacks
+		std::list<Unit *> stackMembers;
+		Unit *stackLeader;
+		int GetStackWeight();
+		bool StackCanWalk();
+		bool StackCanRide();
+		bool StackCanFly();
+		bool StackCanSwim();
+		std::list<Unit *> GetAllStackMembers();
+		void LeaveStack();
+		void JoinStack(Unit *leader);
+		void DismissStack();
 };
 
 #endif
