@@ -49,6 +49,9 @@ void Game::RunMovementOrders()
 	AString order, *tOrder;
 
 	// stacks must be broken if some units want to move separately
+	// orders that will break stacking
+	// MOVE, ADVANCE, SAIL
+	// ENTER, LEAVE
 	forlist(&regions) {
 		r = (ARegion *) elem;
 		forlist(&r->objects) {
@@ -56,7 +59,8 @@ void Game::RunMovementOrders()
 			forlist(&o->units) {
 				u = (Unit *) elem;
 
-				if (u->monthorders && (u->monthorders->type == O_MOVE || u->monthorders->type == O_ADVANCE || u->monthorders->type == O_ENTER || u->monthorders->type == O_SAIL)) {
+				if (u->monthorders && (u->monthorders->type == O_MOVE || u->monthorders->type == O_ADVANCE || u->monthorders->type == O_SAIL
+					|| u->monthorders->type == O_ENTER || u->monthorders->type == O_LEAVE)) {
 					u->LeaveStack();
 				}
 			}
