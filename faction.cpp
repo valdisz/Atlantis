@@ -25,7 +25,6 @@
 
 #include "gamedata.h"
 #include "game.h"
-#include <algorithm>
 
 char const *as[] = {
 	"Hostile",
