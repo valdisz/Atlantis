@@ -156,6 +156,8 @@ bool IsArmyOverwhelmedBy(Army * a, Army * b) {
 
 void Battle::FreeRound(Army * att,Army * def, int ass)
 {
+	this->roundLog = this->battleLog.FreeRound(*att->leader);
+
 	/* Write header */
 	AddLine(*(att->leader->name) + " gets a free round of attacks.");
 
@@ -174,6 +176,7 @@ void Battle::FreeRound(Army * att,Army * def, int ass)
 	bool attOverwhelm = IsArmyOverwhelmedBy(def, att);
 	if (attOverwhelm) {
 		AddLine(*(def->leader->name) + " is overwhelmed.");
+		roundLog->Add(new BattleLog::Overwhelmed(*def->leader));
 	}
 
 	/* Run attacks until done */
@@ -191,6 +194,7 @@ void Battle::FreeRound(Army * att,Army * def, int ass)
 	alv -= def->NumAlive();
 	AddLine(*(def->leader->name) + " loses " + alv + ".");
 	AddLine("");
+	roundLog->Add(new BattleLog::Losses(*def->leader, alv));
 
 	if (Globals->BATTLE_LOG_LEVEL == BattleLogLevel::VERBOSE) {
 		AddLine("Free round statistics:");
@@ -227,15 +231,13 @@ void Battle::DoAttack(int round, Soldier *a, Army *attackers, Army *def,
 					times *= pMt->specialLev;
 				int realtimes = spd->damage[i].minnum + getrandom(times) +
 					getrandom(times);
+				auto attackLog = new BattleLog::Attack(*a, (AttackType) spd->damage[i].type, realtimes);
 				num = def->DoAnAttack(this, pMt->mountSpecial, realtimes,
 						spd->damage[i].type, pMt->specialLev,
 						spd->damage[i].flags, spd->damage[i].dclass,
 						spd->damage[i].effect, 0, a, attackers,
-						canAttackBehind, hitDamage);
-				if (num != -1) {
-					if (tot == -1) tot = num;
-					else tot += num;
-				}
+						canAttackBehind, hitDamage, attackLog);
+				roundLog->Add(attackLog);
 			}
 			if (tot != -1) {
 				AddLine(a->name + " " + spd->spelldesc + ", " +
@@ -278,24 +280,30 @@ void Battle::DoAttack(int round, Soldier *a, Army *attackers, Army *def,
 			mountBonus = pWep->mountBonus;
 			attackClass = pWep->weapClass;
 		}
+		auto attackLog = new BattleLog::Attack(*a, (AttackType) attackType, a->askill);
 		def->DoAnAttack(this, NULL, 1, attackType, a->askill, flags, attackClass,
-				NULL, mountBonus, a, attackers, canAttackBehind, hitDamage);
+				NULL, mountBonus, a, attackers, canAttackBehind, hitDamage, attackLog);
+		roundLog->Add(attackLog);
 		if (!def->NumAlive()) break;
 	}
 
 	a->ClearOneTimeEffects();
 }
 
-void Battle::NormalRound(int round,Army * a,Army * b)
+void Battle::NormalRound(int round, Army * a,Army * b)
 {
+	this->roundLog = this->battleLog.NormalRound();
+
 	/* Write round header */
 	AddLine(AString("Round ") + round + ":");
 
 	if (a->tactics_bonus > b->tactics_bonus) {
 		AddLine(*(a->leader->name) + " tactics bonus " + a->tactics_bonus + ".");	
+		roundLog->Add(new BattleLog::TacticalBonus(*a->leader, a->tactics_bonus));
 	}
 	if (b->tactics_bonus > a->tactics_bonus) {
 		AddLine(*(b->leader->name) + " tactics bonus " + b->tactics_bonus + ".");	
+		roundLog->Add(new BattleLog::TacticalBonus(*b->leader, b->tactics_bonus));
 	}
 
 	/* Update both army's shields */
@@ -315,11 +323,13 @@ void Battle::NormalRound(int round,Army * a,Army * b)
 	bool aOverwhelm = IsArmyOverwhelmedBy(b, a);
 	if (aOverwhelm) {
 		AddLine(*(b->leader->name) + " is overwhelmed.");
+		roundLog->Add(new BattleLog::Overwhelmed(*b->leader));
 	}
 
 	bool bOverwhelm = IsArmyOverwhelmedBy(a, b);
 	if (bOverwhelm) {
 		AddLine(*(a->leader->name) + " is overwhelmed.");
+		roundLog->Add(new BattleLog::Overwhelmed(*a->leader));
 	}
 
 	/* Run attacks until done */
@@ -355,6 +365,8 @@ void Battle::NormalRound(int round,Army * a,Army * b)
 	bialive -= balive;
 	AddLine(*(b->leader->name) + " loses " + bialive + ".");
 	AddLine("");
+	roundLog->Add(new BattleLog::Losses(*a->leader, aialive));
+	roundLog->Add(new BattleLog::Losses(*b->leader, bialive));
 
 	if (Globals->BATTLE_LOG_LEVEL == BattleLogLevel::VERBOSE) {
 		AddLine(AString("Round ") + round + " statistics:");
@@ -386,6 +398,7 @@ void Battle::GetSpoils(AList *losers, ItemList *spoils, int ass)
 		if (!numalive) {
 			if (quests.CheckQuestKillTarget(u, spoils, &quest_rewards)) {
 				AddLine(AString("Quest completed! ") + quest_rewards);
+				roundLog->Add(new BattleLog::QuestCompleted(quest_rewards.Str()));
 			}
 		}
 		forlist(&u->items) {
@@ -505,9 +518,12 @@ int Battle::Run(Events* events,
 
 		if (armies[0]->NumAlive()) {
 			AddLine(*(armies[0]->leader->name) + " is routed!");
+			this->roundLog->Add(new BattleLog::Routed(*armies[0]->leader));
+
 			FreeRound(armies[1],armies[0]);
 		} else {
 			AddLine(*(armies[0]->leader->name) + " is destroyed!");
+			this->roundLog->Add(new BattleLog::Destroyed(*armies[0]->leader));
 		}
 		AddLine("");
 
@@ -556,12 +572,16 @@ int Battle::Run(Events* events,
 						" is assassinated in " +
 						region->ShortPrint( pRegs ) +
 						"!");
+			// todo: check that assassination included into the log
 		}
 		if (armies[1]->NumAlive()) {
 			AddLine(*(armies[1]->leader->name) + " is routed!");
+			this->roundLog->Add(new BattleLog::Routed(*armies[1]->leader));
+
 			FreeRound(armies[0],armies[1]);
 		} else {
 			AddLine(*(armies[1]->leader->name) + " is destroyed!");
+			this->roundLog->Add(new BattleLog::Destroyed(*armies[1]->leader));
 		}
 		AddLine("");
 

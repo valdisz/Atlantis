@@ -185,6 +185,7 @@ void Battle::UpdateShields(Army *a)
 
 		AddLine(*(a->soldiers[i]->unit->name) + " casts " +
 				spd->shielddesc + ".");
+		roundLog->Add(new BattleLog::CastShield(*a->soldiers[i], spd));
 	}
 }
 
@@ -210,11 +211,13 @@ void Battle::DoSpecialAttack(int round, Soldier *a, Army *attackers,
 			times *= a->slevel;
 		int realtimes = spd->damage[i].minnum + getrandom(times) +
 			getrandom(times);
+		auto attackLog = new BattleLog::Attack(*a, (AttackType) spd->damage[i].type, realtimes);
 		num = def->DoAnAttack(this, a->special, realtimes,
 				spd->damage[i].type, a->slevel,
 				spd->damage[i].flags, spd->damage[i].dclass,
 				spd->damage[i].effect, 0, a, attackers,
-				canattackback, hitDamage);
+				canattackback, hitDamage, attackLog);
+		roundLog->Add(attackLog);
 		if (spd->effectflags & SpecialType::FX_DONT_COMBINE && num != -1) {
 			if (spd->damage[i].effect == NULL) {
 				results[dam] = AString("killing ") + num;

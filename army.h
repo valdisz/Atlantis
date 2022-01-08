@@ -114,7 +114,8 @@ class Soldier {
 		void SetEffect(char const *);
 		void ClearEffect(char const *);
 		void ClearOneTimeEffects(void);
-		int ArmorProtect(int weaponClass );
+		int ArmorProtect(int weaponClass);
+		float GetProtectionLevel(int weaponClass);
 
 		void RestoreItems();
 		void Alive(int);
@@ -191,7 +192,8 @@ class Army
 		int RemoveEffects(int num, char const *effect);
 		int DoAnAttack(Battle *, char const *special, int numAttacks, int attackType,
 				int attackLevel, int flags, int weaponClass, char const *effect,
-				int mountBonus, Soldier *attacker, Army *attackers, bool attackbehind, int attackDamage);
+				int mountBonus, Soldier *attacker, Army *attackers, bool attackbehind, int attackDamage,
+				BattleLog::Attack* attack);
 		void Kill(int killed, int damage);
 		void Reset();
 

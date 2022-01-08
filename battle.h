@@ -35,6 +35,7 @@ class Battle;
 #include "items.h"
 #include "events.h"
 #include <vector>
+#include "battle-log.h"
 
 enum {
 	ASS_NONE,
@@ -89,6 +90,9 @@ class Battle : public AListElem
 		Faction * attacker; /* Only matters in the case of an assassination */
 		AString * asstext;
 		AList text;
+
+		BattleLog::Battle battleLog;
+		BattleLog::Round* roundLog;
 };
 
 #endif

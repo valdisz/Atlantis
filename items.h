@@ -33,7 +33,7 @@ class ItemType;
 #include "alist.h"
 #include "astring.h"
 
-enum {
+enum AttackType {
 	ATTACK_COMBAT,
 	ATTACK_ENERGY,
 	ATTACK_SPIRIT,
@@ -198,7 +198,7 @@ class MonType
 
 extern MonType *MonDefs;
 
-enum {
+enum WeaponClass {
 	SLASHING,		// e.g. sword attack (This is default)
 	PIERCING,		// e.g. spear or arrow attack
 	CRUSHING,		// e.g. mace attack

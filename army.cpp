@@ -605,6 +605,19 @@ int Soldier::ArmorProtect(int weaponClass)
 	return 0;
 }
 
+float Soldier::GetProtectionLevel(int weaponClass)
+{
+	//
+	// Return 1 if the armor is successful
+	//
+	ArmorType *pArm = NULL;
+	if (armor > 0) pArm = FindArmor(ItemDefs[armor].abr);
+	if (pArm == NULL) return 0;
+	int chance = pArm->saves[weaponClass];
+
+	return (float) chance / pArm->from;
+}
+
 void Soldier::RestoreItems()
 {
 	if (healing && healitem != -1) {
@@ -1327,15 +1340,29 @@ WeaponBonusMalus* GetWeaponBonusMalus(WeaponType *weapon, WeaponType *target) {
 
 int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attackType,
 		int attackLevel, int flags, int weaponClass, char const *effect,
-		int mountBonus, Soldier *attacker, Army *attackers, bool attackbehind, int attackDamage)
+		int mountBonus, Soldier *attacker, Army *attackers, bool attackbehind, int attackDamage,
+		BattleLog::Attack* attack)
 {
-	SpecialType *sp = special != NULL
-		? FindSpecial(special)
-		: NULL;
+	// attack = new BattleLog::Attack(*attacker, (AttackType) attackType, numAttacks);
+
+	SpecialType *sp = FindSpecial(special);
 
 	// if special is defined then it is magical attack and not attack by the physical weapon soldier has
 	int weaponIndex = sp == NULL ? attacker->weapon : -1;
-	attackers->stats.TrackSoldier(attacker->unit->num, weaponIndex, sp, attackType, weaponClass);
+	// attackers->stats.TrackSoldier(attacker->unit->num, weaponIndex, sp, attackType, weaponClass);
+
+	if (sp == NULL && weaponIndex != -1) {
+		attack->weapon = new BattleLog::Weapon({
+			type: FindWeapon(ItemDefs[weaponIndex].abr),
+			weaponClass: (WeaponClass) weaponClass
+		});
+	}
+
+	if (sp != NULL || effect != NULL) {
+		attack->magic = new BattleLog::Magic();
+		attack->magic->special = sp;
+		attack->magic->effect = FindEffect(effect);
+	}
 
 	/* 1. Check against Global effects (not sure how yet) */
 	/* 2. Attack shield */
@@ -1364,6 +1391,7 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 		if (hi) {
 			/* Check if we get through shield */
 			if (!Hits(attackLevel, hi->shieldskill)) {
+				attack->deflected = true;
 				return -1;
 			}
 
@@ -1389,6 +1417,9 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 			WeaponType *pw = FindWeapon(ItemDefs[tar->weapon].abr);
 			tarFlags = pw->flags;
 		}
+
+		BattleLog::Target* target = attack->AddTarget(*tar);
+		target->protection = tar->GetProtectionLevel(weaponClass);
 
 		/* 4. Add in any effects, if applicable */
 		int tlev = 0;
@@ -1438,7 +1469,7 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 
 		/* 5. Attack soldier */
 		if (attackType != NUM_ATTACK_TYPES) {
-			attackers->stats.RecordAttack(attacker->unit->num, weaponIndex, sp);
+			// attackers->stats.RecordAttack(attacker->unit->num, weaponIndex, sp);
 
 			if (!(flags & WeaponType::ALWAYSREADY)) {
 				int failchance = 2;
@@ -1447,22 +1478,24 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 				}
 
 				if (getrandom(failchance)) {
-					attackers->stats.RecordAttackFailed(attacker->unit->num, weaponIndex, sp);
+					// attackers->stats.RecordAttackFailed(attacker->unit->num, weaponIndex, sp);
 					continue;
 				}
 			}
 
 			if (combat) {
 				/* 5.1 Add advanced tactics bonus */
-				if (!Hits(attackLevel + attackers->tactics_bonus, tlev + tactics_bonus)) {
-					attackers->stats.RecordAttackMissed(attacker->unit->num, weaponIndex, sp);
-					continue;
-				}
-			} else {
-				if (!Hits(attackLevel, tlev)) {
-					attackers->stats.RecordAttackMissed(attacker->unit->num, weaponIndex, sp);
-					continue;
-				}
+				attackLevel += attackers->tactics_bonus;
+				tlev += tactics_bonus;
+			}
+
+			target->attackLevel = attackLevel;
+			target->defenseLevel = tlev;
+
+			if (!Hits(attackLevel, tlev)) {
+				// attackers->stats.RecordAttackMissed(attacker->unit->num, weaponIndex, sp);
+				target->outcome = BattleLog::AttackOutcome::MISS;
+				continue;
 			}
 		}
 
@@ -1470,16 +1503,20 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 		if (effect == NULL) {
 			/* 7. Last chance... Check armor */
 			if (tar->ArmorProtect(weaponClass)) {
-				attackers->stats.RecordAttackBlocked(attacker->unit->num, weaponIndex, sp);
+				// attackers->stats.RecordAttackBlocked(attacker->unit->num, weaponIndex, sp);
+				target->outcome = BattleLog::AttackOutcome::BLOCK;
 				continue;
 			}
 
-			attackers->stats.RecordHit(attacker->unit->num, weaponIndex, sp, attackDamage);
+			// attackers->stats.RecordHit(attacker->unit->num, weaponIndex, sp, attackDamage);
+			target->outcome = BattleLog::AttackOutcome::HIT;
+			target->damage = std::min(attackDamage, tar->hits);
 
 			/* 8. Seeya! */
 			Kill(tarnum, attackDamage);
 			if (tar->hits == 0) {
-				attackers->stats.RecordKill(attacker->unit->num, weaponIndex, sp);
+				// attackers->stats.RecordKill(attacker->unit->num, weaponIndex, sp);
+				target->outcome = BattleLog::AttackOutcome::KILL;
 			}
 
 			ret++;
@@ -1492,8 +1529,11 @@ int Army::DoAnAttack(Battle * b, char const *special, int numAttacks, int attack
 			}
 		} else {
 			if (tar->HasEffect(effect)) {
+				target->outcome = BattleLog::AttackOutcome::WASTED;
 				continue;
 			}
+
+			target->outcome = BattleLog::AttackOutcome::CHARMED;
 			tar->SetEffect(effect);
 			ret++;
 		}
