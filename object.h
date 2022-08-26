@@ -37,6 +37,55 @@ class Object;
 
 #define I_WOOD_OR_STONE -2
 
+enum SpawningMonsterType {
+	BIG,
+	SMALL,
+	HUMANOID,
+	SPECIFIC
+};
+
+class SpawningMonster {
+	public:
+		SpawningMonster(const SpawningMonsterType type, const int itemIndex)
+			: SpawningMonster(
+				type,
+				itemIndex,
+				[](const MonType *mp) { return (mp->number + getrandom(mp->number) + 1) / 2; }
+			)
+		{
+
+		}
+
+		SpawningMonster(const SpawningMonsterType type, const int itemIndex, const std::function<int(const MonType *)> count);
+
+		const SpawningMonsterType GetType();
+		const int GetItemIndex(const TerrainType *terrain);
+		const MonType* GetMonsterType(const int itemIndex);
+		const int GetCount(const MonType *monsterType);
+
+		static const SpawningMonster* Big();
+		static const SpawningMonster* Big(const std::function<int(const MonType *)> count);
+		static const SpawningMonster* Small();
+		static const SpawningMonster* Small(const std::function<int(const MonType *)> count);
+		static const SpawningMonster* Humanoid();
+		static const SpawningMonster* Humanoid(const std::function<int(const MonType *)> count);
+		static const SpawningMonster* Specific(const int itemIndex);
+		static const SpawningMonster* Specific(const int itemIndex, const std::function<int(const MonType *)> count);
+
+	private:
+		SpawningMonsterType type;
+		int itemIndex;
+		std::function<int(const MonType *)> count;
+};
+
+class MonsterSpawn {
+	public:
+		std::string name;
+		std::vector<SpawningMonster *> monsters;
+
+		Unit* Spawn(Game *game, Faction *faction, Object *object);
+};
+
 class ObjectType {
 	public:
 		char const *name;
@@ -65,7 +114,7 @@ class ObjectType {
 		int maxMonthlyDecay;
 		int maintFactor;
 
-		int monster;
+		MonsterSpawn* monster;
 
 		int productionAided;
 		int defenceArray[NUM_ATTACK_TYPES];

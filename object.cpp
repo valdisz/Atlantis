@@ -29,6 +29,126 @@
 #include "skills.h"
 #include "gamedata.h"
 #include "unit.h"
+#include "game.h"
+
+SpawningMonster::SpawningMonster(const SpawningMonsterType type, const int itemIndex, const function<int(const MonType*)> count) {
+	this->type = type;
+
+	this->itemIndex = type == SpawningMonsterType::SPECIFIC
+		? itemIndex
+		: -1;
+
+	this->count = count;
+}
+
+const SpawningMonsterType SpawningMonster::GetType() {
+	return this->type;
+}
+
+const int SpawningMonster::GetItemIndex(const TerrainType *terrain) {
+	int index;
+	switch (this->type) {
+		case SpawningMonsterType::BIG:
+			index = terrain->bigmon;
+			break;
+
+		case SpawningMonsterType::SMALL:
+			index = terrain->smallmon;
+			break;
+
+		case SpawningMonsterType::HUMANOID:
+			index = terrain->humanoid;
+			break;
+		default:
+			index = this->itemIndex;
+			break;
+	}
+
+	if (index >= 0 && ItemDefs[index].flags & ItemType::DISABLED) {
+		return -1;
+	}
+
+	return index;
+}
+
+const MonType* SpawningMonster::GetMonsterType(const int itemIndex) {
+	if (itemIndex < 0) {
+		return NULL;
+	}
+
+	ItemType &item = ItemDefs[itemIndex];
+
+	const auto monster = FindMonster(item.abr, item.type & IT_ILLUSION);
+	return monster;
+}
+
+const int SpawningMonster::GetCount(const MonType *monsterType) {
+	return this->count(monsterType);
+}
+
+const SpawningMonster* SpawningMonster::Big(const std::function<int(const MonType *)> count) {
+	return new SpawningMonster(SpawningMonsterType::BIG, -1, count);
+}
+
+const SpawningMonster* SpawningMonster::Small() {
+	return new SpawningMonster(SpawningMonsterType::SMALL, -1);
+}
+
+const SpawningMonster* SpawningMonster::Small(const std::function<int(const MonType *)> count) {
+	return new SpawningMonster(SpawningMonsterType::SMALL, -1, count);
+}
+
+const SpawningMonster* SpawningMonster::Humanoid() {
+	return new SpawningMonster(SpawningMonsterType::HUMANOID, -1);
+}
+
+const SpawningMonster* SpawningMonster::Humanoid(const std::function<int(const MonType *)> count) {
+	return new SpawningMonster(SpawningMonsterType::HUMANOID, -1, count);
+
+}
+
+const SpawningMonster* SpawningMonster::Specific(const int itemIndex) {
+	return new SpawningMonster(SpawningMonsterType::HUMANOID, itemIndex);
+}
+
+const SpawningMonster* SpawningMonster::Specific(const int itemIndex, const std::function<int(const MonType *)> count) {
+	return new SpawningMonster(SpawningMonsterType::SPECIFIC, itemIndex, count);
+}
+
+
+Unit* MonsterSpawn::Spawn(Game* game, Faction* faction, Object *object) {
+	auto terrain = &TerrainDefs[object->region->type];
+
+	Unit *unit = NULL;
+
+	for (auto &monster : this->monsters) {
+		const auto itemIndex = monster->GetItemIndex(terrain);
+		const auto monsterType = monster->GetMonsterType(itemIndex);
+		if (!monsterType) {
+			continue;
+		}
+
+		const int count = monster->GetCount(monsterType);
+		if (!count) {
+			continue;
+		}
+
+		if (!unit) {
+			unit = game->GetNewUnit(faction, 0);
+
+			std::string unitName = this->name.empty()
+				? monsterType->name
+				: this->name;
+
+			unit->MakeWMon(unitName.c_str(), itemIndex, count);
+		}
+		else {
+			unit->items.SetNum(itemIndex, count);
+		}
+	}
+
+	return unit;
+}
 
 int LookupObject(AString *token)
 {

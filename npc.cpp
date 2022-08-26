@@ -149,10 +149,16 @@ void Game::GrowLMons(int rate)
 		
 		forlist(&r->objects) {
 			Object *obj = (Object *) elem;
-			if (obj->units.Num()) continue;
-			int montype = ObjectDefs[obj->type].monster;
-			int grow=!(ObjectDefs[obj->type].flags&ObjectType::NOMONSTERGROWTH);
-			if ((montype != -1) && grow) {
+			if (obj->units.Num()) {
+				continue;
+			}
+
+			bool grow = !(ObjectDefs[obj->type].flags & ObjectType::NOMONSTERGROWTH);
+			if (!grow) {
+				continue;
+			}
+
+			if (ObjectDefs[obj->type].monster) {
 				if (getrandom(100) < rate) {
 					MakeLMon(obj);
 				}
@@ -190,126 +196,133 @@ void Game::MakeLMon(Object *pObj)
 	if (!Globals->LAIR_MONSTERS_EXIST) return;
 	if (ObjectDefs[pObj->type].flags & ObjectType::NOMONSTERGROWTH) return;
 
-	int montype = ObjectDefs[pObj->type].monster;
+	auto monster = ObjectDefs[pObj->type].monster;
 
-	if (montype == I_TRENT)
-		montype = TerrainDefs[pObj->region->type].bigmon;
-
-	if (montype == I_CENTAUR)
-		montype = TerrainDefs[pObj->region->type].humanoid;
-
-	if ((montype == -1) || (ItemDefs[montype].flags & ItemType::DISABLED))
-		return;
-
-	MonType *mp = FindMonster(ItemDefs[montype].abr,
-			(ItemDefs[montype].type & IT_ILLUSION));
 	Faction *monfac = GetFaction(&factions, monfaction);
-	Unit *u = GetNewUnit(monfac, 0);
-	switch(montype) {
-		case I_IMP:
-			u->MakeWMon("Demons", I_IMP, getrandom(mp->number + 1));
+	auto unit = monster->Spawn(this, monfac, pObj);
 
-			mp = FindMonster(ItemDefs[I_DEMON].abr,
-					(ItemDefs[I_DEMON].type & IT_ILLUSION));
-			u->items.SetNum(I_DEMON, getrandom(mp->number + 1));
-
-			mp = FindMonster(ItemDefs[I_DEVIL].abr,
-					(ItemDefs[I_DEVIL].type & IT_ILLUSION));
-			u->items.SetNum(I_DEVIL, getrandom(mp->number + 1));
-			break;
-		case I_SKELETON:
-			u->MakeWMon("Undead", I_SKELETON, getrandom(mp->number + 1));
-
-			mp = FindMonster(ItemDefs[I_UNDEAD].abr,
-					(ItemDefs[I_UNDEAD].type & IT_ILLUSION));
-			u->items.SetNum(I_UNDEAD, getrandom(mp->number + 1));
-
-			mp = FindMonster(ItemDefs[I_LICH].abr,
-					(ItemDefs[I_LICH].type & IT_ILLUSION));
-			u->items.SetNum(I_LICH, getrandom(mp->number + 1));
-			break;
-		case I_MAGICIANS:
-			u->MakeWMon("Evil Mages", I_MAGICIANS,
-					(mp->number + getrandom(mp->number) + 1) / 2);
-
-			mp = FindMonster(ItemDefs[I_SORCERERS].abr,
-					(ItemDefs[I_SORCERERS].type & IT_ILLUSION));
-			u->items.SetNum(I_SORCERERS,
-					getrandom(mp->number + 1));
-			u->SetFlag(FLAG_BEHIND, 1);
-			u->guard = GUARD_NONE;
-			u->MoveUnit(pObj);
-
-			u = GetNewUnit(monfac, 0);
-
-			mp = FindMonster(ItemDefs[I_WARRIORS].abr,
-					(ItemDefs[I_WARRIORS].type & IT_ILLUSION));
-			u->MakeWMon(mp->name, I_WARRIORS,
-					(mp->number + getrandom(mp->number) + 1) / 2);
-			u->guard = GUARD_NONE;
-
-			break;
-		case I_DARKMAGE:
-			u->MakeWMon("Dark Mages", I_DARKMAGE, (getrandom(mp->number) + 1));
-
-			mp = FindMonster(ItemDefs[I_MAGICIANS].abr,
-					(ItemDefs[I_MAGICIANS].type & IT_ILLUSION));
-			u->items.SetNum(I_MAGICIANS,
-					(mp->number + getrandom(mp->number) + 1) / 2);
-
-			mp = FindMonster(ItemDefs[I_SORCERERS].abr,
-					(ItemDefs[I_SORCERERS].type & IT_ILLUSION));
-			u->items.SetNum(I_SORCERERS, getrandom(mp->number + 1));
-
-			mp = FindMonster(ItemDefs[I_DARKMAGE].abr,
-					(ItemDefs[I_DARKMAGE].type & IT_ILLUSION));
-			u->items.SetNum(I_DARKMAGE, getrandom(mp->number + 1));
-			u->SetFlag(FLAG_BEHIND, 1);
-			u->guard = GUARD_NONE;
-			u->MoveUnit(pObj);
-
-			u = GetNewUnit(monfac, 0);
-
-			mp = FindMonster(ItemDefs[I_DROW].abr,
-					(ItemDefs[I_DROW].type & IT_ILLUSION));
-			u->MakeWMon(mp->name, I_DROW,
-					(mp->number + getrandom(mp->number) + 1) / 2);
-			u->guard = GUARD_NONE;
-
-			break;
-		case I_ILLYRTHID:
-			u->MakeWMon(mp->name, I_ILLYRTHID,
-					(mp->number + getrandom(mp->number) + 1) / 2);
-			u->SetFlag(FLAG_BEHIND, 1);
-			u->guard = GUARD_NONE;
-			u->MoveUnit(pObj);
-
-			u = GetNewUnit(monfac, 0);
-
-			mp = FindMonster(ItemDefs[I_SKELETON].abr,
-					(ItemDefs[I_SKELETON].type & IT_ILLUSION));
-			u->MakeWMon("Undead", I_SKELETON, getrandom(mp->number + 1));
-
-			mp = FindMonster(ItemDefs[I_UNDEAD].abr,
-					(ItemDefs[I_UNDEAD].type & IT_ILLUSION));
-			u->items.SetNum(I_UNDEAD, getrandom(mp->number + 1));
-			u->guard = GUARD_NONE;
-			break;
-		case I_STORMGIANT:
-			if (getrandom(3) < 1) {
-				montype = I_CLOUDGIANT;
-				mp = FindMonster(ItemDefs[montype].abr,
-						(ItemDefs[montype].type & IT_ILLUSION));
-			}
-			u->MakeWMon(mp->name, montype,
-					(mp->number + getrandom(mp->number) + 1) / 2);
-			break;
-		default:
-			u->MakeWMon(mp->name, montype,
-					(mp->number + getrandom(mp->number) + 1) / 2);
-			break;
+	if (unit) {
+		unit->MoveUnit(pObj);
 	}
-	u->MoveUnit(pObj);
+
+	// if (montype == I_TRENT)
+	// 	montype = TerrainDefs[pObj->region->type].bigmon;
+
+	// if (montype == I_CENTAUR)
+	// 	montype = TerrainDefs[pObj->region->type].humanoid;
+
+	// if ((montype == -1) || (ItemDefs[montype].flags & ItemType::DISABLED))
+	// 	return;
+
+	// MonType *mp = FindMonster(ItemDefs[montype].abr,
+	// 		(ItemDefs[montype].type & IT_ILLUSION));
+	// Faction *monfac = GetFaction(&factions, monfaction);
+	// Unit *u = GetNewUnit(monfac, 0);
+	// switch(montype) {
+	// 	case I_IMP:
+	// 		u->MakeWMon("Demons", I_IMP, getrandom(mp->number + 1));
+
+	// 		mp = FindMonster(ItemDefs[I_DEMON].abr,
+	// 				(ItemDefs[I_DEMON].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_DEMON, getrandom(mp->number + 1));
+
+	// 		mp = FindMonster(ItemDefs[I_DEVIL].abr,
+	// 				(ItemDefs[I_DEVIL].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_DEVIL, getrandom(mp->number + 1));
+	// 		break;
+	// 	case I_SKELETON:
+	// 		u->MakeWMon("Undead", I_SKELETON, getrandom(mp->number + 1));
+
+	// 		mp = FindMonster(ItemDefs[I_UNDEAD].abr,
+	// 				(ItemDefs[I_UNDEAD].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_UNDEAD, getrandom(mp->number + 1));
+
+	// 		mp = FindMonster(ItemDefs[I_LICH].abr,
+	// 				(ItemDefs[I_LICH].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_LICH, getrandom(mp->number + 1));
+	// 		break;
+	// 	case I_MAGICIANS:
+	// 		u->MakeWMon("Evil Mages", I_MAGICIANS,
+	// 				(mp->number + getrandom(mp->number) + 1) / 2);
+
+	// 		mp = FindMonster(ItemDefs[I_SORCERERS].abr,
+	// 				(ItemDefs[I_SORCERERS].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_SORCERERS,
+	// 				getrandom(mp->number + 1));
+	// 		u->SetFlag(FLAG_BEHIND, 1);
+	// 		u->guard = GUARD_NONE;
+	// 		u->MoveUnit(pObj);
+
+	// 		u = GetNewUnit(monfac, 0);
+
+	// 		mp = FindMonster(ItemDefs[I_WARRIORS].abr,
+	// 				(ItemDefs[I_WARRIORS].type & IT_ILLUSION));
+	// 		u->MakeWMon(mp->name, I_WARRIORS,
+	// 				(mp->number + getrandom(mp->number) + 1) / 2);
+	// 		u->guard = GUARD_NONE;
+
+	// 		break;
+	// 	case I_DARKMAGE:
+	// 		u->MakeWMon("Dark Mages", I_DARKMAGE, (getrandom(mp->number) + 1));
+
+	// 		mp = FindMonster(ItemDefs[I_MAGICIANS].abr,
+	// 				(ItemDefs[I_MAGICIANS].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_MAGICIANS,
+	// 				(mp->number + getrandom(mp->number) + 1) / 2);
+
+	// 		mp = FindMonster(ItemDefs[I_SORCERERS].abr,
+	// 				(ItemDefs[I_SORCERERS].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_SORCERERS, getrandom(mp->number + 1));
+
+	// 		mp = FindMonster(ItemDefs[I_DARKMAGE].abr,
+	// 				(ItemDefs[I_DARKMAGE].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_DARKMAGE, getrandom(mp->number + 1));
+	// 		u->SetFlag(FLAG_BEHIND, 1);
+	// 		u->guard = GUARD_NONE;
+	// 		u->MoveUnit(pObj);
+
+	// 		u = GetNewUnit(monfac, 0);
+
+	// 		mp = FindMonster(ItemDefs[I_DROW].abr,
+	// 				(ItemDefs[I_DROW].type & IT_ILLUSION));
+	// 		u->MakeWMon(mp->name, I_DROW,
+	// 				(mp->number + getrandom(mp->number) + 1) / 2);
+	// 		u->guard = GUARD_NONE;
+
+	// 		break;
+	// 	case I_ILLYRTHID:
+	// 		u->MakeWMon(mp->name, I_ILLYRTHID,
+	// 				(mp->number + getrandom(mp->number) + 1) / 2);
+	// 		u->SetFlag(FLAG_BEHIND, 1);
+	// 		u->guard = GUARD_NONE;
+	// 		u->MoveUnit(pObj);
+
+	// 		u = GetNewUnit(monfac, 0);
+
+	// 		mp = FindMonster(ItemDefs[I_SKELETON].abr,
+	// 				(ItemDefs[I_SKELETON].type & IT_ILLUSION));
+	// 		u->MakeWMon("Undead", I_SKELETON, getrandom(mp->number + 1));
+
+	// 		mp = FindMonster(ItemDefs[I_UNDEAD].abr,
+	// 				(ItemDefs[I_UNDEAD].type & IT_ILLUSION));
+	// 		u->items.SetNum(I_UNDEAD, getrandom(mp->number + 1));
+	// 		u->guard = GUARD_NONE;
+	// 		break;
+	// 	case I_STORMGIANT:
+	// 		if (getrandom(3) < 1) {
+	// 			montype = I_CLOUDGIANT;
+	// 			mp = FindMonster(ItemDefs[montype].abr,
+	// 					(ItemDefs[montype].type & IT_ILLUSION));
+	// 		}
+	// 		u->MakeWMon(mp->name, montype,
+	// 				(mp->number + getrandom(mp->number) + 1) / 2);
+	// 		break;
+	// 	default:
+	// 		u->MakeWMon(mp->name, montype,
+	// 				(mp->number + getrandom(mp->number) + 1) / 2);
+	// 		break;
+	// }
+	// u->MoveUnit(pObj);
 }
 
 Unit *Game::MakeManUnit(Faction *fac, int mantype, int num, int level, int weaponlevel, int armor, int behind)
