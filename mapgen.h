@@ -131,17 +131,45 @@ private:
 };
 
 
+// HINT: map is generated using perlin noise, look here what is this https://adrianb.io/2014/08/09/perlinnoise.html
+//       chapter "Working with Octaves" has good picture of what is going on with different frequencies and amplitudes
+
 class Map {
 public:
     Map(int width, int height);
 
+    // HINT: min and max temperature on the map
+    //       to get more temparate map decrease max temp
     int minTemp;
     int maxTemp;
+
+    // HINT: water hexes produce moisture, this variable controls how much moisture is produced which can later be used to calculate rainfall
     double evoparation;
+
+    // HINT: not used anymore
     double redistribution;
+
+    // HINT: controls perlin noise generation frequency peramters
+    //       increasing this will add more noise to the map
+    //       this add distortions to large features (by cereating samll ones :) )
+    //       by default set to 5
     double frequency;
+
+    // HINT: controls perlin noise generation frequency peramters
+    //       increasing this value will create more larger features
+    //       decreasing this value will create less larger features
+    //       this means bigger the number more hills and mountains, less the value more flat map
+    //       by default set to 0.5
     double amplitude;
+
+    // HINT: how much % must be water
+    //       water will take all the lowest points
+    //       takes values from 0 to 1
     double waterPercent;
+
+    // HINT: how much % must be mountains
+    //       mountains will take all the highest points
+    //       takes values from 0 to 1
     double mountainPercent;
 
     CellMap map;

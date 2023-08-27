@@ -52,6 +52,9 @@ const int MAX_TEMP = 1000;
 
 const int MAX_RAINFALL = 1000;
 
+// HINT: this table controls what types of hexes will be used
+//       main thing is temperature and rainfall
+//       temperature sets in which temerature range biome can appear and rainfall determines exact type for that temperature range based on available moisture
 const std::vector<Biome> BIOMES = {
     // -10
     { name: B_TUNDRA,                     feritality: 0.6, temp: { -1000,    0 }, rainfall: {   0,  200 } },
@@ -259,6 +262,8 @@ double density(double saturation, int temperature) {
     return P;
 }
 
+// HINT: this constant is used to calculate temperature change by altitude
+//       temperaure drops if altitude increases
 const double TEMP_ALT_CHANGE = 6.0 / 1000;  // temperature changes by 6°C every 1000m
 
 double temperature(double minTemp, double maxTemp, double axialTiltRad, double latitudeRad, int elevation) {
@@ -426,6 +431,8 @@ void Map::Generate() {
     std::vector<Blob*> blobs;
 
     // 0. elevation
+    // HINT: this variable tells what is difference between min and max elevation
+    //       to have more flat map set decrease this value
     const int ELEVATION = 16000;    // elevation range is 16km
     int minElevation = ELEVATION;
     int maxElevation = 0;

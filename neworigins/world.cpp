@@ -429,10 +429,14 @@ void Game::CreateWorld()
 	else {
 		Map* map = new Map(xx * 2, yy * 2);
 		map->redistribution = 1.5;
+		// HINT: increase this value to get more moisture
 		map->evoparation = 0.75;
 		map->mountainPercent = 0.1;
 		map->waterPercent = 0.1;
 
+		// HINT: it creates just surface with the new algorithm
+		//       other levels can be generated as you wish
+		//       shafts are places at the very end of map generation process when all levels are created
 		regions.CreateNaturalSurfaceLevel(map);
 	}
 
