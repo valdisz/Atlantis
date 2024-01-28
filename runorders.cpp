@@ -587,7 +587,7 @@ void Game::Do1Destroy(ARegion *r, Object *o, Unit *u) {
 	int destroyPower;
 	switch (behavior) {
 		case DestroyBehavior::PER_SKILL:
-			destroyPower = u->GetMen() * std::max(1, u->GetSkill(S_BUILDING));
+			destroyPower = u->GetMen() * (1 + u->GetSkill(S_BUILDING));
 			break;
 
 		case DestroyBehavior::PER_FIGURE:
